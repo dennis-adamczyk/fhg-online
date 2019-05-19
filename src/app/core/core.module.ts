@@ -8,7 +8,7 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 
 import { ServiceWorkerModule } from '@angular/service-worker';
 
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 @NgModule({
   declarations: [],
