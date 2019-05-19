@@ -1,8 +1,27 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireFunctionsModule } from '@angular/fire/functions';
+import { AngularFireStorageModule } from '@angular/fire/storage';
+
+import { ServiceWorkerModule } from '@angular/service-worker';
+
+import { environment } from 'src/environments/environment';
+
 @NgModule({
   declarations: [],
-  imports: [],
+  imports: [
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production
+    }),
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAuthModule,
+    AngularFirestoreModule,
+    AngularFireFunctionsModule,
+    AngularFireStorageModule
+  ],
   exports: []
 })
 export class CoreModule {
