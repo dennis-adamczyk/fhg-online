@@ -9,9 +9,15 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { environment } from '../../environments/environment';
+import { NavigationComponent } from './navigation/navigation.component';
+import { LayoutModule } from '@angular/cdk/layout';
+import { SharedModule } from '../shared/shared.module';
+import { AppToolbarService } from './services/app-toolbar.service';
+
+// TODO: Add Angular Fire Performance
 
 @NgModule({
-  declarations: [],
+  declarations: [NavigationComponent],
   imports: [
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production
@@ -20,9 +26,12 @@ import { environment } from '../../environments/environment';
     AngularFireAuthModule,
     AngularFirestoreModule,
     AngularFireFunctionsModule,
-    AngularFireStorageModule
+    AngularFireStorageModule,
+    LayoutModule,
+    SharedModule
   ],
-  exports: []
+  exports: [NavigationComponent],
+  providers: []
 })
 export class CoreModule {
   constructor(@Optional() @SkipSelf() parentModule: CoreModule) {
