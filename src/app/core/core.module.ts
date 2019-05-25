@@ -7,6 +7,7 @@ import { AngularFireFunctionsModule } from '@angular/fire/functions';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { RouterModule } from '@angular/router';
 
 import { environment } from '../../environments/environment';
 import { NavigationComponent } from './navigation/navigation.component';
@@ -27,6 +28,7 @@ import { AppToolbarService } from './services/app-toolbar.service';
     AngularFirestoreModule,
     AngularFireFunctionsModule,
     AngularFireStorageModule,
+    RouterModule,
     LayoutModule,
     SharedModule
   ],

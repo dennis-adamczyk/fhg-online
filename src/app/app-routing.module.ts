@@ -3,6 +3,18 @@ import { Routes, RouterModule } from '@angular/router';
 
 const routes: Routes = [
   {
+    path: 'timetable',
+    loadChildren: './modules/timetable/timetable.module#TimetableModule'
+  },
+  {
+    path: 'homework',
+    loadChildren: './modules/homework/homework.module#HomeworkModule'
+  },
+  {
+    path: 'calendar',
+    loadChildren: './modules/calendar/calendar.module#CalendarModule'
+  },
+  {
     path: '',
     loadChildren: './modules/home/home.module#HomeModule'
   }

@@ -1,3 +1,13 @@
+const domino = require('domino');
+const fs = require('fs');
+const path = require('path');
+const template = fs
+  .readFileSync(path.join(process.cwd(), 'dist/browser', 'index.html'))
+  .toString();
+const win = domino.createWindow(template);
+global['window'] = win;
+global['document'] = win.document;
+
 (global as any).WebSocket = require('ws');
 (global as any).XMLHttpRequest = require('xhr2');
 

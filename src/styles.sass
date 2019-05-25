@@ -1,4 +1,15 @@
-@import ./custom-theme.sass
+@import ~@angular/material/theming
+
++mat-core
+
+@import ./themes/light-theme.sass
+@import ./themes/dark-theme.sass
+
+.light-theme
+    +angular-material-theme($light-theme)
+
+.dark-theme
+    +angular-material-theme($dark-theme)
 
 html, body
     height: 100%

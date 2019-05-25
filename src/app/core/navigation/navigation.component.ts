@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, withLatestFrom, filter } from 'rxjs/operators';
 import { AppToolbarService, MenuItem } from '../services/app-toolbar.service';
+import { Router, NavigationEnd } from '@angular/router';
+import { MatSidenav } from '@angular/material';
+import * as Hammer from 'hammerjs';
 
 @Component({
   selector: 'app-navigation',
@@ -10,15 +13,45 @@ import { AppToolbarService, MenuItem } from '../services/app-toolbar.service';
   styleUrls: ['./navigation.component.sass']
 })
 export class NavigationComponent {
+  @ViewChild('drawer') drawer: MatSidenav;
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(map(result => result.matches));
   activeMenuItem$: Observable<MenuItem>;
+  extended: boolean = false;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
-    private toolbarService: AppToolbarService
+    private toolbarService: AppToolbarService,
+    private router: Router,
+    private elementRef: ElementRef
   ) {
     this.activeMenuItem$ = this.toolbarService.activeMenuItem$;
+    router.events
+      .pipe(
+        withLatestFrom(this.isHandset$),
+        filter(([a, b]) => b && a instanceof NavigationEnd)
+      )
+      .subscribe(_ => this.drawer.close());
+
+    const hammertime = new Hammer(elementRef.nativeElement, {});
+    hammertime.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+    hammertime.on('panright', ev => {
+      if (ev.pointerType !== 'mouse' && ev.center.x >= 1 && ev.center.x <= 50)
+        this.drawer.open();
+    });
+    hammertime.on('panleft', ev => {
+      if (ev.pointerType !== 'mouse') this.drawer.close();
+    });
+    hammertime.on('panup', event => false);
+    hammertime.on('pandown', event => false);
+  }
+
+  onExtendNavigation() {
+    this.extended = !this.extended;
+  }
+
+  onChange() {
+    if (!this.drawer.opened) this.extended = false;
   }
 }
