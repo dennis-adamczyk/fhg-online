@@ -13,7 +13,6 @@ import { environment } from '../../environments/environment';
 import { NavigationComponent } from './navigation/navigation.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { SharedModule } from '../shared/shared.module';
-import { AppToolbarService } from './services/app-toolbar.service';
 
 // TODO: Add Angular Fire Performance
 
