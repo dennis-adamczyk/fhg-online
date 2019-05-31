@@ -9,90 +9,137 @@
     [opened]="!(isHandset$ | async)"
   >
     <mat-toolbar [class.extended]="extended">
-      <img
-        src="assets/logo_white.svg"
-        alt="FHG Online"
-        class="logo"
-        routerLink="/"
-      />
-      <div class="classes">
-        <div class="class active">
-          <p>5B</p>
+      <ng-container *ngIf="auth.isLoggedIn()">
+        <div class="logo" routerLink="/">
+          <img src="assets/logo_white.svg" alt="FHG Online" />
         </div>
-      </div>
-      <div class="user">
-        <div class="text">
-          <p class="name">Maximilian Mustermann</p>
-          <p class="details">Schüler • 135 Punkte</p>
+
+        <div class="classes">
+          <div class="class active">
+            <p>{{ (auth.user$ | async)?.class }}</p>
+          </div>
         </div>
-        <button
-          type="button"
-          mat-icon-button
-          class="dropDown"
-          (click)="onExtendNavigation()"
-        >
-          <mat-icon mat-icon-button>arrow_drop_down</mat-icon>
-        </button>
-      </div>
+        <div class="user">
+          <div class="text">
+            <p class="name">
+              {{ name | async }}
+            </p>
+            <p class="details">Schüler • 135 Punkte</p>
+          </div>
+          <button
+            type="button"
+            mat-icon-button
+            class="dropDown"
+            (click)="onExtendNavigation()"
+          >
+            <mat-icon mat-icon-button>arrow_drop_down</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!auth.isLoggedIn()">
+        <div class="large">
+          <div class="logo" routerLink="/">
+            <img src="assets/logo_white.svg" alt="FHG Online" />
+          </div>
+          <p>FHG Online</p>
+        </div>
+      </ng-container>
     </mat-toolbar>
     <mat-nav-list class="sidenav-list">
-      <ng-container *ngIf="!extended">
-        <a
-          mat-list-item
-          routerLink="/"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <mat-icon mat-list-icon>home</mat-icon>
-          <p mat-line>Übersicht</p>
-        </a>
-        <a mat-list-item routerLink="/timetable" routerLinkActive="active">
-          <mat-icon mat-list-icon>access_time</mat-icon>
-          <p mat-line>Stundenplan</p>
-        </a>
-        <a mat-list-item routerLink="/homework" routerLinkActive="active">
-          <mat-icon mat-list-icon>list</mat-icon>
-          <p mat-line>Hausaufgaben</p>
-        </a>
-        <a mat-list-item routerLink="/calendar" routerLinkActive="active">
-          <mat-icon mat-list-icon>event</mat-icon>
-          <p mat-line>Kalender</p>
-        </a>
-        <mat-divider></mat-divider>
-        <a mat-list-item routerLink="/settings" routerLinkActive="active">
-          <mat-icon mat-list-icon>settings</mat-icon>
-          <p mat-line>Einstellungen</p>
-        </a>
-        <a mat-list-item routerLink="/help-feedback" routerLinkActive="active">
-          <mat-icon mat-list-icon>help</mat-icon>
-          <p mat-line>Hilfe & Feedback</p>
-        </a>
-        <a
-          mat-list-item
-          routerLink="/imprint-privacy"
-          routerLinkActive="active"
-        >
-          <mat-icon mat-list-icon>security</mat-icon>
-          <p mat-line>Impressum & Datenschutz</p>
-        </a>
+      <ng-container *ngIf="auth.isLoggedIn()">
+        <ng-container *ngIf="!extended">
+          <a
+            mat-list-item
+            routerLink="/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <mat-icon mat-list-icon>home</mat-icon>
+            <p mat-line>Übersicht</p>
+          </a>
+          <a mat-list-item routerLink="/timetable" routerLinkActive="active">
+            <mat-icon mat-list-icon>access_time</mat-icon>
+            <p mat-line>Stundenplan</p>
+          </a>
+          <a mat-list-item routerLink="/homework" routerLinkActive="active">
+            <mat-icon mat-list-icon>list</mat-icon>
+            <p mat-line>Hausaufgaben</p>
+          </a>
+          <a mat-list-item routerLink="/calendar" routerLinkActive="active">
+            <mat-icon mat-list-icon>event</mat-icon>
+            <p mat-line>Kalender</p>
+          </a>
+          <mat-divider></mat-divider>
+          <a mat-list-item routerLink="/settings" routerLinkActive="active">
+            <mat-icon mat-list-icon>settings</mat-icon>
+            <p mat-line>Einstellungen</p>
+          </a>
+          <a
+            mat-list-item
+            routerLink="/help-feedback"
+            routerLinkActive="active"
+          >
+            <mat-icon mat-list-icon>help</mat-icon>
+            <p mat-line>Hilfe & Feedback</p>
+          </a>
+          <a
+            mat-list-item
+            routerLink="/imprint-privacy"
+            routerLinkActive="active"
+          >
+            <mat-icon mat-list-icon>security</mat-icon>
+            <p mat-line>Impressum & Datenschutz</p>
+          </a>
+        </ng-container>
+        <ng-container *ngIf="extended">
+          <a
+            mat-list-item
+            routerLink="/settings#account"
+            routerLinkActive="active"
+          >
+            <mat-icon mat-list-icon>account_circle</mat-icon>
+            <p mat-line>Mein Konto</p>
+          </a>
+          <a mat-list-item routerLink="/logout" routerLinkActive="active">
+            <mat-icon mat-list-icon>exit_to_app</mat-icon>
+            <p mat-line>Abmelden</p>
+          </a>
+          <mat-divider></mat-divider>
+          <a
+            mat-list-item
+            routerLink="/help-feedback"
+            routerLinkActive="active"
+          >
+            <mat-icon mat-list-icon>help</mat-icon>
+            <p mat-line>Hilfe & Feedback</p>
+          </a>
+          <a
+            mat-list-item
+            routerLink="/imprint-privacy"
+            routerLinkActive="active"
+          >
+            <mat-icon mat-list-icon>security</mat-icon>
+            <p mat-line>Impressum & Datenschutz</p>
+          </a>
+        </ng-container>
       </ng-container>
-      <ng-container *ngIf="extended">
-        <a
-          mat-list-item
-          routerLink="/settings#account"
-          routerLinkActive="active"
-        >
-          <mat-icon mat-list-icon>account_circle</mat-icon>
-          <p mat-line>Mein Konto</p>
+      <ng-container *ngIf="!auth.isLoggedIn()">
+        <a mat-list-item routerLink="/" routerLinkActive="active">
+          <mat-icon mat-list-icon>home</mat-icon>
+          <p mat-line>Start</p>
         </a>
-        <a mat-list-item routerLink="/logout" routerLinkActive="active">
-          <mat-icon mat-list-icon>exit_to_app</mat-icon>
-          <p mat-line>Abmelden</p>
+        <a mat-list-item routerLink="/about" routerLinkActive="active">
+          <mat-icon mat-list-icon>group</mat-icon>
+          <p mat-line>Über Uns</p>
         </a>
         <mat-divider></mat-divider>
-        <a mat-list-item routerLink="/help-feedback" routerLinkActive="active">
-          <mat-icon mat-list-icon>help</mat-icon>
-          <p mat-line>Hilfe & Feedback</p>
+        <a mat-list-item routerLink="/login" routerLinkActive="active">
+          <mat-icon mat-list-icon>exit_to_app</mat-icon>
+          <p mat-line>Anmelden</p>
+        </a>
+        <a mat-list-item routerLink="/login/register" routerLinkActive="active">
+          <mat-icon mat-list-icon>person_add</mat-icon>
+          <p mat-line>Registrieren</p>
         </a>
         <a
           mat-list-item
@@ -117,7 +164,7 @@
       >
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <span>{{ (activeMenuItem$ | async)?.title }}</span>
+      <span>{{ (activeMenuItem$ | async)?.title || 'FHG Online' }}</span>
     </mat-toolbar>
     <main>
       <ng-content></ng-content>

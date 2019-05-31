@@ -69,7 +69,7 @@ export class FirestoreService {
       );
   }
 
-  public docWithIds$<T>(ref: DocPredicate<T>): Observable<any> {
+  public docWithId$<T>(ref: DocPredicate<T>): Observable<any> {
     return this.doc(ref)
       .snapshotChanges()
       .pipe(

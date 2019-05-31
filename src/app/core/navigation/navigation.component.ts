@@ -6,6 +6,7 @@ import { AppToolbarService, MenuItem } from '../services/app-toolbar.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { MatSidenav } from '@angular/material';
 import * as Hammer from 'hammerjs';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-navigation',
@@ -19,12 +20,14 @@ export class NavigationComponent {
     .pipe(map(result => result.matches));
   activeMenuItem$: Observable<MenuItem>;
   extended: boolean = false;
+  name: Observable<any>;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
     private toolbarService: AppToolbarService,
     private router: Router,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    public auth: AuthService
   ) {
     this.activeMenuItem$ = this.toolbarService.activeMenuItem$;
     router.events
@@ -33,6 +36,10 @@ export class NavigationComponent {
         filter(([a, b]) => b && a instanceof NavigationEnd)
       )
       .subscribe(_ => this.drawer.close());
+
+    this.auth.isLoggedIn().subscribe(x => console.log(x));
+
+    this.name = this.auth.displayName;
 
     const hammertime = new Hammer(elementRef.nativeElement, {});
     hammertime.get('pan').set({ direction: Hammer.DIRECTION_ALL });

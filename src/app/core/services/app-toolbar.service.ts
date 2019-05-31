@@ -26,7 +26,8 @@ export class AppToolbarService {
       map(_ => this.router.routerState.root),
       map(route => {
         let active = this.lastRouteWithMenuItem(route.root);
-        this.titleService.setTitle(active.title + ' ◂ FHG Online');
+        if (active.title)
+          this.titleService.setTitle(active.title + ' ◂ FHG Online');
         this.meta.addTag({ name: 'description', content: active.description });
         return active;
       })
