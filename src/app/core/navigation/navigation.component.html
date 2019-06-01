@@ -8,23 +8,23 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="!(isHandset$ | async)"
   >
-    <mat-toolbar [class.extended]="extended">
-      <ng-container *ngIf="auth.isLoggedIn()">
+    <mat-toolbar [class.extended]="extended && (auth.user$ | async)">
+      <ng-container *ngIf="auth.user$ | async as user">
         <div class="logo" routerLink="/">
           <img src="assets/logo_white.svg" alt="FHG Online" />
         </div>
 
         <div class="classes">
           <div class="class active">
-            <p>{{ (auth.user$ | async)?.class }}</p>
+            <p>{{ user.class }}</p>
           </div>
         </div>
         <div class="user">
           <div class="text">
             <p class="name">
-              {{ name | async }}
+              {{ auth.getDisplayName(user) }}
             </p>
-            <p class="details">Schüler • 135 Punkte</p>
+            <p class="details">{{ auth.getRoleName(user) }}</p>
           </div>
           <button
             type="button"
@@ -36,7 +36,7 @@
           </button>
         </div>
       </ng-container>
-      <ng-container *ngIf="!auth.isLoggedIn()">
+      <ng-container *ngIf="!(auth.user$ | async)">
         <div class="large">
           <div class="logo" routerLink="/">
             <img src="assets/logo_white.svg" alt="FHG Online" />
@@ -46,7 +46,7 @@
       </ng-container>
     </mat-toolbar>
     <mat-nav-list class="sidenav-list">
-      <ng-container *ngIf="auth.isLoggedIn()">
+      <ng-container *ngIf="auth.user$ | async as user">
         <ng-container *ngIf="!extended">
           <a
             mat-list-item
@@ -123,8 +123,13 @@
           </a>
         </ng-container>
       </ng-container>
-      <ng-container *ngIf="!auth.isLoggedIn()">
-        <a mat-list-item routerLink="/" routerLinkActive="active">
+      <ng-container *ngIf="!(auth.user$ | async)">
+        <a
+          mat-list-item
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
           <mat-icon mat-list-icon>home</mat-icon>
           <p mat-line>Start</p>
         </a>
@@ -133,7 +138,12 @@
           <p mat-line>Über Uns</p>
         </a>
         <mat-divider></mat-divider>
-        <a mat-list-item routerLink="/login" routerLinkActive="active">
+        <a
+          mat-list-item
+          routerLink="/login"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
           <mat-icon mat-list-icon>exit_to_app</mat-icon>
           <p mat-line>Anmelden</p>
         </a>
@@ -164,7 +174,7 @@
       >
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <span>{{ (activeMenuItem$ | async)?.title || 'FHG Online' }}</span>
+      <span>{{ (activeMenuItem$ | async)?.title }}</span>
     </mat-toolbar>
     <main>
       <ng-content></ng-content>

@@ -1,3 +1,69 @@
-<p>
-  login works!
-</p>
+<div class="login">
+  <div class="title">
+    <p class="maintitle">Wilkommen bei <span>FHG Online</span></p>
+    <p class="subtitle">- Deinem Online Schulaner -</p>
+  </div>
+  <form [formGroup]="loginForm">
+    <mat-form-field hideRequiredMarker>
+      <mat-label>E-Mail</mat-label>
+      <input
+        matInput
+        type="email"
+        placeholder="vorname.nachname"
+        formControlName="email"
+        required
+      />
+      <p matSuffix>@franz-haniel-gym….eu</p>
+      <mat-error *ngIf="email.invalid">{{ getEmailErrorMessage() }}</mat-error>
+    </mat-form-field>
+    <mat-form-field hideRequiredMarker>
+      <mat-label>Passwort</mat-label>
+      <input
+        (keyup.enter)="submit(); (false)"
+        matInput
+        [type]="showPassword ? 'text' : 'password'"
+        formControlName="password"
+        required
+      />
+      <mat-icon
+        mat-icon-button
+        matSuffix
+        (click)="showPassword = !showPassword"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="showPassword"
+        class="passwordVisibility"
+        >{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon
+      >
+      <mat-error *ngIf="password.invalid">{{
+        getPasswordErrorMessage()
+      }}</mat-error>
+    </mat-form-field>
+    <a class="forgotPassword" routerLink="/login/forgotPassword"
+      >Passwort vergessen?</a
+    >
+    <div id="recaptcha-container"></div>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="loginForm.invalid"
+      class="submit"
+      (click)="submit()"
+    >
+      <ng-container *ngIf="loading">
+        <mat-spinner [diameter]="24"></mat-spinner>
+      </ng-container>
+      <ng-container *ngIf="!loading">
+        Anmelden
+      </ng-container>
+    </button>
+    <button
+      type="button"
+      mat-flat-button
+      class="register"
+      routerLink="/login/register"
+    >
+      Kein Konto? Jetzt Registrieren
+    </button>
+  </form>
+</div>

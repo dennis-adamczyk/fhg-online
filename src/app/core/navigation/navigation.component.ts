@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map, withLatestFrom, filter } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, withLatestFrom, filter, tap } from 'rxjs/operators';
 import { AppToolbarService, MenuItem } from '../services/app-toolbar.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { MatSidenav } from '@angular/material';
@@ -20,7 +20,6 @@ export class NavigationComponent {
     .pipe(map(result => result.matches));
   activeMenuItem$: Observable<MenuItem>;
   extended: boolean = false;
-  name: Observable<any>;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -36,10 +35,6 @@ export class NavigationComponent {
         filter(([a, b]) => b && a instanceof NavigationEnd)
       )
       .subscribe(_ => this.drawer.close());
-
-    this.auth.isLoggedIn().subscribe(x => console.log(x));
-
-    this.name = this.auth.displayName;
 
     const hammertime = new Hammer(elementRef.nativeElement, {});
     hammertime.get('pan').set({ direction: Hammer.DIRECTION_ALL });

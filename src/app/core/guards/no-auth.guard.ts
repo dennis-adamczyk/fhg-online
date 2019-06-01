@@ -5,9 +5,9 @@ import {
   RouterStateSnapshot,
   Router
 } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { map, take, tap } from 'rxjs/operators';
+import { map, take, tap, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -19,11 +19,11 @@ export class NoAuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | boolean {
-    return this.auth.authUser$.pipe(
+    return this.auth.user$.pipe(
       take(1),
       map(user => !user),
-      tap(loggedIn => {
-        if (loggedIn) {
+      tap(loggedOut => {
+        if (!loggedOut) {
           this.router.navigate(['/']);
         }
       })
