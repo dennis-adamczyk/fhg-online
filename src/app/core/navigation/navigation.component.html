@@ -141,8 +141,7 @@
         <a
           mat-list-item
           routerLink="/login"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
+          [class.active]="isLinkActive('/login')"
         >
           <mat-icon mat-list-icon>exit_to_app</mat-icon>
           <p mat-line>Anmelden</p>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { message } from '../../../../../messages/messages';
 import * as firebase from 'firebase';
 
@@ -19,8 +19,7 @@ export class LoginComponent implements OnInit {
   constructor(
     public auth: AuthService,
     private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {

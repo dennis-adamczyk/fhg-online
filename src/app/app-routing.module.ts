@@ -6,27 +6,27 @@ import { NoAuthGuard } from './core/guards/no-auth.guard';
 const routes: Routes = [
   {
     path: 'timetable',
-    loadChildren: './modules/timetable/timetable.module#TimetableModule',
+    loadChildren: () => import('./modules/timetable/timetable.module').then(m => m.TimetableModule),
     canActivate: [AuthGuard]
   },
   {
     path: 'homework',
-    loadChildren: './modules/homework/homework.module#HomeworkModule',
+    loadChildren: () => import('./modules/homework/homework.module').then(m => m.HomeworkModule),
     canActivate: [AuthGuard]
   },
   {
     path: 'calendar',
-    loadChildren: './modules/calendar/calendar.module#CalendarModule',
+    loadChildren: () => import('./modules/calendar/calendar.module').then(m => m.CalendarModule),
     canActivate: [AuthGuard]
   },
   {
     path: 'login',
-    loadChildren: './modules/login/login.module#LoginModule',
+    loadChildren: () => import('./modules/login/login.module').then(m => m.LoginModule),
     canActivate: [NoAuthGuard]
   },
   {
     path: '',
-    loadChildren: './modules/home/home.module#HomeModule',
+    loadChildren: () => import('./modules/home/home.module').then(m => m.HomeModule),
     canActivate: [AuthGuard]
   }
 ];

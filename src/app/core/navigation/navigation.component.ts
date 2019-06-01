@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { map, withLatestFrom, filter, tap } from 'rxjs/operators';
 import { AppToolbarService, MenuItem } from '../services/app-toolbar.service';
 import { Router, NavigationEnd } from '@angular/router';
-import { MatSidenav } from '@angular/material';
+import { MatSidenav } from '@angular/material/sidenav';
 import * as Hammer from 'hammerjs';
 import { AuthService } from '../services/auth.service';
 
@@ -14,7 +14,7 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./navigation.component.sass']
 })
 export class NavigationComponent {
-  @ViewChild('drawer') drawer: MatSidenav;
+  @ViewChild('drawer', { static: false }) drawer: MatSidenav;
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(map(result => result.matches));
@@ -55,5 +55,12 @@ export class NavigationComponent {
 
   onChange() {
     if (!this.drawer.opened) this.extended = false;
+  }
+
+  isLinkActive(url: string) {
+    let charPos = this.router.url.indexOf('?');
+    let cleanUrl =
+      charPos !== -1 ? this.router.url.slice(0, charPos) : this.router.url;
+    return cleanUrl === url;
   }
 }

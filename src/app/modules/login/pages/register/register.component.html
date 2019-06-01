@@ -1,3 +1,193 @@
-<p>
-  register works!
-</p>
+<div class="register">
+  <p class="tagline">
+    Erstelle dein Konto in 5 einfachen Schritten
+  </p>
+  <form [formGroup]="registerForm">
+    <mat-vertical-stepper
+      formArrayName="formArray"
+      linear="true"
+      class="stepper"
+      #stepper
+    >
+      <mat-step
+        formGroupName="0"
+        [stepControl]="formArray?.get([0])"
+        class="role"
+      >
+        <ng-template matStepLabel>Wer bist du?</ng-template>
+        <div class="content">
+          <p>Ich bin ein…</p>
+          <mat-radio-group formControlName="role" required>
+            <mat-radio-button value="student" color="primary"
+              >Schüler</mat-radio-button
+            >
+            <mat-radio-button value="teacher" color="primary"
+              >Lehrer</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step
+        formGroupName="1"
+        [stepControl]="formArray?.get([1])"
+        class="email"
+      >
+        <ng-template matStepLabel>Deine iServ-E-Mail eingeben</ng-template>
+        <div class="content">
+          <mat-form-field>
+            <mat-label>E-Mail</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="vorname.nachname"
+              formControlName="email"
+              required
+            />
+            <p matSuffix>@franz-haniel-gym….eu</p>
+          </mat-form-field>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+          <button mat-button matStepperPrevious type="button">
+            Zurück
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step
+        formGroupName="2"
+        [stepControl]="formArray?.get([2])"
+        class="name"
+      >
+        <ng-template matStepLabel>Namen überprüfen</ng-template>
+        <div class="content">
+          <p>Ist das dein Name?</p>
+          <mat-form-field>
+            <mat-label>Vorname</mat-label>
+            <input matInput type="text" formControlName="first_name" required />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Nachname</mat-label>
+            <input matInput type="text" formControlName="last_name" required />
+          </mat-form-field>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+          <button mat-button matStepperPrevious type="button">
+            Zurück
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step
+        formGroupName="3"
+        [stepControl]="formArray?.get([3])"
+        class="class"
+      >
+        <ng-template matStepLabel>Klasse eingeben</ng-template>
+        <div class="content">
+          <mat-form-field>
+            <mat-label>Klasse</mat-label>
+            <mat-select>
+              <mat-option>None</mat-option>
+              <mat-option value="option1">Option 1</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+          <button mat-button matStepperPrevious type="button">
+            Zurück
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step
+        formGroupName="4"
+        [stepControl]="formArray?.get([4])"
+        class="password"
+      >
+        <ng-template matStepLabel>Passwort festlegen</ng-template>
+        <div class="content">
+          <mat-form-field>
+            <mat-label>Passwort</mat-label>
+            <input
+              matInput
+              type="password"
+              formControlName="password1"
+              required
+            />
+            <mat-icon
+              mat-icon-button
+              matSuffix
+              [attr.aria-label]="'Hide password'"
+              class="passwordVisibility"
+              >visibility_off</mat-icon
+            >
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Passwort wiederholen</mat-label>
+            <input
+              matInput
+              type="password"
+              formControlName="password2"
+              required
+            />
+            <mat-icon
+              mat-icon-button
+              matSuffix
+              [attr.aria-label]="'Hide password'"
+              class="passwordVisibility"
+              >visibility_off</mat-icon
+            >
+          </mat-form-field>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+          <button mat-button matStepperPrevious type="button">
+            Zurück
+          </button>
+        </div>
+      </mat-step>
+    </mat-vertical-stepper>
+  </form>
+</div>
