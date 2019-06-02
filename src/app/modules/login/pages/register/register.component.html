@@ -7,15 +7,12 @@
       formArrayName="formArray"
       linear="true"
       class="stepper"
+      (selectionChange)="onStepChange($event)"
       #stepper
     >
-      <mat-step
-        formGroupName="0"
-        [stepControl]="formArray?.get([0])"
-        class="role"
-      >
+      <mat-step formGroupName="0" [stepControl]="formArray?.get([0])">
         <ng-template matStepLabel>Wer bist du?</ng-template>
-        <div class="content">
+        <div class="content role">
           <p>Ich bin ein…</p>
           <mat-radio-group formControlName="role" required>
             <mat-radio-button value="student" color="primary"
@@ -24,6 +21,9 @@
             <mat-radio-button value="teacher" color="primary"
               >Lehrer</mat-radio-button
             >
+            <mat-error *ngIf="role.invalid && role.touched">{{
+              getRoleErrorMessage()
+            }}</mat-error>
           </mat-radio-group>
         </div>
         <div class="bottom">
@@ -38,13 +38,9 @@
         </div>
       </mat-step>
 
-      <mat-step
-        formGroupName="1"
-        [stepControl]="formArray?.get([1])"
-        class="email"
-      >
+      <mat-step formGroupName="1" [stepControl]="formArray?.get([1])">
         <ng-template matStepLabel>Deine iServ-E-Mail eingeben</ng-template>
-        <div class="content">
+        <div class="content email">
           <mat-form-field>
             <mat-label>E-Mail</mat-label>
             <input
@@ -52,9 +48,14 @@
               type="text"
               placeholder="vorname.nachname"
               formControlName="email"
+              autocorrect="off"
+              autocapitalize="none"
               required
             />
             <p matSuffix>@franz-haniel-gym….eu</p>
+            <mat-error *ngIf="email.invalid">{{
+              getEmailErrorMessage()
+            }}</mat-error>
           </mat-form-field>
         </div>
         <div class="bottom">
@@ -72,21 +73,23 @@
         </div>
       </mat-step>
 
-      <mat-step
-        formGroupName="2"
-        [stepControl]="formArray?.get([2])"
-        class="name"
-      >
+      <mat-step formGroupName="2" [stepControl]="formArray?.get([2])">
         <ng-template matStepLabel>Namen überprüfen</ng-template>
-        <div class="content">
+        <div class="content name">
           <p>Ist das dein Name?</p>
           <mat-form-field>
             <mat-label>Vorname</mat-label>
             <input matInput type="text" formControlName="first_name" required />
+            <mat-error *ngIf="first_name.invalid">{{
+              getFirstNameErrorMessage()
+            }}</mat-error>
           </mat-form-field>
           <mat-form-field>
             <mat-label>Nachname</mat-label>
             <input matInput type="text" formControlName="last_name" required />
+            <mat-error *ngIf="last_name.invalid">{{
+              getLastNameErrorMessage()
+            }}</mat-error>
           </mat-form-field>
         </div>
         <div class="bottom">
@@ -104,19 +107,17 @@
         </div>
       </mat-step>
 
-      <mat-step
-        formGroupName="3"
-        [stepControl]="formArray?.get([3])"
-        class="class"
-      >
+      <mat-step formGroupName="3" [stepControl]="formArray?.get([3])">
         <ng-template matStepLabel>Klasse eingeben</ng-template>
-        <div class="content">
+        <div class="content class">
           <mat-form-field>
             <mat-label>Klasse</mat-label>
-            <mat-select>
-              <mat-option>None</mat-option>
-              <mat-option value="option1">Option 1</mat-option>
+            <mat-select formControlName="class">
+              <mat-option value="5b">5b</mat-option>
             </mat-select>
+            <mat-error *ngIf="class.invalid">{{
+              getClassErrorMessage()
+            }}</mat-error>
           </mat-form-field>
         </div>
         <div class="bottom">
@@ -134,54 +135,63 @@
         </div>
       </mat-step>
 
-      <mat-step
-        formGroupName="4"
-        [stepControl]="formArray?.get([4])"
-        class="password"
-      >
+      <mat-step formGroupName="4" [stepControl]="formArray?.get([4])">
         <ng-template matStepLabel>Passwort festlegen</ng-template>
-        <div class="content">
+        <div class="content password">
           <mat-form-field>
             <mat-label>Passwort</mat-label>
             <input
               matInput
-              type="password"
+              [type]="showPassword1 ? 'text' : 'password'"
               formControlName="password1"
               required
             />
             <mat-icon
               mat-icon-button
               matSuffix
+              (click)="showPassword1 = !showPassword1"
               [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="showPassword1"
               class="passwordVisibility"
-              >visibility_off</mat-icon
+              >{{ showPassword1 ? 'visibility_off' : 'visibility' }}</mat-icon
             >
+            <mat-error *ngIf="password1.invalid">{{
+              getPassword1ErrorMessage()
+            }}</mat-error>
           </mat-form-field>
           <mat-form-field>
             <mat-label>Passwort wiederholen</mat-label>
             <input
               matInput
-              type="password"
+              [type]="showPassword2 ? 'text' : 'password'"
               formControlName="password2"
               required
             />
             <mat-icon
               mat-icon-button
               matSuffix
+              (click)="showPassword2 = !showPassword2"
               [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="showPassword2"
               class="passwordVisibility"
-              >visibility_off</mat-icon
+              >{{ showPassword2 ? 'visibility_off' : 'visibility' }}</mat-icon
             >
+            <mat-error *ngIf="password2.invalid">{{
+              getPassword2ErrorMessage()
+            }}</mat-error>
           </mat-form-field>
         </div>
         <div class="bottom">
           <button
             mat-raised-button
-            matStepperNext
+            (click)="onSubmit()"
+            [disabled]="registerForm.invalid"
+            type="submit"
+            class="submit"
             color="primary"
             type="button"
           >
-            Weiter
+            Fertig
           </button>
           <button mat-button matStepperPrevious type="button">
             Zurück

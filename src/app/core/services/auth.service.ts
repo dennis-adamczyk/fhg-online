@@ -4,7 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { of, Observable, forkJoin } from 'rxjs';
 import { User } from '../models/user.model';
 import { FirestoreService } from './firestore.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, startWith, tap } from 'rxjs/operators';
 import { message } from '../../../messages/messages';
 
 @Injectable({

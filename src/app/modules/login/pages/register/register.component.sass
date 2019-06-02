@@ -13,3 +13,65 @@
 
     .stepper
         background-color: inherit
+
+        .content
+            p
+                margin: 0
+                padding: 0
+                font-size: 14px
+                font-weight: 400
+
+            &.role
+                mat-radio-group
+                    display: block
+                    margin: 12px 0
+
+                    mat-radio-button
+                        display: block
+                        padding: 8px 0
+
+            &.email
+                mat-form-field
+                    width: 100%
+
+                    p[matSuffix]
+                        font-size: 12px
+
+            &.name
+                display: flex
+                justify-content: space-between
+                flex-wrap: wrap
+
+                p
+                    width: 100%
+
+                mat-form-field
+                    margin: 12px 0 0 0
+                    width: calc(50% - 4px)
+
+            &.password
+                mat-form-field
+                    width: 100%
+
+                    .passwordVisibility
+                        user-select: none
+                        cursor: pointer
+                        color: mat-color($foreground-light, secondary-text)
+
+
+        .bottom
+            margin: 16px 0 0 0
+
+            button
+                text-transform: uppercase
+
+                &.submit[disabled]
+                    background-color: rgba(mat-color($primary-light), .54)
+                    color: mat-color($foreground-dark, text)
+
+                &:first-child
+                    margin: 0 8px 0 0
+
+                &[matStepperPrevious]
+                    background-color: mat-color($background-light, disabled-button)
+                    color: mat-color($foreground-light, secondary-text)

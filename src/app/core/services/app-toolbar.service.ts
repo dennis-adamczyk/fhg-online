@@ -30,7 +30,7 @@ export class AppToolbarService {
           this.titleService.setTitle(active.title + ' ◂ FHG Online');
         this.meta.addTag({
           name: 'description',
-          content: active && active.description ? active.description : null
+          content: active && active.description ? active.description : ''
         });
         return active;
       })

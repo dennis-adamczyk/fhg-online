@@ -3,10 +3,13 @@ import {
   FormGroup,
   FormBuilder,
   Validators,
-  FormArray,
   AbstractControl
 } from '@angular/forms';
-import { AuthService } from 'src/app/core/services/auth.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { FirestoreService } from '../../../../core/services/firestore.service';
+import { take, debounceTime, map } from 'rxjs/operators';
+import { message } from '../../../../../messages/messages';
+import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -15,34 +18,205 @@ import { AuthService } from 'src/app/core/services/auth.service';
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
+  showPassword1: boolean;
+  showPassword2: boolean;
 
-  constructor(public auth: AuthService, private fb: FormBuilder) {}
+  constructor(
+    public auth: AuthService,
+    private fb: FormBuilder,
+    private db: FirestoreService
+  ) {}
 
   ngOnInit() {
+    this.showPassword1 = false;
+    this.showPassword2 = false;
     this.registerForm = this.fb.group({
       formArray: this.fb.array([
         this.fb.group({
-          role: ['']
+          role: [
+            '',
+            [Validators.required, Validators.pattern(/^student$|^teacher$/)]
+          ]
         }),
         this.fb.group({
-          email: ['']
+          email: [
+            '',
+            [
+              Validators.required,
+              Validators.minLength(3),
+              Validators.pattern(/^([\w-]+\.[\w-]+)+$/)
+            ],
+            RegisterValidator.email(this.db)
+          ]
         }),
         this.fb.group({
-          first_name: [''],
-          last_name: ['']
+          first_name: [
+            '',
+            [Validators.required, Validators.pattern(/^(\w+-?\w+\s?)+$/)]
+          ],
+          last_name: [
+            '',
+            [Validators.required, Validators.pattern(/^(\w+-?\w+\s?)+$/)]
+          ]
         }),
         this.fb.group({
-          class: ['']
+          class: [
+            '',
+            [Validators.required, Validators.pattern(/^[5-9][a-f]|EF|Q1|Q2$/i)]
+          ]
         }),
-        this.fb.group({
-          password1: [''],
-          password2: ['']
-        })
+        this.fb.group(
+          {
+            password1: ['', [Validators.required, Validators.minLength(6)]],
+            password2: ['', [Validators.required]]
+          },
+          { validator: RegisterValidator.passwordConfirmed }
+        )
       ])
     });
   }
 
-  get formArray(): AbstractControl | null {
+  get formArray(): AbstractControl {
     return this.registerForm.get('formArray');
+  }
+
+  get role() {
+    return this.formArray.get([0]).get('role');
+  }
+
+  get email() {
+    return this.formArray.get([1]).get('email');
+  }
+
+  get first_name() {
+    return this.formArray.get([2]).get('first_name');
+  }
+
+  get last_name() {
+    return this.formArray.get([2]).get('last_name');
+  }
+
+  get class() {
+    return this.formArray.get([3]).get('class');
+  }
+
+  get password1() {
+    return this.formArray.get([4]).get('password1');
+  }
+
+  get password2() {
+    return this.formArray.get([4]).get('password2');
+  }
+
+  getRoleErrorMessage(): string {
+    if (this.role.hasError('required')) {
+      return message.errors.register.role.required;
+    }
+    if (this.role.hasError('pattern')) {
+      return message.errors.register.role.pattern;
+    }
+  }
+
+  getEmailErrorMessage(): string {
+    if (this.email.hasError('required')) {
+      return message.errors.register.email.required;
+    }
+    if (this.email.hasError('minlength')) {
+      return message.errors.register.email.minlength;
+    }
+    if (this.email.hasError('pattern')) {
+      return message.errors.register.email.pattern;
+    }
+    if (this.email.hasError('alreadyExists')) {
+      return message.errors.register.email.alreadyExists;
+    }
+  }
+
+  getFirstNameErrorMessage(): string {
+    if (this.first_name.hasError('required')) {
+      return message.errors.register.first_name.required;
+    }
+    if (this.first_name.hasError('pattern')) {
+      return message.errors.register.first_name.pattern;
+    }
+  }
+
+  getLastNameErrorMessage(): string {
+    if (this.last_name.hasError('required')) {
+      return message.errors.register.last_name.required;
+    }
+    if (this.last_name.hasError('pattern')) {
+      return message.errors.register.last_name.pattern;
+    }
+  }
+
+  getClassErrorMessage(): string {
+    if (this.class.hasError('required')) {
+      return message.errors.register.class.required;
+    }
+    if (this.class.hasError('pattern')) {
+      return message.errors.register.class.pattern;
+    }
+  }
+
+  getPassword1ErrorMessage(): string {
+    if (this.password1.hasError('required')) {
+      return message.errors.register.password1.required;
+    }
+    if (this.password1.hasError('minlength')) {
+      return message.errors.register.password1.minlength;
+    }
+  }
+
+  getPassword2ErrorMessage(): string {
+    if (this.password2.hasError('required')) {
+      return message.errors.register.password2.required;
+    }
+    if (this.password2.hasError('notMatch')) {
+      return message.errors.register.password2.notMatch;
+    }
+  }
+
+  onStepChange(event: any) {
+    if (event.selectedIndex == 2) {
+      if (this.first_name.untouched && this.last_name.untouched) {
+        let splitedName = String(this.email.value).split(/\.(.+)/);
+
+        this.first_name.setValue(this.capitalizeFirstLetter(splitedName[0]));
+        this.last_name.setValue(this.capitalizeFirstLetter(splitedName[1]));
+      }
+    }
+  }
+
+  private capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  onSubmit() {}
+}
+
+export class RegisterValidator {
+  static email(db: FirestoreService) {
+    return (control: AbstractControl) => {
+      const email =
+        String(control.value).toLowerCase() + '@franz-haniel-gymnasium.eu';
+      return db
+        .col$('users', ref => ref.where('email', '==', email))
+        .pipe(
+          debounceTime(500),
+          take(1),
+          map(arr => (arr.length ? { alreadyExists: true } : null))
+        );
+    };
+  }
+
+  static passwordConfirmed(control: AbstractControl) {
+    if (
+      control.get('password1').value !== control.get('password2').value &&
+      control.get('password2').valid
+    ) {
+      control.get('password2').setErrors({ notMatch: true });
+    }
+    return null;
   }
 }

@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { message } from '../../../../../messages/messages';
 import * as firebase from 'firebase';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',

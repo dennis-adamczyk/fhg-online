@@ -4,11 +4,15 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 
 const routes: Routes = [
-  { path: '', component: LoginComponent, data: { title: 'Anmelden' } },
+  {
+    path: '',
+    component: LoginComponent,
+    data: { title: 'Anmelden', description: '' }
+  },
   {
     path: 'register',
     component: RegisterComponent,
-    data: { title: 'Registrieren' }
+    data: { title: 'Registrieren', description: '' }
   }
 ];
 

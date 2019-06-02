@@ -10,12 +10,44 @@ export const message = {
       email: {
         required: 'E-Mail benötigt',
         minlength: 'Gib mindestens 3 Zeichen ein',
-        pattern: 'Benutze das Format <Vorname>.<Nachname>',
+        pattern: 'Benutze das Format vorname.nachname',
         notFound: 'E-Mail nicht vergeben'
       },
       password: {
         required: 'Passwort benötigt',
         wrong: 'Falsches Passwort'
+      }
+    },
+    register: {
+      role: {
+        required: 'Rolle benötigt',
+        pattern: 'Gib eine gültige Rolle an'
+      },
+      email: {
+        required: 'E-Mail benötigt',
+        minlength: 'Gib mindestens 3 Zeichen ein',
+        pattern: 'Benutze das Format vorname.nachname',
+        alreadyExists: 'E-Mail wird bereits verwendet'
+      },
+      first_name: {
+        required: 'Vorname benötigt',
+        pattern: 'Gib einen gültigen Vornamen ein'
+      },
+      last_name: {
+        required: 'Nachname benötigt',
+        pattern: 'Gib einen gültigen Nachnamen ein'
+      },
+      class: {
+        required: 'Klasse benötigt',
+        pattern: 'Gib eine gültige Klasse an'
+      },
+      password1: {
+        required: 'Passwort benötigt',
+        minlength: 'Gib mindestens 6 Zeichen ein'
+      },
+      password2: {
+        required: 'Wiederhole das Passwort',
+        notMatch: 'Passwörter stimmen nicht überein'
       }
     }
   }

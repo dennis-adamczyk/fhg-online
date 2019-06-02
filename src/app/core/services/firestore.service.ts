@@ -4,7 +4,8 @@ import { Injectable } from '@angular/core';
 import {
   AngularFirestoreCollection,
   AngularFirestoreDocument,
-  AngularFirestore
+  AngularFirestore,
+  QueryFn
 } from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
 
@@ -21,7 +22,7 @@ export class FirestoreService {
 
   public col<T>(
     ref: CollectionPredicate<T>,
-    queryFn?
+    queryFn?: QueryFn
   ): AngularFirestoreCollection<T> {
     return typeof ref === 'string' ? this.db.collection<T>(ref, queryFn) : ref;
   }
@@ -42,7 +43,10 @@ export class FirestoreService {
       );
   }
 
-  public col$<T>(ref: CollectionPredicate<T>, queryFn?): Observable<T[]> {
+  public col$<T>(
+    ref: CollectionPredicate<T>,
+    queryFn?: QueryFn
+  ): Observable<T[]> {
     return this.col(ref, queryFn)
       .snapshotChanges()
       .pipe(
