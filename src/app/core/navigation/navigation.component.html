@@ -8,8 +8,8 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="!(isHandset$ | async)"
   >
-    <mat-toolbar [class.extended]="extended && (auth.user$ | async)">
-      <ng-container *ngIf="auth.user$ | async as user">
+    <mat-toolbar [class.extended]="extended && auth.user">
+      <ng-container *ngIf="auth.user as user">
         <div class="logo" routerLink="/">
           <img src="assets/logo_white.svg" alt="FHG Online" />
         </div>
@@ -36,7 +36,7 @@
           </button>
         </div>
       </ng-container>
-      <ng-container *ngIf="!(auth.user$ | async)">
+      <ng-container *ngIf="!auth.user">
         <div class="large">
           <div class="logo" routerLink="/">
             <img src="assets/logo_white.svg" alt="FHG Online" />
@@ -46,7 +46,7 @@
       </ng-container>
     </mat-toolbar>
     <mat-nav-list class="sidenav-list">
-      <ng-container *ngIf="auth.user$ | async as user">
+      <ng-container *ngIf="auth.user as user">
         <ng-container *ngIf="!extended">
           <a
             mat-list-item
@@ -123,7 +123,7 @@
           </a>
         </ng-container>
       </ng-container>
-      <ng-container *ngIf="!(auth.user$ | async)">
+      <ng-container *ngIf="!auth.user">
         <a
           mat-list-item
           routerLink="/"
