@@ -48,14 +48,21 @@
               type="text"
               placeholder="vorname.nachname"
               formControlName="email"
+              autocomplete="off"
               autocorrect="off"
               autocapitalize="none"
               required
             />
             <p matSuffix>@franz-haniel-gym….eu</p>
-            <mat-error *ngIf="email.invalid">{{
-              getEmailErrorMessage()
-            }}</mat-error>
+            <mat-error *ngIf="email.invalid"
+              >{{ getEmailErrorMessage() }}
+              <mat-icon
+                *ngIf="email.hasError('invalidTeacher')"
+                class="error-help"
+                routerLink="help"
+                >help</mat-icon
+              ><!-- TODO: Link to Help page -->
+            </mat-error>
           </mat-form-field>
         </div>
         <div class="bottom">
@@ -107,7 +114,11 @@
         </div>
       </mat-step>
 
-      <mat-step formGroupName="3" [stepControl]="formArray?.get([3])">
+      <mat-step
+        formGroupName="3"
+        [stepControl]="formArray?.get([3])"
+        *ngIf="role.value == 'student'"
+      >
         <ng-template matStepLabel>Klasse eingeben</ng-template>
         <div class="content class">
           <mat-form-field>

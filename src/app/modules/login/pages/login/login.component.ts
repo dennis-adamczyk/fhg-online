@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { message } from '../../../../../messages/messages';
+import { message } from '../../../../../configs/messages';
+import { constant } from '../../../../../configs/constants';
 import * as firebase from 'firebase';
 import { Title } from '@angular/platform-browser';
 
@@ -86,7 +87,7 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     this.loginForm.markAsPending;
     const values = this.loginForm.value;
-    const email = values.email + '@franz-haniel-gymnasium.eu';
+    const email = values.email + constant.emailSuffix;
     const password = values.password;
 
     this.auth

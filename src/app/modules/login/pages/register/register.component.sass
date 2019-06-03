@@ -37,6 +37,11 @@
                     p[matSuffix]
                         font-size: 12px
 
+                    .error-help
+                        float: right
+                        padding: 8px
+                        margin: -8px
+
             &.name
                 display: flex
                 justify-content: space-between
@@ -75,3 +80,8 @@
                 &[matStepperPrevious]
                     background-color: mat-color($background-light, disabled-button)
                     color: mat-color($foreground-light, secondary-text)
+
+@media not all and ($mat-xsmall)
+    .register
+        margin: 0 auto
+        width: 576px

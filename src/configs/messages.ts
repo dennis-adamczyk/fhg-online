@@ -27,7 +27,8 @@ export const message = {
         required: 'E-Mail benötigt',
         minlength: 'Gib mindestens 3 Zeichen ein',
         pattern: 'Benutze das Format vorname.nachname',
-        alreadyExists: 'E-Mail wird bereits verwendet'
+        alreadyExists: 'E-Mail wird bereits verwendet',
+        invalidTeacher: 'Keinen Lehrer mit dieser E-Mail gefunden'
       },
       first_name: {
         required: 'Vorname benötigt',

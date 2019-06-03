@@ -5,7 +5,7 @@ import { of, Observable, forkJoin } from 'rxjs';
 import { User } from '../models/user.model';
 import { FirestoreService } from './firestore.service';
 import { switchMap, startWith, tap } from 'rxjs/operators';
-import { message } from '../../../messages/messages';
+import { message } from '../../../configs/messages';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
@@ -43,7 +43,39 @@ export class AuthService {
   async login(email: string, password: string, url?: string) {
     return this.afAuth.auth
       .signInWithEmailAndPassword(email, password)
-      .then(_ => this.router.navigate([url || '/']));
+      .then(credentials => {
+        this.router.navigate([url || '/']);
+        return credentials;
+      });
+  }
+
+  async register(
+    role: string,
+    email: string,
+    fist_name: string,
+    last_name: string,
+    password: string,
+    clazz?: string
+  ) {
+    return this.afAuth.auth
+      .createUserWithEmailAndPassword(email, password)
+      .then(credentials => {
+        return this.db.set(`users/${credentials.user.uid}`, {
+          roles: {
+            admin: false,
+            guard: false,
+            student: role == 'student' ? true : false,
+            teacher: role == 'teacher' ? true : false
+          },
+          email: email,
+          name: {
+            first_name: fist_name,
+            last_name: last_name
+          },
+          class: clazz,
+          status: 0
+        });
+      });
   }
 
   logout() {

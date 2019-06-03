@@ -7,9 +7,10 @@ import {
 } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FirestoreService } from '../../../../core/services/firestore.service';
-import { take, debounceTime, map } from 'rxjs/operators';
-import { message } from '../../../../../messages/messages';
+import { take, debounceTime, map, tap } from 'rxjs/operators';
+import { message } from '../../../../../configs/messages';
 import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
+import { constant } from 'src/configs/constants';
 
 @Component({
   selector: 'app-register',
@@ -31,48 +32,66 @@ export class RegisterComponent implements OnInit {
     this.showPassword1 = false;
     this.showPassword2 = false;
     this.registerForm = this.fb.group({
-      formArray: this.fb.array([
-        this.fb.group({
-          role: [
-            '',
-            [Validators.required, Validators.pattern(/^student$|^teacher$/)]
-          ]
-        }),
-        this.fb.group({
-          email: [
-            '',
-            [
-              Validators.required,
-              Validators.minLength(3),
-              Validators.pattern(/^([\w-]+\.[\w-]+)+$/)
+      formArray: this.fb.array(
+        [
+          this.fb.group({
+            role: [
+              '',
+              [Validators.required, Validators.pattern(/^student$|^teacher$/)]
+            ]
+          }),
+          this.fb.group({
+            email: [
+              '',
+              [
+                Validators.required,
+                Validators.minLength(3),
+                Validators.pattern(/^([\w-]+\.[\w-]+)+$/)
+              ],
+              [RegisterValidator.email(this.db)]
+            ]
+          }),
+          this.fb.group({
+            first_name: [
+              '',
+              [
+                Validators.required,
+                Validators.pattern(
+                  /^([\wÄäÖöÜüÉÈéèÇç]+-?[\wÄäÖöÜüÉÈéèÇç]+\s?)+$/
+                )
+              ]
             ],
-            RegisterValidator.email(this.db)
-          ]
-        }),
-        this.fb.group({
-          first_name: [
-            '',
-            [Validators.required, Validators.pattern(/^(\w+-?\w+\s?)+$/)]
-          ],
-          last_name: [
-            '',
-            [Validators.required, Validators.pattern(/^(\w+-?\w+\s?)+$/)]
-          ]
-        }),
-        this.fb.group({
-          class: [
-            '',
-            [Validators.required, Validators.pattern(/^[5-9][a-f]|EF|Q1|Q2$/i)]
-          ]
-        }),
-        this.fb.group(
-          {
-            password1: ['', [Validators.required, Validators.minLength(6)]],
-            password2: ['', [Validators.required]]
-          },
-          { validator: RegisterValidator.passwordConfirmed }
-        )
-      ])
+            last_name: [
+              '',
+              [
+                Validators.required,
+                Validators.pattern(
+                  /^([\wÄäÖöÜüÉÈéèÇç]+-?[\wÄäÖöÜüÉÈéèÇç]+\s?)+$/
+                )
+              ]
+            ]
+          }),
+          this.fb.group({
+            class: [
+              '',
+              [
+                Validators.required,
+                Validators.pattern(/^[5-9][a-f]|EF|Q1|Q2$/i)
+              ]
+            ]
+          }),
+          this.fb.group(
+            {
+              password1: ['', [Validators.required, Validators.minLength(6)]],
+              password2: ['', [Validators.required]]
+            },
+            { validator: RegisterValidator.passwordConfirmed }
+          )
+        ],
+        {
+          asyncValidators: RegisterValidator.teachersEmail(this.db)
+        }
+      )
     });
   }
 
@@ -130,6 +149,9 @@ export class RegisterComponent implements OnInit {
     if (this.email.hasError('alreadyExists')) {
       return message.errors.register.email.alreadyExists;
     }
+    if (this.email.hasError('invalidTeacher')) {
+      return message.errors.register.email.invalidTeacher;
+    }
   }
 
   getFirstNameErrorMessage(): string {
@@ -186,26 +208,75 @@ export class RegisterComponent implements OnInit {
         this.last_name.setValue(this.capitalizeFirstLetter(splitedName[1]));
       }
     }
+    if (event.previouslySelectedIndex == 0) {
+      console.log(this.formArray);
+      if (this.role.value == 'teacher') {
+        this.class.disable();
+      } else {
+        this.class.enable();
+      }
+    }
   }
 
   private capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  onSubmit() {}
+  onSubmit() {
+    if (this.registerForm.valid) {
+      this.auth
+        .register(
+          this.role.value,
+          this.email.value + constant.emailSuffix,
+          this.first_name.value,
+          this.last_name.value,
+          this.password1.value,
+          this.class.value
+        )
+        .then(x => console.log(x))
+        .catch(error => console.error(error));
+    }
+  }
 }
 
 export class RegisterValidator {
   static email(db: FirestoreService) {
     return (control: AbstractControl) => {
-      const email =
-        String(control.value).toLowerCase() + '@franz-haniel-gymnasium.eu';
+      const email = String(control.value).toLowerCase() + constant.emailSuffix;
       return db
         .col$('users', ref => ref.where('email', '==', email))
         .pipe(
           debounceTime(500),
           take(1),
           map(arr => (arr.length ? { alreadyExists: true } : null))
+        );
+    };
+  }
+
+  static teachersEmail(db: FirestoreService) {
+    return (control: AbstractControl) => {
+      if (control.get([0]).get('role').value != 'teacher') return of(null);
+      console.log(control);
+      const email = String(control.get([1]).get('email').value).toLowerCase();
+      return db
+        .col$('users', ref =>
+          ref
+            .where('index', '==', true)
+            .where('teachers', 'array-contains', email)
+        )
+        .pipe(
+          debounceTime(500),
+          take(1),
+          tap(data => console.log(data)),
+          map(arr => {
+            if (!arr.length && control.get([1]).get('email').valid) {
+              control
+                .get([1])
+                .get('email')
+                .setErrors({ invalidTeacher: true });
+            }
+            return null;
+          })
         );
     };
   }
