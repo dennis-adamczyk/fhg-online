@@ -4,8 +4,11 @@
 /dist
 /tmp
 /out-tsc
-/functions
+/functions/dist
+/functions/lib
+/functions/node_modules
 /.firebase
+
 # Only exists if Bazel was run
 /bazel-out
 

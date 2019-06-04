@@ -124,7 +124,9 @@
           <mat-form-field>
             <mat-label>Klasse</mat-label>
             <mat-select formControlName="class">
-              <mat-option value="5b">5b</mat-option>
+              <mat-option *ngFor="let class of classes" [value]="class">{{
+                class
+              }}</mat-option>
             </mat-select>
             <mat-error *ngIf="class.invalid">{{
               getClassErrorMessage()

@@ -21,6 +21,7 @@ export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   showPassword1: boolean;
   showPassword2: boolean;
+  classes: Array<string>;
 
   constructor(
     public auth: AuthService,
@@ -92,6 +93,13 @@ export class RegisterComponent implements OnInit {
           asyncValidators: RegisterValidator.teachersEmail(this.db)
         }
       )
+    });
+    this.db.doc$('years/--index--').subscribe(data => {
+      if (this.role.value != 'teacher') {
+        let classArray = data['classes'] as Array<string>;
+        classArray.sort();
+        this.classes = classArray;
+      }
     });
   }
 
@@ -209,7 +217,6 @@ export class RegisterComponent implements OnInit {
       }
     }
     if (event.previouslySelectedIndex == 0) {
-      console.log(this.formArray);
       if (this.role.value == 'teacher') {
         this.class.disable();
       } else {
@@ -256,7 +263,6 @@ export class RegisterValidator {
   static teachersEmail(db: FirestoreService) {
     return (control: AbstractControl) => {
       if (control.get([0]).get('role').value != 'teacher') return of(null);
-      console.log(control);
       const email = String(control.get([1]).get('email').value).toLowerCase();
       return db
         .col$('users', ref =>
@@ -267,7 +273,6 @@ export class RegisterValidator {
         .pipe(
           debounceTime(500),
           take(1),
-          tap(data => console.log(data)),
           map(arr => {
             if (!arr.length && control.get([1]).get('email').valid) {
               control

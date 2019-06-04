@@ -58,7 +58,7 @@ export class FirestoreService {
 
   public colWithIds$<T>(
     ref: CollectionPredicate<T>,
-    queryFn?
+    queryFn?: QueryFn
   ): Observable<any[]> {
     return this.col(ref, queryFn)
       .snapshotChanges()
@@ -111,7 +111,7 @@ export class FirestoreService {
     return this.doc(ref).delete();
   }
 
-  public add<T>(ref: CollectionPredicate<T>, data) {
+  public add<T>(ref: CollectionPredicate<T>, data: any) {
     const timestamp = this.timestamp;
     return this.col(ref).add({
       ...data,

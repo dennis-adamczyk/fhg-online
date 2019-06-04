@@ -3,7 +3,10 @@ import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireFunctionsModule } from '@angular/fire/functions';
+import {
+  AngularFireFunctionsModule,
+  FUNCTIONS_ORIGIN
+} from '@angular/fire/functions';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -32,7 +35,7 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule
   ],
   exports: [NavigationComponent],
-  providers: []
+  providers: [{ provide: FUNCTIONS_ORIGIN, useValue: 'http://localhost:5001' }]
 })
 export class CoreModule {
   constructor(@Optional() @SkipSelf() parentModule: CoreModule) {

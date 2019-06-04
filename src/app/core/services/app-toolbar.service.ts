@@ -3,11 +3,11 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+import { constant } from '../../../configs/constants';
 
 export interface MenuItem {
   path: string;
   title: string;
-  description?: string;
 }
 
 @Injectable({
@@ -27,11 +27,7 @@ export class AppToolbarService {
       map(route => {
         let active = this.lastRouteWithMenuItem(route.root);
         if (active && active.title)
-          this.titleService.setTitle(active.title + ' ◂ FHG Online');
-        this.meta.addTag({
-          name: 'description',
-          content: active && active.description ? active.description : ''
-        });
+          this.titleService.setTitle(active.title + constant.titleSuffix);
         return active;
       })
     );
@@ -43,8 +39,7 @@ export class AppToolbarService {
       .map(route => {
         return {
           path: route.path,
-          title: route.data.title,
-          description: route.data.description
+          title: route.data.title
         };
       });
   }
@@ -62,8 +57,7 @@ export class AppToolbarService {
     return cfg && cfg.data && cfg.data.title
       ? {
           path: cfg.path,
-          title: cfg.data.title,
-          description: cfg.data.description
+          title: cfg.data.title
         }
       : undefined;
   }

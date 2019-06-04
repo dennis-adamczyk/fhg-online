@@ -7,6 +7,7 @@ import { FirestoreService } from './firestore.service';
 import { switchMap, startWith, tap } from 'rxjs/operators';
 import { message } from '../../../configs/messages';
 import { isPlatformBrowser } from '@angular/common';
+import { AngularFireFunctions } from '@angular/fire/functions';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class AuthService {
   constructor(
     private afAuth: AngularFireAuth,
     private db: FirestoreService,
+    private afFunc: AngularFireFunctions,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -52,30 +54,33 @@ export class AuthService {
   async register(
     role: string,
     email: string,
-    fist_name: string,
+    first_name: string,
     last_name: string,
     password: string,
     clazz?: string
   ) {
-    return this.afAuth.auth
-      .createUserWithEmailAndPassword(email, password)
-      .then(credentials => {
-        return this.db.set(`users/${credentials.user.uid}`, {
-          roles: {
-            admin: false,
-            guard: false,
-            student: role == 'student' ? true : false,
-            teacher: role == 'teacher' ? true : false
-          },
-          email: email,
-          name: {
-            first_name: fist_name,
-            last_name: last_name
-          },
-          class: clazz,
-          status: 0
-        });
-      });
+    let registerUser = this.afFunc.functions.httpsCallable('registerUser');
+    return registerUser({
+      role: role,
+      email: email,
+      name: {
+        first_name: first_name,
+        last_name: last_name
+      },
+      password: password,
+      class: clazz
+    })
+      .then(result => {
+        console.log(result);
+        // this.afAuth.auth
+        //   .signInWithCustomToken(result.data.token)
+        //   .then(firebaseUser => {
+        //     firebaseUser.user.sendEmailVerification().then(() => {
+        //       this.afAuth.auth.signOut().then(() => console.log('successful'));
+        //     });
+        //   });
+      })
+      .catch(error => console.log(error));
   }
 
   logout() {
