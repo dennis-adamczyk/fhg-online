@@ -9,6 +9,9 @@
 /functions/node_modules
 /.firebase
 
+# secret
+/functions/src/*.json
+
 # Only exists if Bazel was run
 /bazel-out
 

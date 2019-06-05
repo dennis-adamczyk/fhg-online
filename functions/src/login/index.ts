@@ -80,77 +80,94 @@ export const registerUser = functions.https.onCall((data, context) => {
 
   // Async Validation
 
-  // admin
-  //   .firestore()
-  //   .collection('users')
-  //   .where('email', '==', email)
-  //   .get()
-  //   .then(data => {
-  //     if (data.size) {
-  //       throw new HttpsError(
-  //         'failed-precondition',
-  //         'Die E-Mail ist bereits vergeben.'
-  //       );
-  //     }
-  //   });
+  admin
+    .firestore()
+    .collection('users')
+    .where('email', '==', email)
+    .get()
+    .then(data => {
+      if (data.size) {
+        throw new HttpsError(
+          'failed-precondition',
+          'Die E-Mail ist bereits vergeben.'
+        );
+      }
+    });
 
-  // admin
-  //   .firestore()
-  //   .collection('users')
-  //   .where('index', '==', true)
-  //   .where('teachers', 'array-contains', email)
-  //   .get()
-  //   .then(data => {
-  //     if (role == 'teacher' && data.size == 0) {
-  //       throw new HttpsError(
-  //         'failed-precondition',
-  //         'Die E-Mail gehört keinem Leherer.'
-  //       );
-  //     }
-  //   });
+  admin
+    .auth()
+    .getUserByEmail(email)
+    .then(userRecord => {
+      if (userRecord.uid) {
+        throw new HttpsError(
+          'failed-precondition',
+          'Die E-Mail ist bereits vergeben.'
+        );
+      }
+    })
+    .catch(error => null);
+
+  admin
+    .firestore()
+    .collection('users')
+    .where('index', '==', true)
+    .where('teachers', 'array-contains', email)
+    .get()
+    .then(data => {
+      if (role == 'teacher' && data.size == 0) {
+        throw new HttpsError(
+          'failed-precondition',
+          'Die E-Mail gehört keinem Leherer.'
+        );
+      }
+    });
 
   // Registration
 
-  // return admin
-  //   .auth()
-  //   .createUser({
-  //     email: email,
-  //     emailVerified: false,
-  //     phoneNumber: undefined,
-  //     password: password,
-  //     displayName: name.first_name + ' ' + name.last_name,
-  //     photoURL: undefined,
-  //     disabled: false
-  //   })
-  //   .then(userRecord => {
-  //     admin
-  //       .firestore()
-  //       .doc(`users/${userRecord.uid}`)
-  //       .create({
-  //         email: email,
-  //         name: name,
-  //         roles: {
-  //           guard: false,
-  //           admin: false,
-  //           student: role == 'student' ? true : false,
-  //           teacher: role == 'teacher' ? true : false
-  //         },
-  //         class: clazz ? clazz : undefined,
-  //         status: 0,
-  //         updated_at: admin.firestore.FieldValue.serverTimestamp(),
-  //         created_at: admin.firestore.FieldValue.serverTimestamp()
-  //       });
-  //     admin.auth().setCustomUserClaims(userRecord.uid, {
-  //       guard: false,
-  //       admin: false,
-  //       student: role == 'student' ? true : false,
-  //       teacher: role == 'teacher' ? true : false
-  //     });
-  //     return admin
-  //       .auth()
-  //       .createCustomToken(userRecord.uid)
-  //       .then(token => {
-  //         return { user: userRecord, token: token };
-  //       });
-  //   });
+  return admin
+    .auth()
+    .createUser({
+      email: email,
+      emailVerified: false,
+      phoneNumber: undefined,
+      password: password,
+      displayName: name.first_name + ' ' + name.last_name,
+      photoURL: undefined,
+      disabled: false
+    })
+    .then(userRecord => {
+      admin
+        .firestore()
+        .doc(`users/${userRecord.uid}`)
+        .create({
+          email: email,
+          name: name,
+          roles: {
+            guard: false,
+            admin: false,
+            student: role == 'student' ? true : false,
+            teacher: role == 'teacher' ? true : false
+          },
+          class: clazz ? clazz : undefined,
+          status: 0,
+          updated_at: admin.firestore.FieldValue.serverTimestamp(),
+          created_at: admin.firestore.FieldValue.serverTimestamp()
+        });
+      return admin
+        .auth()
+        .setCustomUserClaims(userRecord.uid, {
+          guard: false,
+          admin: false,
+          student: role == 'student' ? true : false,
+          teacher: role == 'teacher' ? true : false
+        })
+        .then(() => {
+          return admin
+            .auth()
+            .createCustomToken(userRecord.uid)
+            .then(token => {
+              return { user: userRecord, token: token };
+            });
+        });
+    });
 });

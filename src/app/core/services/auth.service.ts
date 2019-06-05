@@ -4,7 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { of, Observable, forkJoin } from 'rxjs';
 import { User } from '../models/user.model';
 import { FirestoreService } from './firestore.service';
-import { switchMap, startWith, tap } from 'rxjs/operators';
+import { switchMap, startWith, tap, map } from 'rxjs/operators';
 import { message } from '../../../configs/messages';
 import { isPlatformBrowser } from '@angular/common';
 import { AngularFireFunctions } from '@angular/fire/functions';
@@ -71,14 +71,13 @@ export class AuthService {
       class: clazz
     })
       .then(result => {
-        console.log(result);
-        // this.afAuth.auth
-        //   .signInWithCustomToken(result.data.token)
-        //   .then(firebaseUser => {
-        //     firebaseUser.user.sendEmailVerification().then(() => {
-        //       this.afAuth.auth.signOut().then(() => console.log('successful'));
-        //     });
-        //   });
+        return this.afAuth.auth
+          .signInWithCustomToken(result.data.token)
+          .then(firebaseUser => {
+            return firebaseUser.user.sendEmailVerification().then(() => {
+              return this.afAuth.auth.signOut().then();
+            });
+          });
       })
       .catch(error => console.log(error));
   }
@@ -87,6 +86,10 @@ export class AuthService {
     return this.afAuth.auth
       .signOut()
       .then(_ => this.router.navigate(['/login']));
+  }
+
+  sendEmailVerification() {
+    return this.afAuth.auth.currentUser.sendEmailVerification();
   }
 
   getDisplayName(user: User): string {

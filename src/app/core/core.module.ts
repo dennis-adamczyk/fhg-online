@@ -19,6 +19,18 @@ import { SharedModule } from '../shared/shared.module';
 
 // TODO: Add Angular Fire Performance
 
+var providerscoll: any = [];
+if (
+  window != undefined &&
+  window.location.hostname == 'localhost' &&
+  window.location.port == '5000'
+) {
+  providerscoll.push({
+    provide: FUNCTIONS_ORIGIN,
+    useValue: 'http://localhost:5001'
+  });
+}
+
 @NgModule({
   declarations: [NavigationComponent],
   imports: [
@@ -35,7 +47,7 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule
   ],
   exports: [NavigationComponent],
-  providers: [{ provide: FUNCTIONS_ORIGIN, useValue: 'http://localhost:5001' }]
+  providers: [providerscoll]
 })
 export class CoreModule {
   constructor(@Optional() @SkipSelf() parentModule: CoreModule) {

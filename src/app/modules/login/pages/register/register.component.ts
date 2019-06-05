@@ -22,6 +22,8 @@ export class RegisterComponent implements OnInit {
   showPassword1: boolean;
   showPassword2: boolean;
   classes: Array<string>;
+  loading: boolean = false;
+  registered: boolean = false;
 
   constructor(
     public auth: AuthService,
@@ -231,6 +233,7 @@ export class RegisterComponent implements OnInit {
 
   onSubmit() {
     if (this.registerForm.valid) {
+      this.loading = true;
       this.auth
         .register(
           this.role.value,
@@ -240,7 +243,10 @@ export class RegisterComponent implements OnInit {
           this.password1.value,
           this.class.value
         )
-        .then(x => console.log(x))
+        .then(() => {
+          this.loading = false;
+          this.registered = true;
+        })
         .catch(error => console.error(error));
     }
   }
