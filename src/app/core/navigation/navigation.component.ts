@@ -23,7 +23,7 @@ export class NavigationComponent {
 
   constructor(
     private breakpointObserver: BreakpointObserver,
-    private toolbarService: AppToolbarService,
+    public toolbarService: AppToolbarService,
     private router: Router,
     private elementRef: ElementRef,
     public auth: AuthService

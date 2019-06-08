@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { constant } from '../../../configs/constants';
 
@@ -15,12 +15,9 @@ export interface MenuItem {
 })
 export class AppToolbarService {
   activeMenuItem$: Observable<MenuItem>;
+  title$ = new Subject<string>();
 
-  constructor(
-    private router: Router,
-    private titleService: Title,
-    private meta: Meta
-  ) {
+  constructor(private router: Router, private titleService: Title) {
     this.activeMenuItem$ = this.router.events.pipe(
       filter(e => e instanceof NavigationEnd),
       map(_ => this.router.routerState.root),
@@ -28,9 +25,15 @@ export class AppToolbarService {
         let active = this.lastRouteWithMenuItem(route.root);
         if (active && active.title)
           this.titleService.setTitle(active.title + constant.titleSuffix);
+        this.title$.next(active.title);
         return active;
       })
     );
+    this.activeMenuItem$.subscribe();
+  }
+
+  setTitle(title: string) {
+    this.title$.next(title);
   }
 
   getMenuItems(): MenuItem[] {

@@ -50,6 +50,22 @@ export const message = {
         required: 'Wiederhole das Passwort',
         notMatch: 'Passwörter stimmen nicht überein'
       }
+    },
+    login_action: {
+      email: {
+        required: 'E-Mail benötigt',
+        minlength: 'Gib mindestens 3 Zeichen ein',
+        pattern: 'Benutze das Format vorname.nachname',
+        notFound: 'E-Mail nicht vergeben'
+      },
+      password1: {
+        required: 'Passwort benötigt',
+        minlength: 'Gib mindestens 6 Zeichen ein'
+      },
+      password2: {
+        required: 'Wiederhole das Passwort',
+        notMatch: 'Passwörter stimmen nicht überein'
+      }
     }
   }
 };

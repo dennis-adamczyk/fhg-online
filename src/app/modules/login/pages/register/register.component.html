@@ -59,9 +59,10 @@
               autocomplete="off"
               autocorrect="off"
               autocapitalize="none"
+              trim
               required
             />
-            <p matSuffix>@franz-haniel-gym….eu</p>
+            <p matSuffix>{{ constant.displayedEmailSuffix }}</p>
             <mat-error *ngIf="email.invalid"
               >{{ getEmailErrorMessage() }}
               <mat-icon
@@ -98,14 +99,26 @@
           <p>Ist das dein Name?</p>
           <mat-form-field>
             <mat-label>Vorname</mat-label>
-            <input matInput type="text" formControlName="first_name" required />
+            <input
+              matInput
+              type="text"
+              formControlName="first_name"
+              trim="blur"
+              required
+            />
             <mat-error *ngIf="first_name.invalid">{{
               getFirstNameErrorMessage()
             }}</mat-error>
           </mat-form-field>
           <mat-form-field>
             <mat-label>Nachname</mat-label>
-            <input matInput type="text" formControlName="last_name" required />
+            <input
+              matInput
+              type="text"
+              formControlName="last_name"
+              trim="blur"
+              required
+            />
             <mat-error *ngIf="last_name.invalid">{{
               getLastNameErrorMessage()
             }}</mat-error>
@@ -174,6 +187,7 @@
               matInput
               [type]="showPassword1 ? 'text' : 'password'"
               formControlName="password1"
+              trim
               required
             />
             <mat-icon

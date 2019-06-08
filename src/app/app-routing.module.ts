@@ -21,8 +21,7 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: './modules/login/login.module#LoginModule',
-    canActivate: [NoAuthGuard]
+    loadChildren: './modules/login/login.module#LoginModule'
   },
   {
     path: '',

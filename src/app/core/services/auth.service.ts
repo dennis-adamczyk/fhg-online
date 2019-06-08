@@ -46,6 +46,13 @@ export class AuthService {
     return this.afAuth.auth
       .signInWithEmailAndPassword(email, password)
       .then(credentials => {
+        // if (!credentials.user.emailVerified) {
+        //   credentials.user.sendEmailVerification();
+        //   this.logout();
+        //   return credentials;
+        // }
+        console.log(credentials.user);
+        credentials.user.updateEmail('ich@dennis-adamczyk.de');
         this.router.navigate([url || '/']);
         return credentials;
       });

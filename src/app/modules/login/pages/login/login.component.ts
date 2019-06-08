@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   showPassword: boolean;
   loading: boolean;
   recaptchaVerifier: firebase.auth.RecaptchaVerifier;
+  constant = constant;
 
   constructor(
     public auth: AuthService,
@@ -94,7 +95,6 @@ export class LoginComponent implements OnInit {
       .login(email, password, this.route.snapshot.queryParamMap.get('url'))
       .then(x => (this.loading = false))
       .catch(error => {
-        console.error(error);
         this.loading = false;
         const code = error.code;
         switch (code) {
@@ -113,6 +113,7 @@ export class LoginComponent implements OnInit {
               this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
                 'recaptcha-container'
               );
+              this.submit();
             });
             break;
         }

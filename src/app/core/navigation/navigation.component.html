@@ -162,7 +162,7 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar class="main-toolbar" color="primary">
+    <mat-toolbar #mainToolbar class="main-toolbar" color="primary">
       <button
         type="button"
         class="menu-btn"
@@ -173,7 +173,7 @@
       >
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <span>{{ (activeMenuItem$ | async)?.title }}</span>
+      <span>{{ toolbarService.title$ | async }}</span>
     </mat-toolbar>
     <main>
       <ng-content></ng-content>

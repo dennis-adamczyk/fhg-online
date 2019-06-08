@@ -13,9 +13,10 @@
         formControlName="email"
         autocorrect="off"
         autocapitalize="none"
+        trim
         required
       />
-      <p matSuffix>@franz-haniel-gym….eu</p>
+      <p matSuffix>{{ constant.displayedEmailSuffix }}</p>
       <mat-error *ngIf="email.invalid">{{ getEmailErrorMessage() }}</mat-error>
     </mat-form-field>
     <mat-form-field hideRequiredMarker>

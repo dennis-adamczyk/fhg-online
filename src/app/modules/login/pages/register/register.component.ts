@@ -24,6 +24,7 @@ export class RegisterComponent implements OnInit {
   classes: Array<string>;
   loading: boolean = false;
   registered: boolean = false;
+  constant = constant;
 
   constructor(
     public auth: AuthService,
@@ -224,6 +225,7 @@ export class RegisterComponent implements OnInit {
       } else {
         this.class.enable();
       }
+      this.email.updateValueAndValidity();
     }
   }
 
