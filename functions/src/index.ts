@@ -8,6 +8,8 @@ admin.initializeApp({
 
 import * as rendering from './ssr';
 import * as login from './login';
+import * as settings from './settings';
 
 export const ssr = rendering.ssr;
 export const registerUser = login.registerUser;
+export const changeSettings = settings.changeSettings;

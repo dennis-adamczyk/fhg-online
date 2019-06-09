@@ -150,6 +150,7 @@ export const registerUser = functions.https.onCall((data, context) => {
           },
           class: clazz ? clazz : undefined,
           status: 0,
+          settings_changed: null,
           updated_at: admin.firestore.FieldValue.serverTimestamp(),
           created_at: admin.firestore.FieldValue.serverTimestamp()
         });

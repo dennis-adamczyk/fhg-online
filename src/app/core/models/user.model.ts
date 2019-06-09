@@ -13,5 +13,5 @@ export interface User {
     teacher: boolean;
   };
   status: number;
-  settingsChanged?: any;
+  settings_changed?: firebase.firestore.Timestamp;
 }
