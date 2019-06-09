@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import {
+  ActivatedRoute,
+  RouterStateSnapshot,
+  NavigationExtras
+} from '@angular/router';
 import { message } from '../../../../../configs/messages';
 import { constant } from '../../../../../configs/constants';
 import * as firebase from 'firebase';
@@ -91,8 +95,22 @@ export class LoginComponent implements OnInit {
     const email = values.email + constant.emailSuffix;
     const password = values.password;
 
+    const url = this.route.snapshot.queryParamMap.get('url')
+      ? decodeURIComponent(this.route.snapshot.queryParamMap.get('url'))
+      : null;
+    const path = url ? url.split('?')[0] : null;
+    const paramsArray = url ? this.getUrlParams(url) : null;
+    const fragment = url ? url.split('#')[1] : null;
+    const extras: NavigationExtras =
+      paramsArray || fragment
+        ? {
+            queryParams: paramsArray,
+            fragment: fragment
+          }
+        : null;
+
     this.auth
-      .login(email, password, this.route.snapshot.queryParamMap.get('url'))
+      .login(email, password, path, extras)
       .then(x => (this.loading = false))
       .catch(error => {
         this.loading = false;
@@ -118,5 +136,51 @@ export class LoginComponent implements OnInit {
             break;
         }
       });
+  }
+
+  private getUrlParams(url): object {
+    var queryString = url.split('?')[1];
+
+    var obj = null;
+
+    if (queryString) {
+      obj = {};
+      queryString = queryString.split('#')[0];
+      var arr = queryString.split('&');
+
+      for (var i = 0; i < arr.length; i++) {
+        var a = arr[i].split('=');
+
+        var paramName = a[0];
+        var paramValue = typeof a[1] === 'undefined' ? true : a[1];
+
+        paramName = paramName.toLowerCase();
+        if (typeof paramValue === 'string')
+          paramValue = paramValue.toLowerCase();
+
+        if (paramName.match(/\[(\d+)?\]$/)) {
+          var key = paramName.replace(/\[(\d+)?\]/, '');
+          if (!obj[key]) obj[key] = [];
+
+          if (paramName.match(/\[\d+\]$/)) {
+            var index = /\[(\d+)\]/.exec(paramName)[1];
+            obj[key][index] = paramValue;
+          } else {
+            obj[key].push(paramValue);
+          }
+        } else {
+          if (!obj[paramName]) {
+            obj[paramName] = paramValue;
+          } else if (obj[paramName] && typeof obj[paramName] === 'string') {
+            obj[paramName] = [obj[paramName]];
+            obj[paramName].push(paramValue);
+          } else {
+            obj[paramName].push(paramValue);
+          }
+        }
+      }
+    }
+
+    return obj;
   }
 }

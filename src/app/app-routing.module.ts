@@ -24,9 +24,23 @@ const routes: Routes = [
     loadChildren: './modules/login/login.module#LoginModule'
   },
   {
+    path: 'help',
+    loadChildren: './modules/help/help.module#HelpModule',
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings',
+    loadChildren: './modules/settings/settings.module#SettingsModule',
+    canActivate: [AuthGuard]
+  },
+  {
     path: '',
     loadChildren: './modules/home/home.module#HomeModule',
     canActivate: [AuthGuard]
+  },
+  {
+    path: '',
+    loadChildren: './modules/static/static.module#StaticModule'
   }
 ];
 

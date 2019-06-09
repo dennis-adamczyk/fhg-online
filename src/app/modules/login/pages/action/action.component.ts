@@ -1,4 +1,11 @@
-import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Renderer2,
+  HostListener,
+  Inject,
+  PLATFORM_ID
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { FirebaseAuth } from '@angular/fire';
@@ -17,6 +24,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, tap, take } from 'rxjs/operators';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { User } from 'src/app/core/models/user.model';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-action',
@@ -55,13 +63,16 @@ export class ActionComponent implements OnInit {
     private toolbarService: AppToolbarService,
     private db: FirestoreService,
     private renderer: Renderer2,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    @Inject(PLATFORM_ID) private platformId: string
   ) {
     const mode: string = this.route.snapshot.queryParams['mode'];
     const actionCode: string = this.route.snapshot.queryParams['oobCode'];
     const continueUrl: string | null =
       this.route.snapshot.queryParams['continueUrl'] || null;
     this.mode = mode;
+
+    if (!isPlatformBrowser(platformId)) return;
 
     switch (mode) {
       case 'resetPassword':
@@ -94,8 +105,6 @@ export class ActionComponent implements OnInit {
           if (title == 'Anmeldung') toolbarService.setTitle('Verifizieren');
         });
 
-        console.log(actionCode, continueUrl);
-
         this.handleVerifyEmail(afAuth.auth, actionCode, continueUrl);
         break;
       case 'forgotPassword':
@@ -123,34 +132,36 @@ export class ActionComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.toolbar = document.querySelector('.main-toolbar');
-    this.sidenavContent = document.querySelector('mat-sidenav-content');
-    this.isHandset$.subscribe(handset => {
-      if (!handset) {
-        let scrollHandler = () => {
-          if (this.sidenavContent.scrollTop > 64) {
-            this.renderer.removeStyle(this.toolbar, 'box-shadow');
-          } else {
-            this.renderer.setStyle(this.toolbar, 'box-shadow', 'none');
-          }
-        };
-        scrollHandler();
-        this.scrollListener = this.renderer.listen(
-          this.sidenavContent,
-          'scroll',
-          event => {
-            scrollHandler();
-          }
-        );
-      } else {
-        this.renderer.removeStyle(this.toolbar, 'box-shadow');
-      }
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      this.toolbar = document.querySelector('.main-toolbar');
+      this.sidenavContent = document.querySelector('mat-sidenav-content');
+      this.isHandset$.subscribe(handset => {
+        if (!handset) {
+          let scrollHandler = () => {
+            if (this.sidenavContent.scrollTop > 64) {
+              this.renderer.removeStyle(this.toolbar, 'box-shadow');
+            } else {
+              this.renderer.setStyle(this.toolbar, 'box-shadow', 'none');
+            }
+          };
+          scrollHandler();
+          this.scrollListener = this.renderer.listen(
+            this.sidenavContent,
+            'scroll',
+            event => scrollHandler()
+          );
+        } else {
+          this.renderer.removeStyle(this.toolbar, 'box-shadow');
+        }
+      });
+    }
   }
 
   ngOnDestroy() {
-    this.scrollListener();
-    this.renderer.removeStyle(this.toolbar, 'box-shadow');
+    if (isPlatformBrowser(this.platformId)) {
+      if (typeof this.scrollListener == 'function') this.scrollListener();
+      this.renderer.removeStyle(this.toolbar, 'box-shadow');
+    }
   }
 
   // FORM
@@ -316,16 +327,12 @@ export class ActionComponent implements OnInit {
       return (this.error =
         'Ungültiger oder abgelaufener Verifizierzungscode. Bitte versuche deine E-Mail erneut zu verifizieren, indem du versucht dich anzumelden.');
 
-    console.log('1: ', actionCode);
     auth
       .checkActionCode(actionCode)
       .then(resp => {
-        console.log('2: ', resp);
-
         auth
           .applyActionCode(actionCode)
           .then(() => {
-            console.log('2.1');
             this.db
               .colWithIds$<User>('users', ref =>
                 ref.where('email', '==', resp.data.email)
@@ -333,7 +340,6 @@ export class ActionComponent implements OnInit {
               .pipe(
                 take(1),
                 tap(data => {
-                  console.log('3: ', data);
                   if (data.length == 0) {
                     return ($this.error =
                       'Das Konto, das du verifizieren möchtest, wurde gelöscht. Bitte registriere dich erneut.');

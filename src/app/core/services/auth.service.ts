@@ -1,5 +1,5 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { of, Observable, forkJoin } from 'rxjs';
 import { User } from '../models/user.model';
@@ -42,18 +42,18 @@ export class AuthService {
     });
   }
 
-  async login(email: string, password: string, url?: string) {
+  async login(
+    email: string,
+    password: string,
+    url?: string | null,
+    navExtras?: NavigationExtras | {}
+  ) {
     return this.afAuth.auth
       .signInWithEmailAndPassword(email, password)
       .then(credentials => {
-        // if (!credentials.user.emailVerified) {
-        //   credentials.user.sendEmailVerification();
-        //   this.logout();
-        //   return credentials;
-        // }
+        // TODO: Send verification email if not verified
         console.log(credentials.user);
-        credentials.user.updateEmail('ich@dennis-adamczyk.de');
-        this.router.navigate([url || '/']);
+        this.router.navigate([url || '/'], navExtras || {});
         return credentials;
       });
   }
@@ -92,7 +92,7 @@ export class AuthService {
   logout() {
     return this.afAuth.auth
       .signOut()
-      .then(_ => this.router.navigate(['/login']));
+      .then(_ => this.router.navigate(['/start']));
   }
 
   sendEmailVerification() {

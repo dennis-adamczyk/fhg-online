@@ -74,11 +74,7 @@
             <mat-icon mat-list-icon>settings</mat-icon>
             <p mat-line>Einstellungen</p>
           </a>
-          <a
-            mat-list-item
-            routerLink="/help-feedback"
-            routerLinkActive="active"
-          >
+          <a mat-list-item routerLink="/help" routerLinkActive="active">
             <mat-icon mat-list-icon>help</mat-icon>
             <p mat-line>Hilfe & Feedback</p>
           </a>
@@ -94,22 +90,19 @@
         <ng-container *ngIf="extended">
           <a
             mat-list-item
-            routerLink="/settings#account"
+            routerLink="/settings"
+            fragment="account"
             routerLinkActive="active"
           >
             <mat-icon mat-list-icon>account_circle</mat-icon>
             <p mat-line>Mein Konto</p>
           </a>
-          <a mat-list-item routerLink="/logout" routerLinkActive="active">
+          <a mat-list-item (click)="auth.logout()">
             <mat-icon mat-list-icon>exit_to_app</mat-icon>
             <p mat-line>Abmelden</p>
           </a>
           <mat-divider></mat-divider>
-          <a
-            mat-list-item
-            routerLink="/help-feedback"
-            routerLinkActive="active"
-          >
+          <a mat-list-item routerLink="/help" routerLinkActive="active">
             <mat-icon mat-list-icon>help</mat-icon>
             <p mat-line>Hilfe & Feedback</p>
           </a>
@@ -124,12 +117,7 @@
         </ng-container>
       </ng-container>
       <ng-container *ngIf="!auth.user">
-        <a
-          mat-list-item
-          routerLink="/"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
+        <a mat-list-item routerLink="/start" routerLinkActive="active">
           <mat-icon mat-list-icon>home</mat-icon>
           <p mat-line>Start</p>
         </a>
