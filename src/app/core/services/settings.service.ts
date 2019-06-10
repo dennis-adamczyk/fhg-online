@@ -17,40 +17,35 @@ export class SettingsService {
     private db: FirestoreService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
-
-  get(key: string): any {
-    return this.getAll().then(settings => {
-      let keys = key.split('.');
-      var setting = settings;
-      keys.forEach(el => {
-        setting = setting[el];
-      });
-      return setting;
-    });
+  ) {
+    this.sync();
   }
 
-  getAll(): Promise<Settings> {
-    return this.sync().then(() => {
-      return this.strictSettings(this.getLocalSettings() as Settings);
+  get(key: string): any {
+    var settings = this.getAll();
+    let keys = key.split('.');
+    var setting = settings;
+    keys.forEach(el => {
+      setting = setting[el];
     });
+    return setting;
+  }
+
+  getAll(): Settings {
+    return this.strictSettings(this.getLocalSettings() as Settings);
   }
 
   set(key: string, value: any): Promise<void> {
-    return this.getAll().then(settings => {
+    return this.sync().then(() => {
+      var settings = this.getAll();
       this.setToValue(settings, value, key);
       return this.setAll(settings);
     });
   }
 
   setAll(settings: Settings): Promise<void> {
-    return this.sync().then(() => {
-      this.setLocalSettings(settings);
-      return this.db.set(
-        `users/${this.auth.user.id}/singles/settings`,
-        settings
-      );
-    });
+    this.setLocalSettings(settings);
+    return this.db.set(`users/${this.auth.user.id}/singles/settings`, settings);
   }
 
   sync(): Promise<void> {
@@ -88,6 +83,11 @@ export class SettingsService {
         resolve();
       }
     });
+  }
+
+  reset(): Promise<void> {
+    console.log('RESET');
+    return this.setAll(this.defaultSettings).then(() => this.sync());
   }
 
   private setToValue(obj, value, path) {

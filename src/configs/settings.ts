@@ -5,7 +5,7 @@ export class Settings {
     style: 'colored'
   };
   home: {
-    calendar_entries: number;
+    calendar_entries: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
     show_days_off: boolean;
   } = {
     calendar_entries: 5,
@@ -28,7 +28,7 @@ export class Settings {
   };
   homework: {
     sort_by: 'due_day' | 'entered';
-    max_days: number;
+    max_days: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
   } = {
     sort_by: 'due_day',
     max_days: 5
@@ -40,13 +40,23 @@ export const language = {
   appearance: {
     title: 'Aussehen',
     style: {
-      title: 'Stil'
+      title: 'Stil',
+      value: {
+        colored: 'Farbig',
+        monotone_primary: 'Monoton Primärfarbe',
+        monotone_gray: 'Monoton Grau'
+      }
     }
   },
   home: {
     title: 'Übersicht',
     calendar_entries: {
-      title: 'Anzahl der Kalendereinträge'
+      title: 'Anzahl der Kalendereinträge',
+      value: {
+        min: 3,
+        max: 10,
+        suffix: 'Einträge'
+      }
     },
     show_days_off: {
       title: 'Freie Tage anzeigen',
@@ -77,10 +87,19 @@ export const language = {
   homework: {
     title: 'Hausaufgaben',
     sort_by: {
-      title: 'Sortieren nach'
+      title: 'Sortieren nach',
+      value: {
+        due_day: 'Fälligkeitsdatum',
+        entered: 'Aufgabetag'
+      }
     },
     max_days: {
-      title: 'Maximale Tagesanzahl'
+      title: 'Maximale Tagesanzahl',
+      value: {
+        min: 3,
+        max: 14,
+        suffix: 'Tage'
+      }
     }
   },
   calendar: {

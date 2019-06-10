@@ -1,3 +1,140 @@
-<p>
-  settings works!
-</p>
+<div class="settings">
+  <mat-action-list class="group" id="account">
+    <h3 mat-subheader>
+      Mein Konto
+    </h3>
+    <div class="list">
+      <mat-list-item disableRipple>
+        <h4 mat-line>
+          Name
+        </h4>
+        <p mat-line>
+          {{ auth.getDisplayName(auth.user) }}
+        </p>
+      </mat-list-item>
+      <mat-list-item disableRipple>
+        <div class="mat-list-text">
+          <h4 mat-line>
+            E-Mail
+          </h4>
+          <p mat-line>
+            {{ auth.user.email }}
+          </p>
+        </div>
+      </mat-list-item>
+      <mat-list-item disableRipple>
+        <h4 mat-line>
+          Klasse
+        </h4>
+        <p mat-line>
+          {{ auth.user.class }}
+        </p>
+      </mat-list-item>
+      <mat-list-item disableRipple>
+        <h4 mat-line>
+          Rolle
+        </h4>
+        <p mat-line>
+          {{ auth.getRoleName(auth.user) }}
+        </p>
+      </mat-list-item>
+      <button mat-list-item (click)="settings.reset()">
+        <mat-icon matListIcon>settings_backup_restore</mat-icon>
+        <h4 mat-line>Einstellungen zurücksetzen</h4>
+      </button>
+      <button mat-list-item>
+        <mat-icon matListIcon>delete</mat-icon>
+        <h4 mat-line>Konto löschen</h4>
+      </button>
+      <button mat-list-item (click)="auth.logout()">
+        <mat-icon matListIcon>exit_to_app</mat-icon>
+        <h4 mat-line>Abmelden</h4>
+      </button>
+    </div>
+  </mat-action-list>
+  <mat-action-list class="group" [id]="group" *ngFor="let group of groups">
+    <h3 mat-subheader>
+      {{ language[group].title }}
+    </h3>
+    <div class="list">
+      <mat-list-item
+        *ngFor="let setting of objectKeys(settingDefaults[group])"
+        [ngSwitch]="settingType(group + '.' + setting)"
+        [ngClass]="settingType(group + '.' + setting)"
+        (click)="changeValue(group + '.' + setting, $event)"
+        [class.hidden]="conditionalPaths(group + '.' + setting)"
+      >
+        <ng-container *ngSwitchCase="'toggle'">
+          <div class="mat-list-text">
+            <h4 mat-line>
+              {{ language[group][setting].title }}
+            </h4>
+            <p mat-line *ngIf="language[group][setting].description">
+              {{ language[group][setting].description }}
+            </p>
+          </div>
+          <mat-slide-toggle
+            color="primary"
+            [checked]="settings.get(group + '.' + setting)"
+            (dragChange)="changeValue(group + '.' + setting, $event)"
+          ></mat-slide-toggle>
+        </ng-container>
+        <ng-container *ngSwitchCase="'select'">
+          <div class="mat-list-text">
+            <h4 mat-line>
+              {{ language[group][setting].title }}
+            </h4>
+            <p mat-line>
+              {{
+                language[group][setting].value[
+                  settings.get(group + '.' + setting)
+                ]
+              }}
+            </p>
+            <mat-select
+              #select
+              mat-line
+              [value]="settings.get(group + '.' + setting)"
+            >
+              <mat-option
+                *ngFor="let i of objectKeys(language[group][setting].value)"
+                [value]="i"
+                >{{ language[group][setting].value[i] }}</mat-option
+              >
+            </mat-select>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'numeric-select'">
+          <div class="mat-list-text">
+            <h4 mat-line>
+              {{ language[group][setting].title }}
+            </h4>
+            <p mat-line>
+              {{
+                settings.get(group + '.' + setting) +
+                  ' ' +
+                  language[group][setting].value.suffix
+              }}
+            </p>
+            <mat-select
+              #numericSelect
+              mat-line
+              [value]="settings.get(group + '.' + setting)"
+            >
+              <mat-option
+                *ngFor="
+                  let i of range(
+                    language[group][setting].value.min,
+                    language[group][setting].value.max
+                  )
+                "
+                [value]="i"
+                >{{ i }}</mat-option
+              >
+            </mat-select>
+          </div>
+        </ng-container>
+      </mat-list-item>
+    </div>
+  </mat-action-list>
+</div>

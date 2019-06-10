@@ -13,7 +13,8 @@ import {
   MatProgressSpinnerModule,
   MatStepperModule,
   MatRadioModule,
-  MatCardModule
+  MatCardModule,
+  MatSlideToggleModule
 } from '@angular/material';
 import { CdkStepperModule } from '@angular/cdk/stepper';
 import { OverlayModule } from '@angular/cdk/overlay';
@@ -34,7 +35,8 @@ const materialComponents = [
   CdkStepperModule,
   MatRadioModule,
   OverlayModule,
-  MatCardModule
+  MatCardModule,
+  MatSlideToggleModule
 ];
 
 @NgModule({
