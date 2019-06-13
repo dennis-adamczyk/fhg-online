@@ -14,7 +14,9 @@ import {
   MatStepperModule,
   MatRadioModule,
   MatCardModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatDialogModule,
+  MatSnackBarModule
 } from '@angular/material';
 import { CdkStepperModule } from '@angular/cdk/stepper';
 import { OverlayModule } from '@angular/cdk/overlay';
@@ -36,7 +38,9 @@ const materialComponents = [
   MatRadioModule,
   OverlayModule,
   MatCardModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatDialogModule,
+  MatSnackBarModule
 ];
 
 @NgModule({

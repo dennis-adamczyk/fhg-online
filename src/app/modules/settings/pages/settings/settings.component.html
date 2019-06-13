@@ -1,5 +1,5 @@
 <div class="settings">
-  <mat-action-list class="group" id="account">
+  <mat-action-list class="group" id="account" *ngIf="auth.user as user">
     <h3 mat-subheader>
       Mein Konto
     </h3>
@@ -9,7 +9,7 @@
           Name
         </h4>
         <p mat-line>
-          {{ auth.getDisplayName(auth.user) }}
+          {{ auth.getDisplayName(user) }}
         </p>
       </mat-list-item>
       <mat-list-item disableRipple>
@@ -18,7 +18,7 @@
             E-Mail
           </h4>
           <p mat-line>
-            {{ auth.user.email }}
+            {{ user.email }}
           </p>
         </div>
       </mat-list-item>
@@ -27,7 +27,7 @@
           Klasse
         </h4>
         <p mat-line>
-          {{ auth.user.class }}
+          {{ user.class }}
         </p>
       </mat-list-item>
       <mat-list-item disableRipple>
@@ -35,14 +35,14 @@
           Rolle
         </h4>
         <p mat-line>
-          {{ auth.getRoleName(auth.user) }}
+          {{ auth.getRoleName(user) }}
         </p>
       </mat-list-item>
-      <button mat-list-item (click)="settings.reset()">
+      <button mat-list-item (click)="resetSettings()">
         <mat-icon matListIcon>settings_backup_restore</mat-icon>
         <h4 mat-line>Einstellungen zurücksetzen</h4>
       </button>
-      <button mat-list-item>
+      <button mat-list-item (click)="deleteAccount()">
         <mat-icon matListIcon>delete</mat-icon>
         <h4 mat-line>Konto löschen</h4>
       </button>

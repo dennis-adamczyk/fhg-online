@@ -7,7 +7,7 @@ export const changeSettings = functions.firestore
     const data: FirebaseFirestore.DocumentData = change.after.data() || {
       updated_at: false
     };
-    admin
+    return admin
       .firestore()
       .doc(`users/${context.params.userId}`)
       .update({

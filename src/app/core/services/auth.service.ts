@@ -95,6 +95,14 @@ export class AuthService {
       .then(_ => this.router.navigate(['/start']));
   }
 
+  delete(): Promise<void> {
+    let id = this.user.id;
+    return this.afAuth.auth.currentUser.delete().then(() => {
+      this.router.navigate(['/start']);
+      return this.db.delete(`users/${id}`);
+    });
+  }
+
   sendEmailVerification() {
     return this.afAuth.auth.currentUser.sendEmailVerification();
   }

@@ -8,8 +8,8 @@ import {
 } from '@angular/router';
 import { message } from '../../../../../configs/messages';
 import { constant } from '../../../../../configs/constants';
-import * as firebase from 'firebase';
-import { Title } from '@angular/platform-browser';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
 
 @Component({
   selector: 'app-login',

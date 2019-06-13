@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>
+  {{ data.title }}
+</h2>
+<mat-dialog-content>
+  {{ data.content }}
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button
+    mat-button
+    color="primary"
+    [mat-dialog-close]="false"
+    [tabindex]="data.defaultCancel ? 1 : -1"
+  >
+    Abbrechen
+  </button>
+  <button mat-button color="primary" [mat-dialog-close]="true">
+    {{ data.accept || 'Akzeptieren' }}
+  </button>
+</mat-dialog-actions>

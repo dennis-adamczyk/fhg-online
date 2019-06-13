@@ -1,20 +1,12 @@
-import {
-  Component,
-  OnInit,
-  ElementRef,
-  ViewChild,
-  ViewChildren,
-  QueryList
-} from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { constant } from '../../../../../configs/constants';
-import { FormGroup, FormBuilder } from '@angular/forms';
 import { SettingsService } from '../../../../core/services/settings.service';
 import { language, Settings } from '../../../../../configs/settings';
-import { MatMenu, MatMenuPanel, MatSelect } from '@angular/material';
-import { Element } from '@angular/compiler/src/render3/r3_ast';
-import { take, map, filter } from 'rxjs/operators';
+import { MatSelect, MatDialog, MatSnackBar } from '@angular/material';
+import { take, filter } from 'rxjs/operators';
+import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 
 @Component({
   selector: 'app-settings',
@@ -34,8 +26,13 @@ export class SettingsComponent implements OnInit {
   constructor(
     public auth: AuthService,
     private route: ActivatedRoute,
-    public settings: SettingsService
-  ) {}
+    private router: Router,
+    public settings: SettingsService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
+  ) {
+    settings.sync();
+  }
 
   ngOnInit() {
     this.route.fragment.subscribe(fragment => {
@@ -47,7 +44,7 @@ export class SettingsComponent implements OnInit {
 
   range(min: number, max: number): number[] {
     let n = max - min + 1;
-    return [...Array(n).keys()].map(i => i + min);
+    return Array.from([...Array<number>(n).keys()].map(i => i + min));
   }
 
   settingType(path: string) {
@@ -129,5 +126,57 @@ export class SettingsComponent implements OnInit {
       if (elem.matches(selector)) return elem;
     }
     return null;
+  }
+
+  resetSettings() {
+    this.dialog
+      .open(AcceptCancelDialog, {
+        data: {
+          title: 'Einstellungen zurücksetzen?',
+          content:
+            'Dadurch wird Ihr Konto auf die Standardeinstellungen zurückgesetzt.'
+        }
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(result => {
+        if (result) {
+          this.settings.reset().then(() =>
+            this.snackBar.open('Einstellungen zurückgesetzt', null, {
+              duration: 4000
+            })
+          );
+        }
+      });
+  }
+
+  deleteAccount() {
+    this.dialog
+      .open(AcceptCancelDialog, {
+        data: {
+          title: 'Konto löschen?',
+          content:
+            'Dein Konto wird unwiederruflich gelöscht, sodass du dich nicht mehr anmelden kannst.',
+          accept: 'Unwiederruflich löschen',
+          defaultCancel: true
+        }
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(result => {
+        if (result) {
+          this.auth.delete().catch(error => {
+            if (error.code == 'auth/requires-recent-login') {
+              this.snackBar
+                .open(
+                  'Bitte melde dich erneut an, bevor du dein Konto löschen kannst.',
+                  'Neu anmelden'
+                )
+                .afterDismissed()
+                .subscribe(() => this.auth.logout());
+            }
+          });
+        }
+      });
   }
 }

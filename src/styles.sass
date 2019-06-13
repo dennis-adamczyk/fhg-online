@@ -26,3 +26,15 @@ body
 
 mat-icon
     user-select: none
+
+.mat-dialog-container
+    max-width: 560px
+
+    @media ($mat-xsmall)
+        max-width: 280px
+
+    .mat-dialog-actions
+        justify-content: flex-end
+
+        .mat-button
+            text-transform: uppercase

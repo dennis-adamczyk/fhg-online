@@ -86,7 +86,6 @@ export class SettingsService {
   }
 
   reset(): Promise<void> {
-    console.log('RESET');
     return this.setAll(this.defaultSettings).then(() => this.sync());
   }
 
