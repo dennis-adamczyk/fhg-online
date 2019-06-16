@@ -5,6 +5,8 @@
 @import ./themes/light-theme.sass
 @import ./themes/dark-theme.sass
 
+@import ./var
+
 +angular-material-theme($light-theme)
 
 .light-theme
@@ -38,3 +40,7 @@ mat-icon
 
         .mat-button
             text-transform: uppercase
+
+.update-install
+    .mat-simple-snackbar-action
+        color: mat-color($primary-dark)
