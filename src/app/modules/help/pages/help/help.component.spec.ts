@@ -1,19 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AcceptCancelDialog } from './accept-cancel.component';
+import { HelpComponent } from './help.component';
 
-describe('AcceptCancelDialog', () => {
-  let component: AcceptCancelDialog;
-  let fixture: ComponentFixture<AcceptCancelDialog>;
+describe('HelpComponent', () => {
+  let component: HelpComponent;
+  let fixture: ComponentFixture<HelpComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AcceptCancelDialog]
-    }).compileComponents();
+      declarations: [ HelpComponent ]
+    })
+    .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AcceptCancelDialog);
+    fixture = TestBed.createComponent(HelpComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

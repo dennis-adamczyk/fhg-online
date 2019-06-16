@@ -170,7 +170,8 @@ export class SettingsComponent implements OnInit {
               this.snackBar
                 .open(
                   'Bitte melde dich erneut an, bevor du dein Konto löschen kannst.',
-                  'Neu anmelden'
+                  'Neu anmelden',
+                  { duration: 6000 }
                 )
                 .afterDismissed()
                 .subscribe(() => this.auth.logout());

@@ -1,0 +1,29 @@
+@import ../../../../../var
+
+mat-tab-group
+    position: sticky
+    top: 0
+    max-height: calc(100vh - 56px)
+
+    ::ng-deep .mat-tab-header
+        +mat-elevation(2)
+
+    .content
+        margin: 24px 0 32px 0
+        padding: 0 16px
+        width: auto
+
+        a
+            text-decoration: none
+            color: mat-color($primary-light)
+
+            &:hover
+                text-decoration: underline
+
+@media not all and ($mat-xsmall)
+    mat-tab-group   
+        max-height: calc(100vh - 64px)
+
+        .content
+            margin: 24px auto 32px auto
+            width: 576px

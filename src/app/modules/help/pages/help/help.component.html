@@ -1,0 +1,16 @@
+<div class="help">
+  <mat-toolbar>
+    <button
+      type="button"
+      class="close-btn"
+      aria-label="Close"
+      mat-icon-button
+      (click)="location.back()"
+      [disableRipple]="isHandset$ | async"
+    >
+      <mat-icon aria-label="Close help icon">close</mat-icon>
+    </button>
+    <span class="title">Hilfe & Feedback</span>
+  </mat-toolbar>
+  <div class="container"></div>
+</div>

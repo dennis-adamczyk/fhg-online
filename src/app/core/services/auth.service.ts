@@ -8,6 +8,7 @@ import { switchMap, startWith, tap, map } from 'rxjs/operators';
 import { message } from '../../../configs/messages';
 import { isPlatformBrowser } from '@angular/common';
 import { AngularFireFunctions } from '@angular/fire/functions';
+import { MatSnackBar } from '@angular/material';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class AuthService {
     private afAuth: AngularFireAuth,
     private db: FirestoreService,
     private afFunc: AngularFireFunctions,
+    private snackBar: MatSnackBar,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -86,7 +88,14 @@ export class AuthService {
             });
           });
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        console.log(error);
+        this.snackBar.open(
+          'Fehler aufgetreten. Bitte versuche es später erneut.',
+          null,
+          { duration: 4000 }
+        );
+      });
   }
 
   logout() {

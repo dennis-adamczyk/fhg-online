@@ -1,0 +1,33 @@
+@import ../../../../../var
+
+.help
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: mat-color($background-light, background)
+    z-index: 6
+
+    mat-toolbar
+        .close-btn
+            color: mat-color($foreground-light, icon)
+            margin: 0 24px 0 0
+
+        .title
+            position: absolute
+            left: 0
+            width: 100%
+            text-align: center
+
+@media not all and ($mat-xsmall)
+    .help
+        mat-toolbar
+            background-color:  mat-color($background-light, card)
+            border-bottom: 1px solid mat-color($foreground-light, divider)
+
+            .title
+                position: static
+                left: auto
+                width: auto
+                text-align: left

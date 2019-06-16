@@ -23,10 +23,10 @@ const routes: Routes = [
     }
   },
   {
-    path: 'imprint-privacy',
+    path: 'info',
     component: ImprintPrivacyComponent,
     data: {
-      title: 'Impressum & Datenschutz'
+      title: 'Informationen'
     }
   }
 ];
