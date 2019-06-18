@@ -14,8 +14,7 @@ export class UpdateService {
           duration: 6000
         })
         .onAction()
-        .subscribe(data => {
-          console.log(data);
+        .subscribe(() => {
           updates.activateUpdate().then(() => document.location.reload());
         });
     });
