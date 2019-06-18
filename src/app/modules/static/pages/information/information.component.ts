@@ -14,11 +14,11 @@ import { ActivatedRoute } from '@angular/router';
 import { MatTabGroup } from '@angular/material';
 
 @Component({
-  selector: 'app-imprint-privacy',
-  templateUrl: './imprint-privacy.component.html',
-  styleUrls: ['./imprint-privacy.component.sass']
+  selector: 'app-information',
+  templateUrl: './information.component.html',
+  styleUrls: ['./information.component.sass']
 })
-export class ImprintPrivacyComponent implements OnInit {
+export class InformationComponent implements OnInit {
   toolbar: Element;
   @ViewChild('tabs', { static: true }) tabGroup: MatTabGroup;
 

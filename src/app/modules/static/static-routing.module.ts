@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { StartComponent } from './pages/start/start.component';
 import { AboutComponent } from './pages/about/about.component';
 import { NoAuthGuard } from 'src/app/core/guards/no-auth.guard';
-import { ImprintPrivacyComponent } from './pages/imprint-privacy/imprint-privacy.component';
+import { InformationComponent } from './pages/information/information.component';
 
 const routes: Routes = [
   {
@@ -24,7 +24,7 @@ const routes: Routes = [
   },
   {
     path: 'info',
-    component: ImprintPrivacyComponent,
+    component: InformationComponent,
     data: {
       title: 'Informationen'
     }
