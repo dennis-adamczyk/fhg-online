@@ -70,6 +70,15 @@
             <p mat-line>Kalender</p>
           </a>
           <mat-divider></mat-divider>
+          <a
+            mat-list-item
+            routerLink="/admin"
+            routerLinkActive="active"
+            *ngIf="auth.user.roles.guard || auth.user.roles.admin"
+          >
+            <mat-icon mat-list-icon>settings_applications</mat-icon>
+            <p mat-line>Administration</p>
+          </a>
           <a mat-list-item routerLink="/settings" routerLinkActive="active">
             <mat-icon mat-list-icon>settings</mat-icon>
             <p mat-line>Einstellungen</p>
@@ -134,16 +143,33 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar #mainToolbar class="main-toolbar" color="primary">
-      <button
-        type="button"
-        class="menu-btn"
-        aria-label="Toggle sidenav"
-        mat-icon-button
-        (click)="drawer.toggle()"
-        [disableRipple]="isHandset$ | async"
-      >
-        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-      </button>
+      <ng-container [ngSwitch]="(activeMenuItem$ | async)?.iconFunction">
+        <ng-container *ngIf="(activeMenuItem$ | async)?.iconFunction == 'back'">
+          <button
+            type="button"
+            class="back-btn"
+            aria-label="Previous page"
+            mat-icon-button
+            (click)="location.back()"
+            [disableRipple]="isHandset$ | async"
+          >
+            <mat-icon aria-label="Side nav back icon">arrow_back</mat-icon>
+          </button>
+        </ng-container>
+        <ng-container *ngIf="(activeMenuItem$ | async)?.iconFunction == 'menu'">
+          <button
+            type="button"
+            class="menu-btn"
+            aria-label="Toggle sidenav"
+            mat-icon-button
+            (click)="drawer.toggle()"
+            [disableRipple]="isHandset$ | async"
+          >
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+        </ng-container>
+      </ng-container>
+
       <span>{{ toolbarService.title$ | async }}</span>
     </mat-toolbar>
     <main>

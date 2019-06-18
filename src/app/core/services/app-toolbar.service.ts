@@ -8,6 +8,7 @@ import { constant } from '../../../configs/constants';
 export interface MenuItem {
   path: string;
   title: string;
+  iconFunction?: string;
 }
 
 @Injectable({
@@ -42,7 +43,8 @@ export class AppToolbarService {
       .map(route => {
         return {
           path: route.path,
-          title: route.data.title
+          title: route.data.title,
+          iconFunction: route.data.iconFunction
         };
       });
   }
@@ -60,7 +62,8 @@ export class AppToolbarService {
     return cfg && cfg.data && cfg.data.title
       ? {
           path: cfg.path,
-          title: cfg.data.title
+          title: cfg.data.title,
+          iconFunction: cfg.data.iconFunction ? cfg.data.iconFunction : 'menu'
         }
       : undefined;
   }

@@ -7,6 +7,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { MatSidenav } from '@angular/material/sidenav';
 import * as Hammer from 'hammerjs';
 import { AuthService } from '../services/auth.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-navigation',
@@ -18,7 +19,7 @@ export class NavigationComponent {
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(map(result => result.matches));
-  activeMenuItem$: Observable<MenuItem>;
+  activeMenuItem$: Observable<MenuItem> = this.toolbarService.activeMenuItem$;
   extended: boolean = false;
 
   constructor(
@@ -26,9 +27,10 @@ export class NavigationComponent {
     public toolbarService: AppToolbarService,
     private router: Router,
     private elementRef: ElementRef,
-    public auth: AuthService
+    public auth: AuthService,
+    public location: Location
   ) {
-    this.activeMenuItem$ = this.toolbarService.activeMenuItem$;
+    // this.activeMenuItem$.subscribe(x => console.log(x));
     router.events
       .pipe(
         withLatestFrom(this.isHandset$),

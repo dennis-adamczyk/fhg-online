@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { NoAuthGuard } from './core/guards/no-auth.guard';
+import { IsAdminOrGuardGuard } from './core/guards/is-admin-or-guard.guard';
 
 const routes: Routes = [
   {
@@ -32,6 +33,11 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: './modules/settings/settings.module#SettingsModule',
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin',
+    loadChildren: './modules/admin/admin.module#AdminModule',
+    canActivate: [IsAdminOrGuardGuard]
   },
   {
     path: '',
