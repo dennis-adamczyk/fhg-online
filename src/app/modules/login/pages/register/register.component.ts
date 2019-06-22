@@ -50,7 +50,7 @@ export class RegisterComponent implements OnInit {
               [
                 Validators.required,
                 Validators.minLength(3),
-                Validators.pattern(/^([\w-]+\.[\w-]+)+$/)
+                Validators.pattern(/^([a-zA-Z-]+\.[a-zA-Z-]+)+$/)
               ],
               [RegisterValidator.email(this.db)]
             ]
@@ -61,7 +61,7 @@ export class RegisterComponent implements OnInit {
               [
                 Validators.required,
                 Validators.pattern(
-                  /^([\wÄäÖöÜüÉÈéèÇç]+-?[\wÄäÖöÜüÉÈéèÇç]+\s?)+$/
+                  /^([a-zA-ZÄäÖöÜüÉÈéèÇç]+-?[a-zA-ZÄäÖöÜüÉÈéèÇç]+\s?)+$/
                 )
               ]
             ],
@@ -70,7 +70,7 @@ export class RegisterComponent implements OnInit {
               [
                 Validators.required,
                 Validators.pattern(
-                  /^([\wÄäÖöÜüÉÈéèÇç]+-?[\wÄäÖöÜüÉÈéèÇç]+\s?)+$/
+                  /^([a-zA-ZÄäÖöÜüÉÈéèÇç]+-?[a-zA-ZÄäÖöÜüÉÈéèÇç]+\s?)+$/
                 )
               ]
             ]

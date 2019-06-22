@@ -1,4 +1,4 @@
-@import ../../../../../var
+@import ../../../../../../var
 
 .toolbar-extention
     position: absolute
@@ -10,7 +10,7 @@
     z-index: -1
     +mat-elevation(2)
 
-.classes
+.users-detail
     margin: 8px
     padding: 0
     height: auto
@@ -70,17 +70,9 @@
             align-items: center
             justify-content: center
 
-        .list
-            padding: 8px 0
-
-            mat-icon
-                color: mat-color($foreground-light, icon)
-
-        
-
     
 @media not all and ($mat-xsmall)
-    .classes
+    .users-detail
         margin: 0 auto 24px auto
         width: 576px
 

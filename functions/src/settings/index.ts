@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-export const changeSettings = functions.firestore
+export const onChangeSettings = functions.firestore
   .document('users/{userId}/singles/settings')
   .onUpdate((change, context) => {
     const data: FirebaseFirestore.DocumentData = change.after.data() || {

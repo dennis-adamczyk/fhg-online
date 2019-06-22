@@ -11,7 +11,7 @@ export class UpdateService {
       snackBar
         .open('Ein Update ist verfügbar.', 'Installieren', {
           panelClass: 'update-install',
-          duration: 6000
+          duration: 10000
         })
         .onAction()
         .subscribe(() => {

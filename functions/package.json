@@ -16,6 +16,7 @@
     "firebase": "^6.1.0",
     "firebase-admin": "^8.0.0",
     "firebase-functions": "^2.3.0",
+    "firebase-tools": "^7.0.1",
     "fs-extra": "^8.0.1",
     "webpack": "^4.33.0"
   },

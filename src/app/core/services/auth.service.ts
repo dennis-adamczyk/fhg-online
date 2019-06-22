@@ -107,8 +107,12 @@ export class AuthService {
   delete(): Promise<void> {
     let id = this.user.id;
     return this.afAuth.auth.currentUser.delete().then(() => {
-      this.router.navigate(['/start']);
-      return this.db.delete(`users/${id}`);
+      return this.db.delete(`users/${id}`).then(() => {
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.clear();
+          location.reload();
+        }
+      });
     });
   }
 

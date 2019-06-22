@@ -1,0 +1,21 @@
+<div class="toolbar-extention"></div>
+<div class="users-detail">
+  <header>
+    <h1>
+      {{ data ? data.name.first_name + ' ' + data.name.last_name : 'Benutzer' }}
+    </h1>
+    <div class="actions">
+      <button mat-icon-button matTooltip="Löschen">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </header>
+  <div class="body">
+    <div class="loading" *ngIf="isLoading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <ng-container *ngIf="data">
+      <ngx-json-viewer [json]="data"></ngx-json-viewer>
+    </ng-container>
+  </div>
+</div>

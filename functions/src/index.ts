@@ -9,7 +9,14 @@ admin.initializeApp({
 import * as rendering from './ssr';
 import * as login from './login';
 import * as settings from './settings';
+import * as admin_users from './admin/users';
 
 export const ssr = rendering.ssr;
 export const registerUser = login.registerUser;
-export const changeSettings = settings.changeSettings;
+export const onChangeUser = login.onChangeUser;
+export const onDeleteUser = login.onDeleteUser;
+export const onChangeSettings = settings.onChangeSettings;
+export const getUsers = admin_users.getUsers;
+export const getUser = admin_users.getUser;
+export const deleteUser = admin_users.deleteUser;
+export const deleteUsers = admin_users.deleteUsers;

@@ -38,7 +38,7 @@ export const registerUser = functions.https.onCall((data, context) => {
   }
   if (
     !email.endsWith('@franz-haniel-gymnasium.eu') ||
-    !email.split('@')[0].match(/^([\w-]+\.[\w-]+)+$/)
+    !email.split('@')[0].match(/^([a-zA-Z-]+\.[a-zA-Z-]+)+$/)
   ) {
     throw new HttpsError('failed-precondition', 'Die E-Mail ist ungültig.');
   }
@@ -54,8 +54,12 @@ export const registerUser = functions.https.onCall((data, context) => {
     );
   }
   if (
-    !name.first_name.match(/^([\wÄäÖöÜüÉÈéèÇç]+-?[\wÄäÖöÜüÉÈéèÇç]+\s?)+$/) ||
-    !name.last_name.match(/^([\wÄäÖöÜüÉÈéèÇç]+-?[\wÄäÖöÜüÉÈéèÇç]+\s?)+$/)
+    !name.first_name.match(
+      /^([a-zA-ZÄäÖöÜüÉÈéèÇç]+-?[a-zA-ZÄäÖöÜüÉÈéèÇç]+\s?)+$/
+    ) ||
+    !name.last_name.match(
+      /^([a-zA-ZÄäÖöÜüÉÈéèÇç]+-?[a-zA-ZÄäÖöÜüÉÈéèÇç]+\s?)+$/
+    )
   ) {
     throw new HttpsError('failed-precondition', 'Die Name ist ungültig.');
   }
@@ -105,7 +109,7 @@ export const registerUser = functions.https.onCall((data, context) => {
         );
       }
     })
-    .catch(error => null);
+    .catch();
 
   admin
     .firestore()
@@ -131,7 +135,7 @@ export const registerUser = functions.https.onCall((data, context) => {
       emailVerified: false,
       phoneNumber: undefined,
       password: password,
-      displayName: name.first_name + ' ' + name.last_name,
+      displayName: name.last_name + ', ' + name.first_name,
       photoURL: undefined,
       disabled: false
     })
@@ -172,3 +176,91 @@ export const registerUser = functions.https.onCall((data, context) => {
         });
     });
 });
+
+export const onChangeUser = functions.firestore
+  .document('users/{userId}')
+  .onUpdate((change, context) => {
+    const newValue = change.after.data()!;
+    const previousValue = change.before.data()!;
+    const uid = context.params.userId;
+
+    if (newValue.roles != previousValue.roles) {
+      admin.auth().setCustomUserClaims(uid, {
+        guard: newValue.roles.guard,
+        admin: newValue.roles.admin,
+        student: newValue.roles.student,
+        teacher: newValue.roles.teacher
+      });
+    }
+    if (newValue.name != previousValue.name) {
+      admin.auth().updateUser(uid, {
+        displayName: newValue.name.last_name + ', ' + newValue.name.first_name
+      });
+    }
+    return true;
+  });
+
+export const onDeleteUser = functions
+  .runWith({
+    timeoutSeconds: 540,
+    memory: '2GB'
+  })
+  .firestore.document('users/{userId}')
+  .onWrite((change, context) => {
+    if (!change.after.exists || !change.after.data()) {
+      const path = `users/${context.params.userId}`;
+      return admin
+        .firestore()
+        .doc(path)
+        .listCollections()
+        .then(collections => {
+          return collections.forEach(collection => {
+            return deleteCollection(admin.firestore(), collection.path);
+          });
+        });
+    }
+    return false;
+  });
+
+function deleteCollection(db, collectionPath) {
+  let collectionRef = db.collection(collectionPath);
+  let query = collectionRef.orderBy('__name__');
+
+  return new Promise((resolve, reject) => {
+    deleteQueryBatch(db, query, resolve, reject);
+  });
+}
+
+function deleteQueryBatch(db, query, resolve, reject) {
+  query
+    .get()
+    .then(snapshot => {
+      // When there are no documents left, we are done
+      if (snapshot.size == 0) {
+        return 0;
+      }
+
+      // Delete documents in a batch
+      let batch = db.batch();
+      snapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      return batch.commit().then(() => {
+        return snapshot.size;
+      });
+    })
+    .then(numDeleted => {
+      if (numDeleted === 0) {
+        resolve();
+        return;
+      }
+
+      // Recurse on the next process tick, to avoid
+      // exploding the stack.
+      process.nextTick(() => {
+        deleteQueryBatch(db, query, resolve, reject);
+      });
+    })
+    .catch(reject);
+}

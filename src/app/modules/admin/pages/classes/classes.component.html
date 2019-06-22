@@ -1,2 +1,31 @@
 <div class="toolbar-extention"></div>
-<div class="classes"></div>
+<div class="classes">
+  <header>
+    <h1>Klassen</h1>
+    <div class="actions">
+      <button mat-icon-button>
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </header>
+  <div class="body">
+    <div class="loading" *ngIf="!(classlist | async)">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <mat-action-list class="list">
+      <button
+        mat-list-item
+        [routerLink]="'/admin/classes/' + class"
+        *ngFor="let class of classlist | async"
+      >
+        <mat-icon matListIcon>{{
+          isClass(class) ? 'class' : 'bookmark'
+        }}</mat-icon>
+        <p mat-line>
+          {{ isClass(class) ? 'Klasse ' + class : 'Stufe ' + class }}
+        </p>
+        <mat-icon matSuffix>chevron_right</mat-icon>
+      </button>
+    </mat-action-list>
+  </div>
+</div>

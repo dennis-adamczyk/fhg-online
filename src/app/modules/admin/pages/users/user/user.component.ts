@@ -2,28 +2,32 @@ import {
   Component,
   OnInit,
   Renderer2,
-  Inject,
-  PLATFORM_ID
+  PLATFORM_ID,
+  Inject
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { FirestoreService } from 'src/app/core/services/firestore.service';
-import { map } from 'rxjs/operators';
+import { AngularFireFunctions } from '@angular/fire/functions';
+import { isPlatformBrowser, Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { User } from 'src/app/core/models/user.model';
 
 @Component({
-  selector: 'app-classes',
-  templateUrl: './classes.component.html',
-  styleUrls: ['./classes.component.sass']
+  selector: 'app-user',
+  templateUrl: './user.component.html',
+  styleUrls: ['./user.component.sass']
 })
-export class ClassesComponent implements OnInit {
+export class UserComponent implements OnInit {
   toolbar: Element;
   sidenavContent: Element;
   toolbarExtention: Element;
   scrollListener: any;
 
-  classlist: Promise<String[]>;
+  data: User;
+  isLoading: boolean = true;
 
   constructor(
-    private db: FirestoreService,
+    private afFunc: AngularFireFunctions,
+    private route: ActivatedRoute,
+    private location: Location,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
@@ -31,12 +35,6 @@ export class ClassesComponent implements OnInit {
   /* ##### Toolbar Extention ##### */
 
   ngOnInit() {
-    this.classlist = this.db
-      .doc('years/--index--')
-      .get()
-      .toPromise()
-      .then(d => d.data().classes.sort());
-
     if (isPlatformBrowser(this.platformId)) {
       this.toolbar = document.querySelector('.main-toolbar');
       this.sidenavContent = document.querySelector('mat-sidenav-content');
@@ -67,9 +65,22 @@ export class ClassesComponent implements OnInit {
     }
   }
 
-  /* ##### CLASSES FUNCTIONS ##### */
+  /* ##### GET DATA ##### */
 
-  isClass(clazz: string): boolean {
-    return !!clazz.match(/^\d/);
+  ngAfterViewInit() {
+    this.route.params.subscribe(params => {
+      if (!params.uid) return this.location.back();
+      this.getData(params.uid);
+    });
+  }
+
+  getData(uid: string) {
+    this.isLoading = true;
+    let getUser = this.afFunc.functions.httpsCallable('getUser');
+    return getUser({ uid: uid }).then(result => {
+      this.data = result.data;
+      this.isLoading = false;
+      return result.data;
+    });
   }
 }

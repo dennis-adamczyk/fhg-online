@@ -20,6 +20,7 @@ export class IsAdminOrGuardGuard implements CanActivate {
   constructor(
     private auth: AuthService,
     private snackBar: MatSnackBar,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -30,12 +31,13 @@ export class IsAdminOrGuardGuard implements CanActivate {
     if (isPlatformBrowser(this.platformId)) {
       return this.auth.user$.pipe(
         take(1),
-        map(user => user.roles.admin || user.roles.guard),
+        map(user => user && (user.roles.admin || user.roles.guard)),
         tap(isAdminOrGuard => {
           if (!isAdminOrGuard) {
             this.snackBar.open(
               'Du hast unzureichende Rechte um diese Seite aufzurufen.'
             );
+            this.router.navigate(['/start']);
             return false;
           }
         })
