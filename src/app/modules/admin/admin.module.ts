@@ -9,6 +9,8 @@ import { UsersComponent } from './pages/users/users.component';
 import { UserComponent } from './pages/users/user/user.component';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { ClassComponent } from './pages/classes/class/class.component';
+import { MembersComponent } from './pages/classes/class/members/members.component';
+import { AdminsComponent } from './pages/classes/class/admins/admins.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +18,9 @@ import { ClassComponent } from './pages/classes/class/class.component';
     ClassesComponent,
     UsersComponent,
     UserComponent,
-    ClassComponent
+    ClassComponent,
+    MembersComponent,
+    AdminsComponent
   ],
   imports: [CommonModule, AdminRoutingModule, SharedModule, NgxJsonViewerModule]
 })

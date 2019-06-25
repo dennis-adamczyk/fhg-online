@@ -16,7 +16,9 @@ import {
 import { SelectionModel } from '@angular/cdk/collections';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
-import { take } from 'rxjs/operators';
+import { take, filter } from 'rxjs/operators';
+import { NavigationEnd, Router, ActivatedRoute } from '@angular/router';
+import { UserComponent } from './user/user.component';
 
 export interface UserElement {
   uid: string;
@@ -35,6 +37,7 @@ export class UsersComponent implements OnInit {
   sidenavContent: Element;
   toolbarExtention: Element;
   scrollListener: any;
+  sub: boolean = !!this.route.children.length;
 
   displayedColumns: string[] = ['select', 'name', 'role', 'last_login'];
   data = new MatTableDataSource<UserElement>([]);
@@ -50,6 +53,8 @@ export class UsersComponent implements OnInit {
 
   constructor(
     private afFunc: AngularFireFunctions,
+    private router: Router,
+    private route: ActivatedRoute,
     private dialog: MatDialog,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
@@ -58,6 +63,11 @@ export class UsersComponent implements OnInit {
   /* ##### Toolbar Extention ##### */
 
   ngOnInit() {
+    this.router.events
+      .pipe(filter(evt => evt instanceof NavigationEnd))
+      .subscribe(url => {
+        this.sub = !!this.route.children.length;
+      });
     if (isPlatformBrowser(this.platformId)) {
       this.toolbar = document.querySelector('.main-toolbar');
       this.sidenavContent = document.querySelector('mat-sidenav-content');
@@ -83,6 +93,7 @@ export class UsersComponent implements OnInit {
 
   ngOnDestroy() {
     if (isPlatformBrowser(this.platformId)) {
+      console.log('out');
       if (typeof this.scrollListener == 'function') this.scrollListener();
       this.renderer.removeStyle(this.toolbar, 'box-shadow');
     }
@@ -91,6 +102,7 @@ export class UsersComponent implements OnInit {
   /* ##### LOAD DATA ##### */
 
   ngAfterViewInit() {
+    if (this.sub) return;
     this.paginator._intl.itemsPerPageLabel = 'Pro Seite:';
     this.paginator._intl.getRangeLabel = (page, pageSize, length) => {
       if (length == 0 || pageSize == 0) {
@@ -242,5 +254,15 @@ export class UsersComponent implements OnInit {
     this.isAllSelected()
       ? this.selection.clear()
       : this.data.data.forEach(row => this.selection.select(row));
+  }
+
+  /* ##### LOAD SUBS ##### */
+
+  onActivate(componentReference) {
+    if (componentReference instanceof UserComponent) {
+      let name: any = this.selection.selected[0].name.split(', ');
+      name = name[1] + ' ' + name[0];
+      componentReference.name = name;
+    }
   }
 }

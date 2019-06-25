@@ -5,6 +5,8 @@ import { ClassesComponent } from './pages/classes/classes.component';
 import { UsersComponent } from './pages/users/users.component';
 import { UserComponent } from './pages/users/user/user.component';
 import { ClassComponent } from './pages/classes/class/class.component';
+import { MembersComponent } from './pages/classes/class/members/members.component';
+import { AdminsComponent } from './pages/classes/class/admins/admins.component';
 
 const routes: Routes = [
   {
@@ -20,15 +22,13 @@ const routes: Routes = [
     data: {
       title: 'Administration',
       iconFunction: 'back'
-    }
-  },
-  {
-    path: 'users/:uid',
-    component: UserComponent,
-    data: {
-      title: 'Administration',
-      iconFunction: 'back'
-    }
+    },
+    children: [
+      {
+        path: ':uid',
+        component: UserComponent
+      }
+    ]
   },
   {
     path: 'classes',
@@ -44,7 +44,17 @@ const routes: Routes = [
     data: {
       title: 'Administration',
       iconFunction: 'back'
-    }
+    },
+    children: [
+      {
+        path: 'members',
+        component: MembersComponent
+      },
+      {
+        path: 'admins',
+        component: AdminsComponent
+      }
+    ]
   }
 ];
 
