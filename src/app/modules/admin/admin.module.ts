@@ -11,6 +11,7 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { ClassComponent } from './pages/classes/class/class.component';
 import { MembersComponent } from './pages/classes/class/members/members.component';
 import { AdminsComponent } from './pages/classes/class/admins/admins.component';
+import { TreeDatabaseService } from './services/tree-database.service';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,12 @@ import { AdminsComponent } from './pages/classes/class/admins/admins.component';
     MembersComponent,
     AdminsComponent
   ],
-  imports: [CommonModule, AdminRoutingModule, SharedModule, NgxJsonViewerModule]
+  imports: [
+    CommonModule,
+    AdminRoutingModule,
+    SharedModule,
+    NgxJsonViewerModule
+  ],
+  providers: [TreeDatabaseService]
 })
 export class AdminModule {}

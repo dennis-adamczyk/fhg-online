@@ -42,7 +42,7 @@ export class UsersComponent implements OnInit {
   displayedColumns: string[] = ['select', 'name', 'role', 'last_login'];
   data = new MatTableDataSource<UserElement>([]);
   selection = new SelectionModel<UserElement>(true, []);
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatSort, { static: false }) sort: MatSort;
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
   resultsLength = 0;
@@ -67,6 +67,9 @@ export class UsersComponent implements OnInit {
       .pipe(filter(evt => evt instanceof NavigationEnd))
       .subscribe(url => {
         this.sub = !!this.route.children.length;
+        if (this.isLoadingResults) {
+          this.refreshData(true);
+        }
       });
     if (isPlatformBrowser(this.platformId)) {
       this.toolbar = document.querySelector('.main-toolbar');
@@ -93,7 +96,6 @@ export class UsersComponent implements OnInit {
 
   ngOnDestroy() {
     if (isPlatformBrowser(this.platformId)) {
-      console.log('out');
       if (typeof this.scrollListener == 'function') this.scrollListener();
       this.renderer.removeStyle(this.toolbar, 'box-shadow');
     }
@@ -103,6 +105,11 @@ export class UsersComponent implements OnInit {
 
   ngAfterViewInit() {
     if (this.sub) return;
+    this.refreshData(false);
+    this.prepareView();
+  }
+
+  prepareView() {
     this.paginator._intl.itemsPerPageLabel = 'Pro Seite:';
     this.paginator._intl.getRangeLabel = (page, pageSize, length) => {
       if (length == 0 || pageSize == 0) {
@@ -119,8 +126,6 @@ export class UsersComponent implements OnInit {
           : startIndex + pageSize;
       return `${startIndex + 1} - ${endIndex} von ${length}`;
     };
-
-    this.refreshData(false);
   }
 
   refreshData(force: boolean) {
@@ -132,6 +137,7 @@ export class UsersComponent implements OnInit {
         this.data = new MatTableDataSource<UserElement>(result);
         this.data.sort = this.sort;
         this.data.paginator = this.paginator;
+        this.prepareView();
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem(
             this.storageKey,
@@ -260,7 +266,10 @@ export class UsersComponent implements OnInit {
 
   onActivate(componentReference) {
     if (componentReference instanceof UserComponent) {
-      let name: any = this.selection.selected[0].name.split(', ');
+      let name: any =
+        this.selection.selected.length == 1
+          ? this.selection.selected[0].name.split(', ')
+          : '';
       name = name[1] + ' ' + name[0];
       componentReference.name = name;
     }

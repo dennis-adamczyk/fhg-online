@@ -17,6 +17,5 @@ export const onChangeUser = login.onChangeUser;
 export const onDeleteUser = login.onDeleteUser;
 export const onChangeSettings = settings.onChangeSettings;
 export const getUsers = admin_users.getUsers;
-export const getUser = admin_users.getUser;
 export const deleteUser = admin_users.deleteUser;
 export const deleteUsers = admin_users.deleteUsers;

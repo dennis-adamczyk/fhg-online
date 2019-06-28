@@ -21,10 +21,12 @@ import {
   MatTableModule,
   MatSortModule,
   MatPaginatorModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatTreeModule
 } from '@angular/material';
 import { CdkStepperModule } from '@angular/cdk/stepper';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { CdkTreeModule } from '@angular/cdk/tree';
 
 const materialComponents = [
   MatToolbarModule,
@@ -50,7 +52,9 @@ const materialComponents = [
   MatTableModule,
   MatSortModule,
   MatPaginatorModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatTreeModule,
+  CdkTreeModule
 ];
 
 @NgModule({

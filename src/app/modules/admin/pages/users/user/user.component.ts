@@ -11,6 +11,12 @@ import { ActivatedRoute } from '@angular/router';
 import { User } from 'src/app/core/models/user.model';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { tap, take } from 'rxjs/operators';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import {
+  PropertyNode,
+  TreeDatabaseService
+} from '../../../services/tree-database.service';
+import { MatTreeNestedDataSource } from '@angular/material';
 
 @Component({
   selector: 'app-user',
@@ -22,13 +28,30 @@ export class UserComponent {
   name: string;
   isLoading: boolean = true;
 
+  nestedTreeControl: NestedTreeControl<PropertyNode>;
+  nestedDataSource: MatTreeNestedDataSource<PropertyNode>;
+
   constructor(
+    private treeDb: TreeDatabaseService,
     private db: FirestoreService,
     private route: ActivatedRoute,
     private location: Location,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  ) {
+    this.nestedTreeControl = new NestedTreeControl<PropertyNode>(
+      this._getChildren
+    );
+    this.nestedDataSource = new MatTreeNestedDataSource();
+
+    treeDb.dataChange.subscribe(data => {
+      this.nestedDataSource.data = data;
+    });
+  }
+
+  hasNestedChild = (_: number, nodeData: PropertyNode) => nodeData.children;
+
+  private _getChildren = (node: PropertyNode) => node.children;
 
   /* ##### GET DATA ##### */
 
@@ -43,6 +66,7 @@ export class UserComponent {
     this.isLoading = true;
     this.db.docWithId$<User>(`users/${uid}`).subscribe(result => {
       this.data = result;
+      this.treeDb.initialize(result);
       this.isLoading = false;
     });
   }

@@ -51,6 +51,111 @@ header
         align-items: center
         justify-content: center
 
+    .data-tree
+        .invisible
+            display: none
+
+
+        .expand
+            color: mat-color($foreground-light, icon)
+
+            mat-icon
+                transition: transform 100ms $ease-in-out-curve-function
+
+                &.expanded
+                    transform: rotate(90deg)
+
+        .key
+            font-family: 'Roboto Mono', monospace
+            margin: 0 8px 0 0
+            color: mat-color($foreground-light, secondary-text)
+
+            &:not(.hide-colon)::after
+                content: ':'
+
+        .preview
+            color: mat-color($foreground-light, secondary-text)
+
+        .value
+            user-select: text
+            cursor: text
+
+            &.null
+                content: 'null'
+                font-style: italic
+                color: mat-color($foreground-light, hint-text)
+
+        .type
+            opacity: 0
+            position: absolute
+            top: 0
+            right: 0
+            bottom: 0
+            padding: 0 16px 0 4px
+            color: mat-color($foreground-light, hint-text)
+            line-height: 48px
+            z-index: 1
+            background-color: #F5F5F5
+            transition: opacity 150ms $ease-in-out-curve-function
+
+        ul, li
+            cursor: pointer
+            margin-top: 0
+            margin-bottom: 0
+            list-style: none
+
+        .child-note
+            padding: 0
+
+            &.array > .mat-tree-node > .mat-tree-node > .key,
+            &.array > .mat-nested-tree-node > li > .mat-tree-node > .key
+                background-color: rgba(mat-color($foreground-light, base), .08)
+                height: 20px
+                line-height: 20px
+                border-radius: 2px
+                min-width: 16px
+                padding: 0 4px
+                text-align: center
+
+                &::after
+                    content: ''
+
+            .single-node,
+            .nested-note
+
+                &[level='1']
+                    padding: 0 0 0 40px
+
+                &[level='2']
+                    padding: 0 0 0 2*40px
+
+                &[level='3']
+                    padding: 0 0 0 3*40px
+
+                &[level='4']
+                    padding: 0 0 0 4*40px
+
+                &[level='5']
+                    padding: 0 0 0 5*40px
+
+                &[level='6']
+                    padding: 0 0 0 6*40px
+
+
+        .nested-note,
+        .single-node
+            position: relative
+            transition: background 150ms $ease-in-out-curve-function
+
+            &:hover
+                background-color: mat-color($background-light, hover)
+
+                &::after
+                    opacity: 1
+
+                .type
+                    opacity: 1
+
     
 @media not all and ($mat-xsmall)
 

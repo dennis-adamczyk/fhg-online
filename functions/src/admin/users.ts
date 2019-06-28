@@ -102,46 +102,6 @@ export const getUsers = functions.https.onCall((data, context) => {
   });
 });
 
-export const getUser = functions.https.onCall((data, context) => {
-  // Get data
-  const uid: string = data.uid;
-
-  // Validation
-  if (!context.auth) {
-    throw new HttpsError(
-      'failed-precondition',
-      'Fehler beim Ausführen der Funktion im unauthentifizierten Zustand.'
-    );
-  }
-  if (
-    !admin
-      .auth()
-      .getUser(context.auth.uid)
-      .then(userRecord => {
-        return (userRecord.customClaims as { guard: boolean })!.guard == true;
-      })
-  ) {
-    throw new HttpsError(
-      'failed-precondition',
-      'Unzureichende Berechtigungen zum Ausführen der Funktion.'
-    );
-  }
-  if (!uid || typeof uid !== 'string' || uid.length == 0) {
-    throw new HttpsError(
-      'failed-precondition',
-      'Parameter UID wurde nicht übergeben.'
-    );
-  }
-
-  return admin
-    .firestore()
-    .doc(`users/${uid}`)
-    .get()
-    .then(doc => {
-      return doc.data();
-    });
-});
-
 export const deleteUser = functions.https.onCall((data, context) => {
   // Get data
   const uid: string = data.uid;

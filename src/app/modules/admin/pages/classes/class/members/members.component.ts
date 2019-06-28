@@ -1,11 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { User } from 'src/app/core/models/user.model';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
-import { take } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { merge } from 'rxjs';
 
 interface UserElement {
   uid: string;
@@ -74,24 +71,21 @@ export class MembersComponent implements OnInit {
   }
 
   getData(callback: () => any) {
-    let students$ = this.db
-      .colWithIds$('users', ref => ref.where('class', '==', this.class))
-      .pipe(take(1));
-    let teachers$ = this.db
-      .colWithIds$('users', ref =>
-        ref.where('classes', 'array-contains', this.class)
-      )
-      .pipe(take(1));
+    let students$ = this.db.colWithIds('users', ref =>
+      ref.where('class', '==', this.class)
+    );
+    let teachers$ = this.db.colWithIds('users', ref =>
+      ref.where('classes', 'array-contains', this.class)
+    );
 
-    forkJoin(students$, teachers$).subscribe((res: any[]) => {
-      this.members = this.flatten(res);
+    merge(students$, teachers$).subscribe((res: any[]) => {
       this.isLoading = false;
+      if (res.length == 0) return;
+      res.forEach(res => {
+        if (!this.members.includes(res)) this.members.push(res);
+      });
       callback();
     });
-  }
-
-  private flatten(array: any[]): any[] {
-    return array.reduce((acc, val) => acc.concat(val), []);
   }
 
   getCreatedFormat(created_at: any) {

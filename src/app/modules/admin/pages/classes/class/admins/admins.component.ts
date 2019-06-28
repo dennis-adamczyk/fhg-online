@@ -2,8 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
-import { take } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { merge } from 'rxjs';
 
 interface UserElement {
   uid: string;
@@ -72,33 +71,29 @@ export class AdminsComponent implements OnInit {
   }
 
   getData(callback: () => any) {
-    let admins$ = this.db
-      .colWithIds$('users', ref =>
-        ref
-          .where('roles.admin', '==', true)
-          .where('classes', 'array-contains', this.class)
-      )
-      .pipe(take(1));
-    let guardsStudent$ = this.db
-      .colWithIds$('users', ref =>
-        ref.where('roles.guard', '==', true).where('class', '==', this.class)
-      )
-      .pipe(take(1));
-    let guardsTeacher$ = this.db
-      .colWithIds$('users', ref =>
-        ref
-          .where('roles.guard', '==', true)
-          .where('classes', 'array-contains', this.class)
-      )
-      .pipe(take(1));
-
-    forkJoin(admins$, guardsStudent$, guardsTeacher$).subscribe(
-      (res: any[]) => {
-        this.admins = this.flatten(res);
-        this.isLoading = false;
-        callback();
-      }
+    let admins$ = this.db.colWithIds('users', ref =>
+      ref
+        .where('roles.admin', '==', true)
+        .where('classes', 'array-contains', this.class)
     );
+    let guardsStudent$ = this.db.colWithIds('users', ref =>
+      ref.where('roles.guard', '==', true).where('class', '==', this.class)
+    );
+
+    let guardsTeacher$ = this.db.colWithIds('users', ref =>
+      ref
+        .where('roles.guard', '==', true)
+        .where('classes', 'array-contains', this.class)
+    );
+
+    merge(admins$, guardsStudent$, guardsTeacher$).subscribe((res: any[]) => {
+      this.isLoading = false;
+      if (res.length == 0) return;
+      res.forEach(res => {
+        if (!this.admins.includes(res)) this.admins.push(res);
+      });
+      callback();
+    });
   }
 
   private flatten(array: any[]): any[] {

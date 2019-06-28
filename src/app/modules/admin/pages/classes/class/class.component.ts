@@ -82,51 +82,55 @@ export class ClassComponent implements OnInit {
       .pipe(filter(evt => evt instanceof NavigationEnd))
       .subscribe(url => {
         this.sub = !!this.route.children.length;
+        if (this.isLoading) {
+          this.members = [];
+          this.admins = [];
+          this.loadData();
+        }
       });
     this.route.params.subscribe(params => {
       this.isLoading = true;
       if (!params.class) return this.location.back();
       this.class = params.class;
 
-      let students$ = this.db
-        .colWithIds$('users', ref => ref.where('class', '==', this.class))
-        .pipe(take(1));
-      let teachers$ = this.db
-        .colWithIds$('users', ref =>
-          ref.where('classes', 'array-contains', this.class)
-        )
-        .pipe(take(1));
+      if (this.sub) return;
 
-      let admins$ = this.db
-        .colWithIds$('users', ref =>
-          ref
-            .where('roles.admin', '==', true)
-            .where('classes', 'array-contains', this.class)
-        )
-        .pipe(take(1));
-      let guardsStudent$ = this.db
-        .colWithIds$('users', ref =>
-          ref.where('roles.guard', '==', true).where('class', '==', this.class)
-        )
-        .pipe(take(1));
-      let guardsTeacher$ = this.db
-        .colWithIds$('users', ref =>
-          ref
-            .where('roles.guard', '==', true)
-            .where('classes', 'array-contains', this.class)
-        )
-        .pipe(take(1));
-
-      forkJoin(students$, teachers$).subscribe((res: any[]) => {
-        this.members = this.flatten(res);
-        if (this.members && this.admins) this.isLoading = false;
-      });
-      forkJoin(admins$, guardsStudent$, guardsTeacher$).subscribe(
-        (res: any[]) => {
-          this.admins = this.flatten(res);
-          if (this.members && this.admins) this.isLoading = false;
-        }
+      let students$ = this.db.colWithIds('users', ref =>
+        ref.where('class', '==', this.class)
       );
+      let teachers$ = this.db.colWithIds('users', ref =>
+        ref.where('classes', 'array-contains', this.class)
+      );
+
+      let admins$ = this.db.colWithIds('users', ref =>
+        ref
+          .where('roles.admin', '==', true)
+          .where('classes', 'array-contains', this.class)
+      );
+      let guardsStudent$ = this.db.colWithIds('users', ref =>
+        ref.where('roles.guard', '==', true).where('class', '==', this.class)
+      );
+
+      let guardsTeacher$ = this.db.colWithIds('users', ref =>
+        ref
+          .where('roles.guard', '==', true)
+          .where('classes', 'array-contains', this.class)
+      );
+
+      merge(students$, teachers$).subscribe((res: any[]) => {
+        this.isLoading = false;
+        if (res.length == 0) return;
+        res.forEach(res => {
+          if (!this.members.includes(res)) this.members.push(res);
+        });
+      });
+      merge(admins$, guardsStudent$, guardsTeacher$).subscribe((res: any[]) => {
+        this.isLoading = false;
+        if (res.length == 0) return;
+        res.forEach(res => {
+          if (!this.admins.includes(res)) this.admins.push(res);
+        });
+      });
     });
   }
 
