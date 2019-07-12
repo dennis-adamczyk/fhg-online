@@ -6,6 +6,7 @@ export interface User {
     last_name: string;
   };
   class?: string | Array<string>;
+  courses: Array<string>;
   roles: {
     admin: boolean;
     guard: boolean;

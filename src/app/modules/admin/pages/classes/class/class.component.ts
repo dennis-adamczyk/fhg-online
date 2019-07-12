@@ -99,13 +99,13 @@ export class ClassComponent implements OnInit {
         ref.where('class', '==', this.class)
       );
       let teachers$ = this.db.colWithIds('users', ref =>
-        ref.where('classes', 'array-contains', this.class)
+        ref.where('class', 'array-contains', this.class)
       );
 
       let admins$ = this.db.colWithIds('users', ref =>
         ref
           .where('roles.admin', '==', true)
-          .where('classes', 'array-contains', this.class)
+          .where('class', 'array-contains', this.class)
       );
       let guardsStudent$ = this.db.colWithIds('users', ref =>
         ref.where('roles.guard', '==', true).where('class', '==', this.class)
@@ -114,7 +114,7 @@ export class ClassComponent implements OnInit {
       let guardsTeacher$ = this.db.colWithIds('users', ref =>
         ref
           .where('roles.guard', '==', true)
-          .where('classes', 'array-contains', this.class)
+          .where('class', 'array-contains', this.class)
       );
 
       merge(students$, teachers$).subscribe((res: any[]) => {

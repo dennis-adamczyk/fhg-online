@@ -3,6 +3,14 @@
     {{ data ? data.name.first_name + ' ' + data.name.last_name : name }}
   </h1>
   <div class="actions">
+    <button
+      mat-icon-button
+      matTooltip="Speichern"
+      (click)="onSave()"
+      *ngIf="edited"
+    >
+      <mat-icon>save</mat-icon>
+    </button>
     <button mat-icon-button matTooltip="Löschen">
       <mat-icon>delete</mat-icon>
     </button>
@@ -12,58 +20,124 @@
   <div class="loading" *ngIf="isLoading">
     <mat-spinner diameter="32"></mat-spinner>
   </div>
-
-  <mat-tree
-    [dataSource]="nestedDataSource"
-    [treeControl]="nestedTreeControl"
-    class="data-tree"
-  >
-    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-      <li class="mat-tree-node single-node" [attr.level]="node.level">
-        <button mat-icon-button disabled></button>
-        <span class="key">{{ node.name }}</span>
-        <span class="value" [class.null]="node.value == null">{{
-          node.value == null ? 'null' : node.value
-        }}</span>
-        <span class="type">({{ node.type || 'Null' }})</span>
-      </li>
-    </mat-tree-node>
-
-    <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
-      <li>
-        <div
-          class="mat-tree-node nested-note"
-          [attr.level]="node.level"
-          matTreeNodeToggle
+  <form [formGroup]="userForm" *ngIf="!isLoading">
+    <section formGroupName="name" class="name">
+      <mat-form-field>
+        <mat-label>Vorname</mat-label>
+        <input matInput formControlName="first_name" />
+        <mat-error *ngIf="first_name.invalid">{{
+          getFirstNameErrorMessage()
+        }}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Nachname</mat-label>
+        <input matInput formControlName="last_name" />
+        <mat-error *ngIf="last_name.invalid">{{
+          getLastNameErrorMessage()
+        }}</mat-error>
+      </mat-form-field>
+    </section>
+    <mat-form-field>
+      <mat-label>E-Mail</mat-label>
+      <input matInput formControlName="email" />
+      <p matSuffix>{{ constant.displayedEmailSuffix }}</p>
+      <mat-error *ngIf="email.invalid">{{ getEmailErrorMessage() }}</mat-error>
+    </mat-form-field>
+    <section formGroupName="roles" class="roles">
+      <h4>Rollen</h4>
+      <mat-checkbox color="primary" formControlName="guard">Guard</mat-checkbox>
+      <mat-checkbox color="primary" formControlName="admin"
+        >Administrator</mat-checkbox
+      >
+      <mat-checkbox color="primary" formControlName="teacher"
+        >Lehrer</mat-checkbox
+      >
+      <mat-checkbox color="primary" formControlName="student"
+        >Schüler</mat-checkbox
+      >
+    </section>
+    <mat-form-field (click)="loadClasses()">
+      <mat-label>Klasse/Stufe</mat-label>
+      <mat-select formControlName="class" *ngIf="isSingleClass">
+        <mat-option
+          [value]="userForm.get('class').value"
+          *ngIf="!classes.length"
+          >{{ userForm.get('class').value }}</mat-option
         >
-          <button
-            mat-icon-button
-            disableRipple
-            [attr.aria-label]="'toggle ' + node.name"
-            class="expand"
-          >
-            <mat-icon [class.expanded]="nestedTreeControl.isExpanded(node)">
-              arrow_right
-            </mat-icon>
-          </button>
-          <span
-            class="key"
-            [class.hide-colon]="nestedTreeControl.isExpanded(node)"
-            >{{ node.name }}</span
-          >
-          <span class="preview" *ngIf="!nestedTreeControl.isExpanded(node)">{{
-            node.preview
-          }}</span>
-          <span class="type">({{ node.type || 'Null' }})</span>
-        </div>
-        <ul
-          class="child-note"
-          [class.array]="node.type == 'Liste'"
-          [class.invisible]="!nestedTreeControl.isExpanded(node)"
+        <mat-option *ngFor="let class of classes" [value]="class">{{
+          class
+        }}</mat-option>
+      </mat-select>
+      <mat-select formControlName="class" multiple *ngIf="!isSingleClass">
+        <mat-option
+          *ngFor="
+            let class of classes.length ? [] : userForm.get('class').value
+          "
+          [value]="class"
+          >{{ class }}</mat-option
         >
-          <ng-container matTreeNodeOutlet></ng-container>
-        </ul>
-      </li>
-    </mat-nested-tree-node>
-  </mat-tree>
+        <mat-option *ngFor="let class of classes" [value]="class">{{
+          class
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field (click)="loadCourses()">
+      <mat-label>Kurse</mat-label>
+      <mat-select formControlName="courses" multiple>
+        <mat-option
+          *ngFor="
+            let course of courses.length ? [] : userForm.get('courses').value
+          "
+          [value]="course"
+          >{{ course }}</mat-option
+        >
+        <mat-option *ngFor="let course of courses" [value]="course">{{
+          course
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <section class="status">
+      <mat-form-field>
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option *ngFor="let status of max(2)" [value]="status">
+            {{ status }}</mat-option
+          >
+        </mat-select>
+        <mat-error *ngIf="status.invalid">{{
+          getStatusErrorMessage()
+        }}</mat-error>
+      </mat-form-field>
+      <p class="description">
+        0 – Registriert<br />
+        1 – Verifiziert<br />
+        2 – Aktiviert
+      </p>
+    </section>
+  </form>
+  <mat-expansion-panel class="info">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Weitere Infromationen
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <form [formGroup]="infoForm" *ngIf="!isLoading">
+      <mat-form-field>
+        <mat-label>Identifikations-Nummer</mat-label>
+        <input matInput formControlName="id" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Einstellungen geändert am</mat-label>
+        <input matInput formControlName="settings_changed" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Erstellt am</mat-label>
+        <input matInput formControlName="created_at" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Geändert am</mat-label>
+        <input matInput formControlName="updated_at" />
+      </mat-form-field>
+    </form>
+  </mat-expansion-panel>
 </div>

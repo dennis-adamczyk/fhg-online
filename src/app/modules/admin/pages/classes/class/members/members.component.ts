@@ -75,7 +75,7 @@ export class MembersComponent implements OnInit {
       ref.where('class', '==', this.class)
     );
     let teachers$ = this.db.colWithIds('users', ref =>
-      ref.where('classes', 'array-contains', this.class)
+      ref.where('class', 'array-contains', this.class)
     );
 
     merge(students$, teachers$).subscribe((res: any[]) => {

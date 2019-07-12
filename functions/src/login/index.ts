@@ -153,6 +153,7 @@ export const registerUser = functions.https.onCall((data, context) => {
             teacher: role == 'teacher' ? true : false
           },
           class: clazz ? clazz : undefined,
+          courses: [],
           status: 0,
           settings_changed: null,
           updated_at: admin.firestore.FieldValue.serverTimestamp(),

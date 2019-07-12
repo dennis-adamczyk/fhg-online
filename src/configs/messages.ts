@@ -66,6 +66,13 @@ export const message = {
         required: 'Wiederhole das Passwort',
         notMatch: 'Passwörter stimmen nicht überein'
       }
+    },
+    admin: {
+      user: {
+        status: {
+          required: 'Status benötigt'
+        }
+      }
     }
   }
 };
