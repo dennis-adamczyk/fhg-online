@@ -3,10 +3,11 @@ import {
   OnInit,
   Renderer2,
   PLATFORM_ID,
-  Inject
+  Inject,
+  HostListener
 } from '@angular/core';
 import { isPlatformBrowser, Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { User } from 'src/app/core/models/user.model';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { fbind } from 'q';
@@ -14,9 +15,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { constant } from 'src/configs/constants';
 import { message } from 'src/configs/messages';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { take } from 'rxjs/operators';
+import { FirebaseFunctions } from '@angular/fire';
+import { AngularFireFunctions } from '@angular/fire/functions';
 
 @Component({
   selector: 'app-user',
@@ -41,12 +44,13 @@ export class UserComponent {
 
   constructor(
     private db: FirestoreService,
+    private afFunc: AngularFireFunctions,
     private route: ActivatedRoute,
+    private router: Router,
     private location: Location,
-    private renderer: Renderer2,
     private fb: FormBuilder,
-    private auth: AuthService,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
 
@@ -98,6 +102,18 @@ export class UserComponent {
       updated_at: ''
     });
     this.infoForm.disable();
+  }
+
+  ngOnDestroy() {
+    if (this.edited) {
+      this.snackBar.open(
+        `Änderungen am Benutzer "${this.name}" wurden verworfen`,
+        null,
+        {
+          duration: 5000
+        }
+      );
+    }
   }
 
   /* ##### GET DATA ##### */
@@ -195,11 +211,29 @@ export class UserComponent {
   onChanges(): void {
     this.userForm.valueChanges.subscribe(val => {
       this.edited = true;
-
-      if (!val.roles.student && typeof val.class == 'string') {
-        this.userForm.get('class').setValue([val.class]);
-      }
     });
+  }
+
+  onTeacherChange(event) {
+    if (event.checked) {
+      this.userForm
+        .get('roles')
+        .get('student')
+        .setValue(false);
+    }
+  }
+
+  onStudentChange(event) {
+    if (event.checked) {
+      this.userForm
+        .get('roles')
+        .get('teacher')
+        .setValue(false);
+      let clazz: any = this.userForm.get('class').value;
+      if (Array.isArray(clazz) && clazz.length == 1) {
+        this.userForm.get('class').setValue(clazz[0]);
+      }
+    }
   }
 
   onSave() {
@@ -219,7 +253,7 @@ export class UserComponent {
         .open(AcceptCancelDialog, {
           data: {
             title: 'Änderungen am Benutzer speichern?',
-            content: `Das Formular ist fehlerhaft. Soll der Benutzer trotzdem gespeichert werden, obwohl dies zu erheblichen Fehlern für diesen führen kann?`,
+            content: `Das Formular ist fehlerhaft. Es können erhebliche Fehler für den Benutzer entstehen.`,
             accept: 'Speichern',
             defaultCancel: true
           }
@@ -234,6 +268,37 @@ export class UserComponent {
     } else {
       return update();
     }
+  }
+
+  onUndo() {
+    this.ngOnInit();
+    this.getData(this.data.id);
+  }
+
+  onDelete() {
+    this.dialog
+      .open(AcceptCancelDialog, {
+        data: {
+          title: 'Konto löschen?',
+          content: `Das Konto von <b>${name}</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
+          accept: 'Unwiederruflich löschen',
+          defaultCancel: true
+        }
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(result => {
+        if (result) {
+          let deleteUser = this.afFunc.functions.httpsCallable('deleteUser');
+          deleteUser({ uid: this.data.id }).then(() => {
+            this.isLoading = true;
+            this.data = null;
+            this.router.navigate(['/admin/users'], {
+              queryParams: { refresh: true }
+            });
+          });
+        }
+      });
   }
 
   /* ##### HELPER ##### */

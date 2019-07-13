@@ -49,7 +49,7 @@ if (
   ],
   entryComponents: [AcceptCancelDialog],
   exports: [NavigationComponent],
-  providers: [providerscoll]
+  providers: [...providerscoll]
 })
 export class CoreModule {
   constructor(@Optional() @SkipSelf() parentModule: CoreModule) {

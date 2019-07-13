@@ -12,10 +12,11 @@ export const registerUser = functions.https.onCall((data, context) => {
   };
   const password: string = data.password;
   const clazz: string | null = data.class || null;
+  const skipVerification: boolean = data.skipVerification || false;
 
   // Validation
 
-  if (context.auth) {
+  if (context.auth && !skipVerification) {
     throw new HttpsError(
       'failed-precondition',
       'Fehler beim Ausführen der Funktion im authentifizierten Zustand.'
@@ -132,7 +133,7 @@ export const registerUser = functions.https.onCall((data, context) => {
     .auth()
     .createUser({
       email: email,
-      emailVerified: false,
+      emailVerified: skipVerification,
       phoneNumber: undefined,
       password: password,
       displayName: name.last_name + ', ' + name.first_name,
@@ -154,7 +155,7 @@ export const registerUser = functions.https.onCall((data, context) => {
           },
           class: clazz ? clazz : undefined,
           courses: [],
-          status: 0,
+          status: skipVerification ? 1 : 0,
           settings_changed: null,
           updated_at: admin.firestore.FieldValue.serverTimestamp(),
           created_at: admin.firestore.FieldValue.serverTimestamp()
@@ -223,7 +224,7 @@ export const onDeleteUser = functions
     return false;
   });
 
-function deleteCollection(db, collectionPath) {
+function deleteCollection(db: any, collectionPath: any) {
   let collectionRef = db.collection(collectionPath);
   let query = collectionRef.orderBy('__name__');
 
@@ -232,10 +233,10 @@ function deleteCollection(db, collectionPath) {
   });
 }
 
-function deleteQueryBatch(db, query, resolve, reject) {
+function deleteQueryBatch(db: any, query: any, resolve: any, reject: any) {
   query
     .get()
-    .then(snapshot => {
+    .then((snapshot: any) => {
       // When there are no documents left, we are done
       if (snapshot.size == 0) {
         return 0;
@@ -251,7 +252,7 @@ function deleteQueryBatch(db, query, resolve, reject) {
         return snapshot.size;
       });
     })
-    .then(numDeleted => {
+    .then((numDeleted: any) => {
       if (numDeleted === 0) {
         resolve();
         return;

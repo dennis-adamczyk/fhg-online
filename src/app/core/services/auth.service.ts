@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Router, NavigationExtras } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { of, Observable, forkJoin } from 'rxjs';
+import { of, Observable, forkJoin, throwError } from 'rxjs';
 import { User } from '../models/user.model';
 import { FirestoreService } from './firestore.service';
 import { switchMap, startWith, tap, map } from 'rxjs/operators';
@@ -89,12 +89,12 @@ export class AuthService {
           });
       })
       .catch(error => {
-        console.log(error);
         this.snackBar.open(
           'Fehler aufgetreten. Bitte versuche es später erneut.',
           null,
           { duration: 4000 }
         );
+        throw error;
       });
   }
 

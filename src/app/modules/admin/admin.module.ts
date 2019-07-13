@@ -12,6 +12,7 @@ import { ClassComponent } from './pages/classes/class/class.component';
 import { MembersComponent } from './pages/classes/class/members/members.component';
 import { AdminsComponent } from './pages/classes/class/admins/admins.component';
 import { TreeDatabaseService } from './services/tree-database.service';
+import { AddComponent } from './pages/users/add/add.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { TreeDatabaseService } from './services/tree-database.service';
     UserComponent,
     ClassComponent,
     MembersComponent,
-    AdminsComponent
+    AdminsComponent,
+    AddComponent
   ],
   imports: [
     CommonModule,

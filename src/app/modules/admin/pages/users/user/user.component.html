@@ -5,13 +5,21 @@
   <div class="actions">
     <button
       mat-icon-button
+      matTooltip="Änderungen verwerfen"
+      (click)="onUndo()"
+      *ngIf="edited"
+    >
+      <mat-icon>undo</mat-icon>
+    </button>
+    <button
+      mat-icon-button
       matTooltip="Speichern"
       (click)="onSave()"
       *ngIf="edited"
     >
       <mat-icon>save</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Löschen">
+    <button mat-icon-button matTooltip="Löschen" (click)="onDelete()">
       <mat-icon>delete</mat-icon>
     </button>
   </div>
@@ -49,10 +57,16 @@
       <mat-checkbox color="primary" formControlName="admin"
         >Administrator</mat-checkbox
       >
-      <mat-checkbox color="primary" formControlName="teacher"
+      <mat-checkbox
+        color="primary"
+        formControlName="teacher"
+        (change)="onTeacherChange($event)"
         >Lehrer</mat-checkbox
       >
-      <mat-checkbox color="primary" formControlName="student"
+      <mat-checkbox
+        color="primary"
+        formControlName="student"
+        (change)="onStudentChange($event)"
         >Schüler</mat-checkbox
       >
     </section>

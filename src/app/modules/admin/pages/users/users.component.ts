@@ -6,7 +6,7 @@ import {
   PLATFORM_ID,
   ViewChild
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, Location } from '@angular/common';
 import {
   MatSort,
   MatTableDataSource,
@@ -42,8 +42,8 @@ export class UsersComponent implements OnInit {
   displayedColumns: string[] = ['select', 'name', 'role', 'last_login'];
   data = new MatTableDataSource<UserElement>([]);
   selection = new SelectionModel<UserElement>(true, []);
-  @ViewChild(MatSort, { static: false }) sort: MatSort;
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: false }) sort!: MatSort;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
 
   resultsLength = 0;
   isLoadingResults = true;
@@ -57,6 +57,7 @@ export class UsersComponent implements OnInit {
     private route: ActivatedRoute,
     private dialog: MatDialog,
     private renderer: Renderer2,
+    private location: Location,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
 
@@ -69,6 +70,17 @@ export class UsersComponent implements OnInit {
         this.sub = !!this.route.children.length;
         if (this.isLoadingResults) {
           this.refreshData(true);
+        }
+        if (!this.sub) {
+          setTimeout(() => {
+            this.data.sort = this.sort;
+            this.data.paginator = this.paginator;
+
+            if (this.route.snapshot.queryParamMap.get('refresh')) {
+              this.refreshData(true);
+              this.location.replaceState('/admin/users');
+            }
+          }, 0);
         }
       });
     if (isPlatformBrowser(this.platformId)) {
@@ -135,8 +147,22 @@ export class UsersComponent implements OnInit {
         this.isLoadingResults = false;
         this.resultsLength = result.length;
         this.data = new MatTableDataSource<UserElement>(result);
+        this.selection = new SelectionModel<UserElement>(true, []);
         this.data.sort = this.sort;
         this.data.paginator = this.paginator;
+        this.data.sortingDataAccessor = (item, property) => {
+          switch (property) {
+            case 'last_login':
+              let parts = item.last_login.split('.');
+              return new Date(
+                parseInt(parts[2]),
+                parseInt(parts[1]) - 1,
+                parseInt(parts[0])
+              );
+            default:
+              return item[property];
+          }
+        };
         this.prepareView();
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem(
@@ -183,6 +209,21 @@ export class UsersComponent implements OnInit {
               this.isLoadingResults = false;
               this.data = new MatTableDataSource<UserElement>(newData);
               this.selection = new SelectionModel<UserElement>(true, []);
+              this.data.sort = this.sort;
+              this.data.paginator = this.paginator;
+              this.data.sortingDataAccessor = (item, property) => {
+                switch (property) {
+                  case 'last_login':
+                    let parts = item.last_login.split('.');
+                    return new Date(
+                      parseInt(parts[2]),
+                      parseInt(parts[1]) - 1,
+                      parseInt(parts[0])
+                    );
+                  default:
+                    return item[property];
+                }
+              };
               localStorage.removeItem(this.storageKey);
             });
           }
@@ -213,6 +254,21 @@ export class UsersComponent implements OnInit {
               newData.splice(index, 1);
               this.data = new MatTableDataSource<UserElement>(newData);
               this.selection = new SelectionModel<UserElement>(true, []);
+              this.data.sort = this.sort;
+              this.data.paginator = this.paginator;
+              this.data.sortingDataAccessor = (item, property) => {
+                switch (property) {
+                  case 'last_login':
+                    let parts = item.last_login.split('.');
+                    return new Date(
+                      parseInt(parts[2]),
+                      parseInt(parts[1]) - 1,
+                      parseInt(parts[0])
+                    );
+                  default:
+                    return item[property];
+                }
+              };
               localStorage.removeItem(this.storageKey);
             });
           }

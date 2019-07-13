@@ -7,6 +7,7 @@ import { UserComponent } from './pages/users/user/user.component';
 import { ClassComponent } from './pages/classes/class/class.component';
 import { MembersComponent } from './pages/classes/class/members/members.component';
 import { AdminsComponent } from './pages/classes/class/admins/admins.component';
+import { AddComponent } from './pages/users/add/add.component';
 
 const routes: Routes = [
   {
@@ -24,6 +25,10 @@ const routes: Routes = [
       iconFunction: 'back'
     },
     children: [
+      {
+        path: 'add',
+        component: AddComponent
+      },
       {
         path: ':uid',
         component: UserComponent

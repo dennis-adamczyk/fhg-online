@@ -59,6 +59,7 @@ header
         justify-content: space-around
 
         & > mat-form-field,
+        & > mat-radio-group,
         & > section
             width: 100%
 
@@ -74,11 +75,8 @@ header
             mat-form-field
                 width: 100%
 
-        .roles
+        .role
             margin: 0 0 16px 0
-            display: flex
-            justify-content: space-between
-            flex-wrap: wrap
 
             h4
                 margin: 0 0 8px 0
@@ -87,24 +85,13 @@ header
                 font-weight: 500
                 color: mat-color($foreground-light, secondary-text)
 
-            mat-checkbox
-                width: calc(50% - 8px)
-                padding: 4px 0
+            mat-radio-button
+                padding: 4px 24px 4px 0
 
-        .status
-            display: flex
-            justify-content: space-between
-            flex-wrap: wrap
-
-            mat-form-field
-                width: 100%
-            
-            .description
-                width: 100%
-                margin: 0
-                padding: 0 16px
-                font-size: 14px
-                font-weight: 400
+        .password
+            .passwordVisibility
+                user-select: none
+                cursor: pointer
                 color: mat-color($foreground-light, secondary-text)
 
     .info
@@ -115,6 +102,9 @@ header
             mat-form-field
                 input
                     color: mat-color($foreground-light, text)
+
+    .submit
+        padding: 8px 0 0 0
 
     
 @media not all and ($mat-xsmall)
@@ -135,12 +125,3 @@ header
 
                 mat-form-field
                     width: calc(50% - 8px)
-
-            .status
-                flex-wrap: nowrap
-
-                mat-form-field
-                    width: auto
-
-                .description
-                    padding: 0 32px

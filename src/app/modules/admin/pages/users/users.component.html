@@ -15,9 +15,9 @@
           <button mat-icon-button (click)="search = true" matTooltip="Suchen">
             <mat-icon>search</mat-icon>
           </button>
-          <button mat-icon-button matTooltip="Hinzufügen">
+          <a mat-icon-button matTooltip="Hinzufügen" routerLink="add">
             <mat-icon>add</mat-icon>
-          </button>
+          </a>
         </div>
       </header>
     </ng-container>
@@ -63,9 +63,6 @@
           >
             <mat-icon>edit</mat-icon>
           </a>
-          <button mat-icon-button>
-            <mat-icon>more_horiz</mat-icon>
-          </button>
         </div>
       </header>
     </ng-container>
@@ -118,7 +115,9 @@
 
         <!-- Last Login Column -->
         <ng-container matColumnDef="last_login">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Angemeldet</th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Angemeldet
+          </th>
           <td mat-cell *matCellDef="let element">{{ element.last_login }}</td>
         </ng-container>
 
