@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { database } from 'firebase';
 
 @Component({
   selector: 'app-accept-cancel',

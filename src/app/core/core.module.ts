@@ -17,6 +17,7 @@ import { NavigationComponent } from './navigation/navigation.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { SharedModule } from '../shared/shared.module';
 import { AcceptCancelDialog } from './dialogs/accept-cancel/accept-cancel.component';
+import { EditLessonsDialog } from './dialogs/edit-lessons/edit-lessons.component';
 
 // TODO: Add Angular Fire Performance
 
@@ -33,7 +34,7 @@ if (
 }
 
 @NgModule({
-  declarations: [NavigationComponent, AcceptCancelDialog],
+  declarations: [NavigationComponent, AcceptCancelDialog, EditLessonsDialog],
   imports: [
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production
@@ -47,7 +48,7 @@ if (
     LayoutModule,
     SharedModule
   ],
-  entryComponents: [AcceptCancelDialog],
+  entryComponents: [AcceptCancelDialog, EditLessonsDialog],
   exports: [NavigationComponent],
   providers: [...providerscoll]
 })

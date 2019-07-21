@@ -54,7 +54,6 @@ export class AuthService {
       .signInWithEmailAndPassword(email, password)
       .then(credentials => {
         // TODO: Send verification email if not verified
-        console.log(credentials.user);
         this.router.navigate([url || '/'], navExtras || {});
         return credentials;
       });

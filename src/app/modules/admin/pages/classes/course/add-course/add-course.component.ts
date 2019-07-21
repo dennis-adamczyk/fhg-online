@@ -6,19 +6,18 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { FirestoreService } from 'src/app/core/services/firestore.service';
-import { map } from 'rxjs/operators';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-classes',
-  templateUrl: './classes.component.html',
-  styleUrls: ['./classes.component.sass']
+  selector: 'app-add-course',
+  templateUrl: './add-course.component.html',
+  styleUrls: ['./add-course.component.sass']
 })
-export class ClassesComponent implements OnInit {
-  classlist: Promise<String[]>;
+export class AddCourseComponent implements OnInit {
+  courseForm: FormGroup;
 
   constructor(
-    private db: FirestoreService,
+    private fb: FormBuilder,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
@@ -31,12 +30,6 @@ export class ClassesComponent implements OnInit {
   scrollListener: any;
 
   ngOnInit() {
-    this.classlist = this.db
-      .doc('years/--index--')
-      .get()
-      .toPromise()
-      .then(d => d.data().classes.sort());
-
     if (isPlatformBrowser(this.platformId)) {
       this.toolbar = document.querySelector('.main-toolbar');
       this.sidenavContent = document.querySelector('mat-sidenav-content');
@@ -58,6 +51,7 @@ export class ClassesComponent implements OnInit {
         event => scrollHandler()
       );
     }
+    this.init();
   }
 
   ngOnDestroy() {
@@ -67,9 +61,43 @@ export class ClassesComponent implements OnInit {
     }
   }
 
-  /* ##### CLASSES FUNCTIONS ##### */
+  /* ##### LOAD DATA ##### */
 
-  isClass(clazz: string): boolean {
-    return !!clazz.match(/^\d/);
+  init() {
+    this.courseForm = this.fb.group({
+      subject: ['', [Validators.required]],
+      short: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[^\s]+$/),
+          Validators.maxLength(5)
+        ]
+      ],
+      room: ['', [Validators.required, Validators.maxLength(5)]],
+      class: [[], [Validators.required]],
+      multi: [false],
+      teacher: this.fb.group({
+        title: ['', [Validators.required, Validators.maxLength(10)]],
+        last_name: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern(
+              /^([a-zA-ZÄäÖöÜüÉÈéèÇçß]+-?[a-zA-ZÄäÖöÜüÉÈéèÇçß]+\s?)+$/
+            )
+          ]
+        ],
+        short: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern(/^[^\s]+$/),
+            Validators.maxLength(5)
+          ]
+        ]
+      }),
+      lessons: [[]]
+    });
   }
 }

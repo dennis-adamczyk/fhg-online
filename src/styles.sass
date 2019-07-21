@@ -29,6 +29,13 @@ body
 mat-icon
     user-select: none
 
+.full-screen-dialog,
+.full-screen-dialog .mat-dialog-container
+    @media ($mat-xsmall)
+        max-width: none !important
+        width: 100vw !important
+
+
 .mat-dialog-container
     max-width: 560px
 
@@ -41,6 +48,6 @@ mat-icon
         .mat-button
             text-transform: uppercase
 
-.update-install
-    .mat-simple-snackbar-action
-        color: mat-color($primary-dark)
+
+.mat-simple-snackbar-action
+    color: mat-color($primary-dark)

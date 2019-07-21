@@ -86,7 +86,6 @@ export class TreeDatabaseService {
             node.preview = objectPreview(value);
           }
         } else {
-          console.log(Array.isArray(value), value);
           var type: string = typeof value;
           switch (type) {
             case 'string':

@@ -12,7 +12,10 @@ import { ClassComponent } from './pages/classes/class/class.component';
 import { MembersComponent } from './pages/classes/class/members/members.component';
 import { AdminsComponent } from './pages/classes/class/admins/admins.component';
 import { TreeDatabaseService } from './services/tree-database.service';
-import { AddComponent } from './pages/users/add/add.component';
+import { AddUserComponent } from './pages/users/add-user/add-user.component';
+import { CoursesComponent } from './pages/classes/class/courses/courses.component';
+import { CourseComponent } from './pages/classes/course/course.component';
+import { AddCourseComponent } from './pages/classes/course/add-course/add-course.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +26,10 @@ import { AddComponent } from './pages/users/add/add.component';
     ClassComponent,
     MembersComponent,
     AdminsComponent,
-    AddComponent
+    AddUserComponent,
+    CoursesComponent,
+    CourseComponent,
+    AddCourseComponent
   ],
   imports: [
     CommonModule,

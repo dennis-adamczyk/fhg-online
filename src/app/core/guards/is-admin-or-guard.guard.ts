@@ -35,7 +35,9 @@ export class IsAdminOrGuardGuard implements CanActivate {
         tap(isAdminOrGuard => {
           if (!isAdminOrGuard) {
             this.snackBar.open(
-              'Du hast unzureichende Rechte um diese Seite aufzurufen.'
+              'Du hast unzureichende Rechte um diese Seite aufzurufen.',
+              null,
+              { duration: 4000 }
             );
             this.router.navigate(['/start']);
             return false;

@@ -72,6 +72,38 @@ export const message = {
         status: {
           required: 'Status benötigt'
         }
+      },
+      course: {
+        subject: {
+          required: 'Fach benötigt'
+        },
+        short: {
+          required: 'Kürzel benötigt',
+          pattern: 'Kürzel beinhaltet Leerzeichen',
+          maxlength: 'Maximal 5 Zeichen'
+        },
+        room: {
+          required: 'Raum benötigt',
+          maxlength: 'Maximal 5 Zeichen'
+        },
+        teacher: {
+          title: {
+            required: 'Anrede benötigt',
+            maxlength: 'Maximal 10 Zeichen'
+          },
+          last_name: {
+            required: 'Nachname benötigt',
+            pattern: 'Ungültiger Nachname'
+          },
+          short: {
+            required: 'Kürzel benötigt',
+            pattern: 'Kürzel beinhaltet Leerzeichen',
+            maxlength: 'Maximal 5 Zeichen'
+          }
+        },
+        class: {
+          required: 'Klasse benötigt'
+        }
       }
     }
   }

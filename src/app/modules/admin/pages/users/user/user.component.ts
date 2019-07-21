@@ -62,7 +62,7 @@ export class UserComponent {
           [
             Validators.required,
             Validators.pattern(
-              /^([a-zA-ZÄäÖöÜüÉÈéèÇç]+-?[a-zA-ZÄäÖöÜüÉÈéèÇç]+\s?)+$/
+              /^([a-zA-ZÄäÖöÜüÉÈéèÇçß]+-?[a-zA-ZÄäÖöÜüÉÈéèÇçß]+\s?)+$/
             )
           ]
         ],
@@ -71,7 +71,7 @@ export class UserComponent {
           [
             Validators.required,
             Validators.pattern(
-              /^([a-zA-ZÄäÖöÜüÉÈéèÇç]+-?[a-zA-ZÄäÖöÜüÉÈéèÇç]+\s?)+$/
+              /^([a-zA-ZÄäÖöÜüÉÈéèÇçß]+-?[a-zA-ZÄäÖöÜüÉÈéèÇçß]+\s?)+$/
             )
           ]
         ]
@@ -110,7 +110,7 @@ export class UserComponent {
         `Änderungen am Benutzer "${this.name}" wurden verworfen`,
         null,
         {
-          duration: 5000
+          duration: 4000
         }
       );
     }
@@ -128,6 +128,15 @@ export class UserComponent {
   getData(uid: string) {
     this.isLoading = true;
     this.db.docWithId$<User>(`users/${uid}`).subscribe(result => {
+      if (result.email == undefined) {
+        this.snackBar
+          .open('Kein Benutzer mit dieser ID gefunden', 'Zurück', {
+            duration: 4000
+          })
+          .afterDismissed()
+          .subscribe(() => this.location.back());
+        return;
+      }
       this.data = result;
       this.isLoading = false;
       this.userForm.patchValue({
@@ -280,7 +289,10 @@ export class UserComponent {
       .open(AcceptCancelDialog, {
         data: {
           title: 'Konto löschen?',
-          content: `Das Konto von <b>${name}</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
+          content: `Das Konto von <b>${this.first_name.value +
+            ' ' +
+            this.last_name
+              .value}</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
           accept: 'Unwiederruflich löschen',
           defaultCancel: true
         }

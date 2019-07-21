@@ -62,6 +62,19 @@ export class AdminsComponent implements OnInit {
         };
       });
       this.data = new MatTableDataSource<UserElement>(result);
+      this.data.sortingDataAccessor = (item, property) => {
+        switch (property) {
+          case 'created':
+            let parts = item.created.split('.');
+            return new Date(
+              parseInt(parts[2]),
+              parseInt(parts[1]) - 1,
+              parseInt(parts[0])
+            );
+          default:
+            return item[property];
+        }
+      };
       this.data.sort = this.sort;
       this.data.paginator = this.paginator;
     };

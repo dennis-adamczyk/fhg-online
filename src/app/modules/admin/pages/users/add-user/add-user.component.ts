@@ -10,11 +10,11 @@ import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-ca
 import { take } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-add',
-  templateUrl: './add.component.html',
-  styleUrls: ['./add.component.sass']
+  selector: 'app-add-user',
+  templateUrl: './add-user.component.html',
+  styleUrls: ['./add-user.component.sass']
 })
-export class AddComponent implements OnInit {
+export class AddUserComponent implements OnInit {
   userForm: FormGroup;
   classes: string[] = [];
   isLoading: boolean = false;
@@ -50,7 +50,7 @@ export class AddComponent implements OnInit {
           [
             Validators.required,
             Validators.pattern(
-              /^([a-zA-ZÄäÖöÜüÉÈéèÇç]+-?[a-zA-ZÄäÖöÜüÉÈéèÇç]+\s?)+$/
+              /^([a-zA-ZÄäÖöÜüÉÈéèÇçß]+-?[a-zA-ZÄäÖöÜüÉÈéèÇçß]+\s?)+$/
             )
           ]
         ]
@@ -80,7 +80,7 @@ export class AddComponent implements OnInit {
   ngOnDestroy() {
     if (this.isLoading) return;
     this.snackBar.open('Neuer Benutzer wurde verworfen', null, {
-      duration: 5000
+      duration: 4000
     });
   }
 
@@ -132,7 +132,7 @@ export class AddComponent implements OnInit {
       .then(result => {
         if (result) {
           this.snackBar.open('Benutzer erfolgreich erstellt', null, {
-            duration: 5000
+            duration: 4000
           });
           this.router.navigate(['/admin/users'], {
             queryParams: { refresh: true }
@@ -143,7 +143,7 @@ export class AddComponent implements OnInit {
             'Fehler aufgetreten. Bitte versuche es später erneut',
             null,
             {
-              duration: 5000
+              duration: 4000
             }
           );
           console.error(result);
@@ -157,7 +157,7 @@ export class AddComponent implements OnInit {
           }). Bitte versuche es später erneut`,
           null,
           {
-            duration: 5000
+            duration: 4000
           }
         );
         console.error(error);

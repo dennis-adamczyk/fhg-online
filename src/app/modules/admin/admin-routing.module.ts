@@ -7,7 +7,10 @@ import { UserComponent } from './pages/users/user/user.component';
 import { ClassComponent } from './pages/classes/class/class.component';
 import { MembersComponent } from './pages/classes/class/members/members.component';
 import { AdminsComponent } from './pages/classes/class/admins/admins.component';
-import { AddComponent } from './pages/users/add/add.component';
+import { AddUserComponent } from './pages/users/add-user/add-user.component';
+import { CoursesComponent } from './pages/classes/class/courses/courses.component';
+import { CourseComponent } from './pages/classes/course/course.component';
+import { AddCourseComponent } from './pages/classes/course/add-course/add-course.component';
 
 const routes: Routes = [
   {
@@ -27,7 +30,7 @@ const routes: Routes = [
     children: [
       {
         path: 'add',
-        component: AddComponent
+        component: AddUserComponent
       },
       {
         path: ':uid',
@@ -58,6 +61,27 @@ const routes: Routes = [
       {
         path: 'admins',
         component: AdminsComponent
+      },
+      {
+        path: 'courses',
+        component: CoursesComponent
+      }
+    ]
+  },
+  {
+    path: 'course',
+    data: {
+      title: 'Administration',
+      iconFunction: 'back'
+    },
+    children: [
+      {
+        path: 'add',
+        component: AddCourseComponent
+      },
+      {
+        path: ':course',
+        component: CourseComponent
       }
     ]
   }

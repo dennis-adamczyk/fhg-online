@@ -58,6 +58,21 @@ header
         align-items: center
         justify-content: center
 
+    section
+        width: 100%
+        matgin: 0
+        padding: 0
+        border-bottom: 1px solid mat-color($foreground-light, divider)
+
+        &.hidden
+            display: none
+
+        h4
+            margin: 16px 0 0 16px
+            font-size: 14px
+            font-weight: 500
+            color: mat-color($foreground-light, text)
+
     table
         width: 100%
 
@@ -69,10 +84,6 @@ header
                 background-color: mat-color($background-light, hover)
 
 @media not all and ($mat-xsmall)
-.class
-    margin: 0 auto 24px auto
-    width: 576px
-
     .header
         display: block
         height: 64px
