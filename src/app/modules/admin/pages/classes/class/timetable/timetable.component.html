@@ -1,0 +1,61 @@
+<header>
+  <h1>
+    {{ title }}
+    <mat-icon>chevron_right</mat-icon>
+    Stundenplan
+  </h1>
+  <div class="actions"></div>
+</header>
+<div class="body">
+  <div class="loading" *ngIf="isLoading">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+  <table *ngIf="!isLoading">
+    <tr class="table-header">
+      <th></th>
+      <th>MO</th>
+      <th>DI</th>
+      <th>MI</th>
+      <th>DO</th>
+      <th>FR</th>
+    </tr>
+    <tr>
+      <th>1.</th>
+      <td>
+        <div class="lesson">
+          <p class="subject">D</p>
+          <p class="teacher">VO</p>
+          <p class="room">R109</p>
+        </div>
+      </td>
+      <td>
+        <div class="lesson">
+          <p class="subject">D</p>
+          <p class="teacher">VO</p>
+          <p class="room">R109</p>
+        </div>
+      </td>
+      <td>
+        <div class="lesson">
+          <p class="subject">D</p>
+          <p class="teacher">VO</p>
+          <p class="room">R109</p>
+        </div>
+      </td>
+      <td>
+        <div class="lesson">
+          <p class="subject">D</p>
+          <p class="teacher">VO</p>
+          <p class="room">R109</p>
+        </div>
+      </td>
+      <td>
+        <div class="lesson">
+          <p class="subject">D</p>
+          <p class="teacher">VO</p>
+          <p class="room">R109</p>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

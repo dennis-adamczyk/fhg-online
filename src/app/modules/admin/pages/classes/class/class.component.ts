@@ -13,6 +13,7 @@ import { Observable, forkJoin, merge, Subject, BehaviorSubject } from 'rxjs';
 import { MembersComponent } from './members/members.component';
 import { AdminsComponent } from './admins/admins.component';
 import { CoursesComponent } from './courses/courses.component';
+import { TimetableComponent } from './timetable/timetable.component';
 
 @Component({
   selector: 'app-class',
@@ -157,6 +158,11 @@ export class ClassComponent implements OnInit {
         (this.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
     }
     if (componentReference instanceof CoursesComponent) {
+      componentReference.class = this.class;
+      componentReference.title =
+        (this.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
+    }
+    if (componentReference instanceof TimetableComponent) {
       componentReference.class = this.class;
       componentReference.title =
         (this.isClass() ? 'Klasse ' : 'Stufe ') + this.class;

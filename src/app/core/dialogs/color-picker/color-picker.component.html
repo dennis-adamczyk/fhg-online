@@ -1,0 +1,78 @@
+<h2 mat-dialog-title>
+  Farbe auswählen
+</h2>
+<mat-dialog-content>
+  <div class="colors">
+    <div
+      class="color"
+      *ngFor="let swatch of swatches"
+      [class.selected]="selection[0] == swatch"
+      [style.background-color]="constant.colors[swatch][500]"
+      [style.box-shadow]="
+        constant.colorsContrast[swatch][500] == '#000000' ? undefined : 'none'
+      "
+      (click)="onSelectSwatch(swatch)"
+    >
+      <div class="check" *ngIf="selection[0] == swatch">
+        <mat-icon [style.color]="constant.colorsContrast[swatch][500]"
+          >check</mat-icon
+        >
+      </div>
+    </div>
+  </div>
+  <div class="selected" *ngIf="selection[0]">
+    <p class="selection">
+      <span
+        class="color"
+        [style.color]="constant.colors[selection[0]][500]"
+        [style.text-shadow]="
+          selection[0] == 'Weiß'
+            ? '1px  1px 0 black, 1px -1px 0 black, -1px  1px 0 black, -1px -1px 0 black'
+            : undefined
+        "
+        >{{ selection[0] }}</span
+      >
+      <span class="shade">{{ selection[1] }}</span>
+    </p>
+    <div
+      class="shades"
+      *ngIf="keysOf(constant.colors[selection[0]]).length > 1"
+    >
+      <div
+        class="shade"
+        *ngFor="let shade of keysOf(constant.colors[selection[0]])"
+        [style.background-color]="constant.colors[selection[0]][shade]"
+        [class.selected]="selection[1] == shade"
+        (click)="onSelectShade(shade)"
+      ></div>
+    </div>
+    <div
+      class="singleShade"
+      *ngIf="keysOf(constant.colors[selection[0]]).length == 1"
+    >
+      <div
+        class="shade"
+        *ngFor="let shade of keysOf(constant.colors[selection[0]])"
+        [style.background-color]="constant.colors[selection[0]][shade]"
+        [class.selected]="selection[1] == shade"
+      ></div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button
+    mat-button
+    color="primary"
+    [mat-dialog-close]="undefined"
+    [tabindex]="-1"
+  >
+    Abbrechen
+  </button>
+  <button
+    mat-button
+    color="primary"
+    [mat-dialog-close]="selection[0] + ' ' + selection[1]"
+  >
+    Auswählen
+  </button>
+</mat-dialog-actions>

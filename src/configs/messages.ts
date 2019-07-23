@@ -103,6 +103,9 @@ export const message = {
         },
         class: {
           required: 'Klasse benötigt'
+        },
+        color: {
+          required: 'Farbe benötigt'
         }
       }
     }

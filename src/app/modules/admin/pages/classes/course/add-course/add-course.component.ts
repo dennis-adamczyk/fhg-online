@@ -16,6 +16,7 @@ import { take } from 'rxjs/operators';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { Course } from '../course.component';
 import { Router } from '@angular/router';
+import { ColorPickerDialog } from 'src/app/core/dialogs/color-picker/color-picker.component';
 
 @Component({
   selector: 'app-add-course',
@@ -113,7 +114,8 @@ export class AddCourseComponent implements OnInit {
           ]
         ]
       }),
-      lessons: [{}]
+      lessons: [{}],
+      color: ['', [Validators.required]]
     });
     this.loadClasses();
   }
@@ -177,7 +179,55 @@ export class AddCourseComponent implements OnInit {
       });
   }
 
+  onClickColor(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    setTimeout(() => {
+      this.color.markAsUntouched();
+      this.color.setErrors([]);
+    }, 0);
+
+    this.dialog
+      .open(ColorPickerDialog, {
+        data: {
+          color: this.color.value
+        }
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(result => {
+        if (result) {
+          this.color.setValue(result);
+        }
+      });
+  }
+
+  onKeyColor(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onShortBlur() {
+    if (this.color.value == '' || this.color.value == undefined) {
+      if (constant.standardColors[this.short.value]) {
+        this.color.setValue(constant.standardColors[this.short.value]);
+      }
+    }
+  }
+
   /* ##### HELPER ##### */
+
+  getColor(color: string): string {
+    if (!color || color == '' || color == undefined) color = 'Indigo 500';
+    let code = color.split(' ');
+    return constant.colors[code[0]][code[1]];
+  }
+
+  getContrastColor(color: string): string {
+    if (!color || color == '' || color == undefined) color = 'Indigo 500';
+    let code = color.split(' ');
+    return constant.colorsContrast[code[0]][code[1]];
+  }
 
   submitForm() {
     this.isLoading = true;
@@ -404,6 +454,10 @@ export class AddCourseComponent implements OnInit {
     return this.courseForm.get('lessons');
   }
 
+  get color() {
+    return this.courseForm.get('color');
+  }
+
   /* ##### ERROR MESSAGES ##### */
 
   getSubjectErrorMessage(): string {
@@ -466,6 +520,12 @@ export class AddCourseComponent implements OnInit {
   getClassErrorMessage(): string {
     if (this.class.hasError('required')) {
       return message.errors.admin.course.class.required;
+    }
+  }
+
+  getColorErrorMessage(): string {
+    if (this.class.hasError('required')) {
+      return message.errors.admin.course.color.required;
     }
   }
 }

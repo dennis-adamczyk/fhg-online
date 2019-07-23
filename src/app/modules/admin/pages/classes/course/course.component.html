@@ -39,7 +39,13 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>Kürzel</mat-label>
-          <input matInput formControlName="short" trim="blur" />
+          <input
+            matInput
+            formControlName="short"
+            trim="blur"
+            oninput="this.value = this.value.toUpperCase()"
+            (blur)="onShortBlur()"
+          />
           <mat-error *ngIf="short.invalid">{{
             getShortErrorMessage()
           }}</mat-error>
@@ -70,7 +76,12 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>Kürzel</mat-label>
-          <input matInput formControlName="short" trim="blur" />
+          <input
+            matInput
+            formControlName="short"
+            trim="blur"
+            oninput="this.value = this.value.toUpperCase()"
+          />
           <mat-error *ngIf="teacher_short.invalid">{{
             getTeacherShortErrorMessage()
           }}</mat-error>
@@ -100,6 +111,29 @@
         <mat-checkbox color="primary" formControlName="multi" disabled
           >Multi</mat-checkbox
         >
+        <mat-form-field class="color" (click)="onClickColor($event)">
+          <mat-label>Farbe</mat-label>
+          <input
+            matInput
+            formControlName="color"
+            trim="blur"
+            (keydown)="onKeyColor($event)"
+            readonly="true"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            [style.color]="getColor(color.value)"
+          >
+            <mat-icon
+              [style.text-shadow]="'0 0 2px ' + getContrastColor(color.value)"
+              >color_lens</mat-icon
+            >
+          </button>
+          <mat-error *ngIf="color.invalid">{{
+            getColorErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
       </section>
       <section class="lessons">
         <h4>Unterrichtszeiten</h4>

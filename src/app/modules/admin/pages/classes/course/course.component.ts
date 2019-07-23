@@ -15,6 +15,7 @@ import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-ca
 import { take } from 'rxjs/operators';
 import { constant } from 'src/configs/constants';
 import { EditLessonsDialog } from 'src/app/core/dialogs/edit-lessons/edit-lessons.component';
+import { ColorPickerDialog } from 'src/app/core/dialogs/color-picker/color-picker.component';
 
 export interface Course {
   class: string[];
@@ -28,6 +29,7 @@ export interface Course {
     title: string;
     short: string;
   };
+  color: string;
 }
 
 @Component({
@@ -137,7 +139,8 @@ export class CourseComponent implements OnInit {
           ]
         ]
       }),
-      lessons: [{}]
+      lessons: [{}],
+      color: ['', [Validators.required]]
     });
     this.courseForm.valueChanges.subscribe((val: Course) => {
       if (val.multi) this.loadClasses();
@@ -172,7 +175,8 @@ export class CourseComponent implements OnInit {
             teacher: result.teacher,
             class: result.class,
             multi: result.multi,
-            lessons: result.lessons
+            lessons: result.lessons,
+            color: result.color
           });
           this.edited = false;
           this.isLoading = false;
@@ -221,6 +225,7 @@ export class CourseComponent implements OnInit {
     };
 
     if (this.courseForm.invalid) {
+      this.courseForm.markAllAsTouched();
       this.dialog
         .open(AcceptCancelDialog, {
           data: {
@@ -288,7 +293,48 @@ export class CourseComponent implements OnInit {
       });
   }
 
+  onClickColor() {
+    this.dialog
+      .open(ColorPickerDialog, {
+        data: {
+          color: this.color.value
+        }
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(result => {
+        if (result) {
+          this.color.setValue(result);
+        }
+      });
+  }
+
+  onKeyColor(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onShortBlur() {
+    if (this.color.value == '' || this.color.value == undefined) {
+      if (constant.standardColors[this.short.value]) {
+        this.color.setValue(constant.standardColors[this.short.value]);
+      }
+    }
+  }
+
   /* ##### HELPER ##### */
+
+  getColor(color: string): string {
+    if (!color || color == '' || color == undefined) color = 'Indigo 500';
+    let code = color.split(' ');
+    return constant.colors[code[0]][code[1]];
+  }
+
+  getContrastColor(color: string): string {
+    if (!color || color == '' || color == undefined) color = 'Indigo 500';
+    let code = color.split(' ');
+    return constant.colorsContrast[code[0]][code[1]];
+  }
 
   validateClasses() {
     if (this.multi.value) {
@@ -375,6 +421,10 @@ export class CourseComponent implements OnInit {
     return this.courseForm.get('lessons');
   }
 
+  get color() {
+    return this.courseForm.get('color');
+  }
+
   /* ##### ERROR MESSAGES ##### */
 
   getSubjectErrorMessage(): string {
@@ -437,6 +487,12 @@ export class CourseComponent implements OnInit {
   getClassErrorMessage(): string {
     if (this.class.hasError('required')) {
       return message.errors.admin.course.class.required;
+    }
+  }
+
+  getColorErrorMessage(): string {
+    if (this.class.hasError('required')) {
+      return message.errors.admin.course.color.required;
     }
   }
 }

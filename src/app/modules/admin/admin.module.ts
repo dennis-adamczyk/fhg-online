@@ -16,6 +16,7 @@ import { AddUserComponent } from './pages/users/add-user/add-user.component';
 import { CoursesComponent } from './pages/classes/class/courses/courses.component';
 import { CourseComponent } from './pages/classes/course/course.component';
 import { AddCourseComponent } from './pages/classes/course/add-course/add-course.component';
+import { TimetableComponent } from './pages/classes/class/timetable/timetable.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { AddCourseComponent } from './pages/classes/course/add-course/add-course
     AddUserComponent,
     CoursesComponent,
     CourseComponent,
-    AddCourseComponent
+    AddCourseComponent,
+    TimetableComponent
   ],
   imports: [
     CommonModule,

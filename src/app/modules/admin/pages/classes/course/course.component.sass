@@ -118,8 +118,26 @@
                         width: calc(50% - 8px)
 
             .class
+                display: flex
+                justify-content: space-between
+                align-items: center
+
+                .color
+                    cursor: pointer
+
+                    input
+                        cursor: pointer
+
+                    button
+                        mat-icon
+                            font-size: 24px
+                            text-shadow: 0 0 2px #000000
+
+                mat-form-field
+                    width: 35%
+
                 mat-checkbox
-                    padding: 4px 0 4px 16px
+                    padding: 4px 32px 4px 16px
 
             .lessons
                 margin: 8px 0 0 0
@@ -141,7 +159,7 @@
                         height: 32px
                         line-height: 32px
                         cursor: pointer
-                        transition: background 200ms ease
+                        transition: background 200ms $ease-in-out-curve-function
 
                         &:hover
                             background-color: mat-color($background-light, hover)
