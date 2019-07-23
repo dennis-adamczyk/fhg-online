@@ -16,7 +16,7 @@ import { take } from 'rxjs/operators';
 import { constant } from 'src/configs/constants';
 import { EditLessonsDialog } from 'src/app/core/dialogs/edit-lessons/edit-lessons.component';
 
-interface Course {
+export interface Course {
   class: string[];
   lessons: any[];
   multi: boolean;
@@ -137,7 +137,7 @@ export class CourseComponent implements OnInit {
           ]
         ]
       }),
-      lessons: [[]]
+      lessons: [{}]
     });
     this.courseForm.valueChanges.subscribe((val: Course) => {
       if (val.multi) this.loadClasses();
@@ -193,9 +193,24 @@ export class CourseComponent implements OnInit {
 
   onSave() {
     let update = () => {
+      if (!this.validateClasses()) {
+        this.dialog.open(AcceptCancelDialog, {
+          data: {
+            title: 'Fehlerhafte Klassen',
+            content: `Ein Kurs kann nur Klassen aus demselben Jahrgang beinhalten. Bitte entferne Klassen aus anderen Jahrgängen.`,
+            accept: 'Korrigieren',
+            defaultCancel: false
+          }
+        });
+        this.isLoading = false;
+        return;
+      }
+
       let val = this.courseForm.value as Course;
       for (var prop in val) {
         if (val[prop] === undefined) val[prop] = null;
+        if (prop == 'class' && typeof val.class == 'string')
+          val.class = [val.class as string];
       }
       return this.db
         .update(
@@ -275,15 +290,31 @@ export class CourseComponent implements OnInit {
 
   /* ##### HELPER ##### */
 
-  getYear() {
-    if (this.course.charAt(0).match(/\d/)) {
-      return this.course.charAt(0);
+  validateClasses() {
+    if (this.multi.value) {
+      var valid = true;
+      var year: any;
+      this.class.value.forEach(clazz => {
+        if (year != undefined && year != this.getYear(clazz)) {
+          valid = false;
+        }
+        year = this.getYear(clazz);
+      });
+      return valid;
+    }
+    return true;
+  }
+
+  getYear(clazz: string = undefined) {
+    if (clazz == undefined) clazz = this.course;
+    if (clazz.charAt(0).match(/\d/)) {
+      return clazz.charAt(0);
     } else {
-      return this.course.slice(0, 2);
+      return clazz.slice(0, 2);
     }
   }
 
-  getLessonsStringArray(lessons: any[]): string[] {
+  getLessonsStringArray(lessons: any[] = undefined): string[] {
     if (lessons == undefined) lessons = this.lessons.value;
     var output = [];
     for (const day in lessons) {

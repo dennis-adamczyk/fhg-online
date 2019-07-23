@@ -18,6 +18,16 @@
   <div class="loading" *ngIf="isLoading">
     <mat-spinner diameter="32"></mat-spinner>
   </div>
+  <div
+    class="add"
+    *ngIf="!single.data.length && !multi.data.length && !isLoading"
+  >
+    <p>Es sind noch keine Kurse für die {{ title }} vorhanden.</p>
+    <button mat-button color="primary" routerLink="/admin/course/add">
+      <mat-icon>add</mat-icon>
+      <span>Hinzufügen</span>
+    </button>
+  </div>
   <section class="single" [class.hidden]="!single.data.length">
     <h4>Einzelkurse</h4>
     <table

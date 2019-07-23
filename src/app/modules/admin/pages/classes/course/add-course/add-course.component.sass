@@ -93,6 +93,62 @@
                     font-weight: 500
                     color: mat-color($foreground-light, secondary-text)
 
+            .subject
+                display: flex
+                justify-content: space-between
+                flex-wrap: nowrap
+
+                mat-form-field
+                    width: calc(25% - 8px)
+                    
+                    &:first-child
+                        width: calc(50% - 8px)
+
+
+            .teacher
+                display: flex
+                justify-content: space-between
+                flex-wrap: wrap
+
+                mat-form-field
+                    &:nth-child(even)
+                        width: calc(25% - 8px)
+
+                    &:nth-child(odd)
+                        width: calc(50% - 8px)
+
+            .class
+                mat-checkbox
+                    padding: 4px 0 4px 16px
+
+            .lessons
+                margin: 8px 0 0 0
+                position: relative
+
+                button
+                    position: absolute
+                    top: -8px
+                    right: 0
+                    color: mat-color($foreground-light, icon)
+
+                ul
+                    list-style: none
+                    padding: 0
+                    margin: 16px -16px 0 -16px
+
+                    li
+                        padding: 0 16px
+                        height: 32px
+                        line-height: 32px
+                        cursor: pointer
+                        transition: background 200ms ease
+
+                        &:hover
+                            background-color: mat-color($background-light, hover)
+
+            .submit
+                padding: 16px 0 0 0
+
 
 @media not all and ($mat-xsmall)
     .course

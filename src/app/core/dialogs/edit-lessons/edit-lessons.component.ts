@@ -98,15 +98,14 @@ export class EditLessonsDialog implements OnInit {
           teacher?: { title: string; last_name: string; short: string };
         };
       }) => {
-        output[val.day] = {
-          [val.lesson]: val.individual
-            ? {
-                changed: true,
-                room: val.changes.room ? val.changes.room : null,
-                teacher: val.changes.teacher ? val.changes.teacher : null
-              }
-            : { changed: false }
-        };
+        if (output[val.day] == undefined) output[val.day] = {};
+        output[val.day][val.lesson] = val.individual
+          ? {
+              changed: true,
+              room: val.changes.room ? val.changes.room : null,
+              teacher: val.changes.teacher ? val.changes.teacher : null
+            }
+          : { changed: false };
       }
     );
     return output;
