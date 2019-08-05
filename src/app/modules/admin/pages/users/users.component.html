@@ -125,7 +125,10 @@
         <tr
           mat-row
           *matRowDef="let row; columns: displayedColumns"
-          (click)="selection.toggle(row)"
+          (click)="
+            selection.selected.length ? selection.toggle(row) : undefined
+          "
+          [routerLink]="!selection.selected.length ? row.uid : undefined"
         ></tr>
       </table>
 

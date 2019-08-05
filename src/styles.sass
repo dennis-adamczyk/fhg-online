@@ -17,6 +17,7 @@
 
 html, body
     height: 100%
+    overflow-y: auto
 
 body
     margin: 0
@@ -28,6 +29,14 @@ body
 
 mat-icon
     user-select: none
+
+.mobile-full-screen-dialog,
+.mobile-full-screen-dialog .mat-dialog-container
+    @media ($mat-xsmall)
+        max-width: none !important
+        width: 100vw !important
+        height: 100vh !important
+        border-radius: 0
 
 .full-screen-dialog,
 .full-screen-dialog .mat-dialog-container

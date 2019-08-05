@@ -11,6 +11,7 @@ import { take, debounceTime, map, tap } from 'rxjs/operators';
 import { message } from '../../../../../configs/messages';
 import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
 import { constant } from 'src/configs/constants';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-register',
@@ -27,6 +28,7 @@ export class RegisterComponent implements OnInit {
   constant = constant;
 
   constructor(
+    private snackBar: MatSnackBar,
     public auth: AuthService,
     private fb: FormBuilder,
     private db: FirestoreService
@@ -249,7 +251,18 @@ export class RegisterComponent implements OnInit {
           this.loading = false;
           this.registered = true;
         })
-        .catch(error => console.error(error));
+        .catch(error => {
+          this.loading = false;
+          this.registered = false;
+          this.snackBar.open(
+            `Fehler aufgetreten (${error.code}: ${
+              error.message
+            }). Bitte versuche es später erneut`,
+            null,
+            { duration: 4000 }
+          );
+          console.error(error);
+        });
     }
   }
 }

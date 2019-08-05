@@ -19,7 +19,7 @@ import { ColorPickerDialog } from 'src/app/core/dialogs/color-picker/color-picke
 
 export interface Course {
   class: string[];
-  lessons: any[];
+  lessons: object;
   multi: boolean;
   short: string;
   subject: string;
@@ -30,6 +30,7 @@ export interface Course {
     short: string;
   };
   color: string;
+  id?: string;
 }
 
 @Component({

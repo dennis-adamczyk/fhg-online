@@ -1,0 +1,134 @@
+<div class="header">
+  <button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>
+  <h2 mat-dialog-title>{{ getWeekDay(day) }}, {{ getPeriodText(period) }}</h2>
+</div>
+<mat-dialog-content>
+  <div class="multi" *ngIf="!isSingle">
+    <mat-tab-group>
+      <mat-tab *ngFor="let single of lesson">
+        <ng-template mat-tab-label>{{ single.id }}</ng-template>
+        <div class="course">
+          <div class="data">
+            <div class="subject">
+              <mat-icon
+                [class.contrast]="getContrastColor(single.color) == '#000000'"
+                [style.color]="getColor(single.color)"
+                >widgets</mat-icon
+              >
+              <p>{{ single.subject }}</p>
+            </div>
+            <div class="time">
+              <mat-icon>access_time</mat-icon>
+              <p>{{ time.start }} – {{ time.end }}</p>
+            </div>
+            <div class="teacher">
+              <mat-icon>person</mat-icon>
+              <p>{{ single.teacher.title }} {{ single.teacher.last_name }}</p>
+            </div>
+            <div class="room">
+              <mat-icon>place</mat-icon>
+              <p>{{ getRoomPrefix(single.room) + single.room }}</p>
+            </div>
+            <div class="class">
+              <mat-icon>class</mat-icon>
+              <p>{{ getClassString(single.class) }}</p>
+            </div>
+          </div>
+          <div class="actions">
+            <button
+              mat-icon-button
+              matTooltip="Bearbeiten"
+              [routerLink]="'/admin/course/' + single.id"
+              mat-dialog-close
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              matTooltip="Entfernen"
+              [mat-dialog-close]="'deleteCourse:' + single.id"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab disabled>
+        <ng-template mat-tab-label>
+          <button
+            mat-icon-button
+            class="delete"
+            matTooltip="Alle entfernen"
+            mat-dialog-close="deleteAllCourses"
+          >
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+        </ng-template>
+      </mat-tab>
+      <mat-tab disabled>
+        <ng-template mat-tab-label>
+          <button
+            mat-icon-button
+            class="add"
+            matTooltip="Hinzufügen"
+            mat-dialog-close="add"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div class="single" *ngIf="isSingle">
+    <div class="data">
+      <div class="subject">
+        <mat-icon
+          [class.contrast]="getContrastColor(lesson.color) == '#000000'"
+          [style.color]="getColor(lesson.color)"
+          >widgets</mat-icon
+        >
+        <p>{{ lesson.subject }}</p>
+      </div>
+      <div class="time">
+        <mat-icon>access_time</mat-icon>
+        <p>{{ time.start }} – {{ time.end }}</p>
+      </div>
+      <div class="teacher">
+        <mat-icon>person</mat-icon>
+        <p>{{ lesson.teacher.title }} {{ lesson.teacher.last_name }}</p>
+      </div>
+      <div class="room">
+        <mat-icon>place</mat-icon>
+        <p>{{ getRoomPrefix(lesson.room) + lesson.room }}</p>
+      </div>
+      <div class="class">
+        <mat-icon>class</mat-icon>
+        <p>{{ getClassString(lesson.class) }}</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button mat-icon-button matTooltip="Hinzufügen" mat-dialog-close="add">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        matTooltip="Bearbeiten"
+        [routerLink]="'/admin/course/' + lesson.id"
+        mat-dialog-close
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        matTooltip="Entfernen"
+        [mat-dialog-close]="
+          'deleteCourse:' + day + '|' + period + '|' + lesson.id
+        "
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+</mat-dialog-content>

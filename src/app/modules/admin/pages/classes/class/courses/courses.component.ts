@@ -3,7 +3,7 @@ import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { take } from 'rxjs/operators';
 
-interface CourseElement {
+export interface CourseElement {
   name: string;
   subject: string;
   teacher: string;

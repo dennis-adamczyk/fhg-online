@@ -1,0 +1,22 @@
+@import ../../../../../../../../../var
+
+mat-dialog-content
+
+    table
+        width: 100%
+        outline: none
+        -webkit-tap-highlight-color: transparent
+
+        th.checkbox
+            padding-right: 16px
+
+        tr.mat-row
+            transition: background 150ms $ease-in-out-curve-function
+            cursor: pointer
+
+            &:hover
+                background-color: mat-color($background-light, hover)
+
+@media not all and ($mat-xsmall)
+    mat-dialog-content
+        width: 448px
