@@ -182,7 +182,7 @@ export class ClassComponent implements OnInit {
 
   getYear(): string {
     if (this.isClass()) return this.class.charAt(0);
-    else this.class;
+    else return this.class;
   }
 
   private flatten(array: any[]): any[] {

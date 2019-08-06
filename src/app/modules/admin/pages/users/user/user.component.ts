@@ -107,7 +107,9 @@ export class UserComponent {
   ngOnDestroy() {
     if (this.edited) {
       this.snackBar.open(
-        `Änderungen am Benutzer "${this.name}" wurden verworfen`,
+        `Änderungen am Benutzer "${this.data.name.first_name} ${
+          this.data.name.last_name
+        }" wurden verworfen`,
         null,
         {
           duration: 4000

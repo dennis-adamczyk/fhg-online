@@ -4,6 +4,7 @@ mat-tab-group
     position: sticky
     top: 0
     max-height: calc(100vh - 56px)
+    max-height: calc(var(--vh, 1vh) * 100 - 56px)
 
     ::ng-deep .mat-tab-header
         +mat-elevation(2)
@@ -23,6 +24,7 @@ mat-tab-group
 @media not all and ($mat-xsmall)
     mat-tab-group   
         max-height: calc(100vh - 64px)
+        max-height: calc(var(--vh, 1vh) * 100 - 64px)
 
         .content
             margin: 24px auto 32px auto

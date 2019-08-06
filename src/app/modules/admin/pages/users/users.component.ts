@@ -320,14 +320,12 @@ export class UsersComponent implements OnInit {
 
   /* ##### LOAD SUBS ##### */
 
-  onActivate(componentReference) {
-    if (componentReference instanceof UserComponent) {
-      let name: any =
-        this.selection.selected.length == 1
-          ? this.selection.selected[0].name.split(', ')
-          : '';
-      name = name[1] + ' ' + name[0];
-      componentReference.name = name;
-    }
-  }
+  // onActivate(componentReference) {
+  //   if (componentReference instanceof UserComponent) {
+  //     let name: any = this.selection.selected[0].name.split(', ');
+  //     console.log(this.selection.selected);
+  //     name = name[1] + ' ' + name[0];
+  //     componentReference.name = name;
+  //   }
+  // }
 }
