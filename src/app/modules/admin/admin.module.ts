@@ -19,6 +19,7 @@ import { AddCourseComponent } from './pages/classes/course/add-course/add-course
 import { TimetableComponent } from './pages/classes/class/timetable/timetable.component';
 import { LessonDetailsDialog } from './pages/classes/class/timetable/dialogs/lesson-details/lesson-details.component';
 import { AddLessonDialog } from './pages/classes/class/timetable/dialogs/add-lesson/add-lesson.component';
+import { AddClassDialog } from './pages/classes/dialogs/add-class/add-class.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { AddLessonDialog } from './pages/classes/class/timetable/dialogs/add-les
     AddCourseComponent,
     TimetableComponent,
     LessonDetailsDialog,
-    AddLessonDialog
+    AddLessonDialog,
+    AddClassDialog
   ],
   imports: [
     CommonModule,
@@ -43,7 +45,7 @@ import { AddLessonDialog } from './pages/classes/class/timetable/dialogs/add-les
     SharedModule,
     NgxJsonViewerModule
   ],
-  entryComponents: [LessonDetailsDialog, AddLessonDialog],
+  entryComponents: [LessonDetailsDialog, AddLessonDialog, AddClassDialog],
   providers: [TreeDatabaseService]
 })
 export class AdminModule {}

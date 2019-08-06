@@ -14,6 +14,9 @@ import { MembersComponent } from './members/members.component';
 import { AdminsComponent } from './admins/admins.component';
 import { CoursesComponent } from './courses/courses.component';
 import { TimetableComponent } from './timetable/timetable.component';
+import { MatDialog, MatSnackBar } from '@angular/material';
+import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-class',
@@ -34,6 +37,8 @@ export class ClassComponent implements OnInit {
   sub: boolean = !!this.route.children.length;
 
   constructor(
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     private db: FirestoreService,
     private route: ActivatedRoute,
     private router: Router,
@@ -95,6 +100,41 @@ export class ClassComponent implements OnInit {
       if (!params.class) return this.location.back();
       this.class = params.class;
 
+      if (params.class.charAt(0).match(/\d/)) {
+        this.db
+          .doc$(`years/${this.getYear()}`)
+          .pipe(take(1))
+          .subscribe((result: { classes: string[] }) => {
+            if (!result || !result.classes.includes(this.class)) {
+              this.snackBar.open(
+                `Die ${this.isClass() ? 'Klasse' : 'Stufe'} ${
+                  this.class
+                } existiert nicht`,
+                null,
+                { duration: 4000 }
+              );
+              this.router.navigate(['/admin/classes']);
+            }
+          });
+      } else {
+        this.db
+          .doc(`years/${this.class}`)
+          .get()
+          .pipe(take(1))
+          .subscribe(docSnapshot => {
+            if (!docSnapshot.exists) {
+              this.snackBar.open(
+                `Die ${this.isClass() ? 'Klasse' : 'Stufe'} ${
+                  this.class
+                } existiert nicht`,
+                null,
+                { duration: 4000 }
+              );
+              this.router.navigate(['/admin/classes']);
+            }
+          });
+      }
+
       if (this.sub) return;
 
       let students$ = this.db.colWithIds('users', ref =>
@@ -137,7 +177,12 @@ export class ClassComponent implements OnInit {
   }
 
   isClass(): boolean {
-    return !!this.class.match(/^\d/);
+    return !!this.class.charAt(0).match(/\d/);
+  }
+
+  getYear(): string {
+    if (this.isClass()) return this.class.charAt(0);
+    else this.class;
   }
 
   private flatten(array: any[]): any[] {
@@ -167,5 +212,117 @@ export class ClassComponent implements OnInit {
       componentReference.title =
         (this.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
     }
+  }
+
+  /* ##### TRIGGER ##### */
+
+  onDelete() {
+    this.dialog
+      .open(AcceptCancelDialog, {
+        data: {
+          title: `${this.isClass() ? 'Klasse' : 'Stufe'} ${
+            this.class
+          } löschen?`,
+          content: `Die ${
+            this.isClass() ? 'Klasse' : 'Stufe'
+          } wird mitsamt allen Mitgliedern, Administratoren und Kursen unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können. Wirklich sicher, dass diese Aktion ausgeführt werden soll?`,
+          defaultCancel: true,
+          accept: 'Unwiederruflich löschen'
+        }
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(result => {
+        if (result) {
+          this.deleteClass();
+        }
+      });
+  }
+
+  /* ##### HELPER ##### */
+
+  deleteClass() {
+    this.db
+      .doc$(`years/--index--`)
+      .pipe(take(1))
+      .subscribe((index: { classes: string[]; index: true }) => {
+        this.db
+          .update(`years/--index--`, {
+            classes: [...index.classes].filter(clazz => clazz !== this.class)
+          })
+          .then(() => {
+            if (!this.isClass()) {
+              this.db.delete(`years/${this.getYear()}`);
+            } else {
+              this.db
+                .doc$(`years/${this.getYear()}`)
+                .pipe(take(1))
+                .subscribe((year: { classes: string[] }) => {
+                  this.db
+                    .update(`years/${this.getYear()}`, {
+                      classes: [...year.classes].filter(
+                        clazz => clazz !== this.class
+                      )
+                    })
+                    .then(() => {
+                      this.db
+                        .colWithIds$(`years/${this.getYear()}/courses`, ref =>
+                          ref.where('class', 'array-contains', this.class)
+                        )
+                        .pipe(take(1))
+                        .subscribe((courses: { id: string }[]) => {
+                          const batch = firebase.firestore().batch();
+                          courses.forEach(course => {
+                            batch.delete(
+                              firebase
+                                .firestore()
+                                .doc(
+                                  `years/${this.getYear()}/courses/${course.id}`
+                                )
+                            );
+                          });
+                          batch.commit();
+                        });
+                    });
+                });
+            }
+
+            this.db
+              .colWithIds$(`users`, ref => ref.where('class', '==', this.class))
+              .pipe(take(1))
+              .subscribe((users: { id: string }[]) => {
+                const batch = firebase.firestore().batch();
+                users.forEach(user => {
+                  batch.update(firebase.firestore().doc(`users/${user.id}`), {
+                    class: null
+                  });
+                });
+                batch.commit();
+              });
+            this.db
+              .colWithIds$(`users`, ref =>
+                ref.where('class', 'array-contains', this.class)
+              )
+              .pipe(take(1))
+              .subscribe((users: { id: string; class: string[] }[]) => {
+                const batch = firebase.firestore().batch();
+                users.forEach(user => {
+                  batch.update(firebase.firestore().doc(`users/${user.id}`), {
+                    class: [...user.class].filter(clazz => clazz !== this.class)
+                  });
+                });
+                batch.commit();
+              });
+
+            this.snackBar.open(
+              `Die ${this.isClass() ? 'Klasse' : 'Stufe'} ${
+                this.class
+              } wurde unwiederruflich gelöscht`,
+              null,
+              { duration: 4000 }
+            );
+            this.router.navigate(['/admin/classes']);
+          });
+      });
   }
 }

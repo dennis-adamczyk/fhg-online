@@ -61,10 +61,6 @@ export class UsersComponent implements OnInit {
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
 
-  testing() {
-    console.log('CLICK');
-  }
-
   /* ##### Toolbar Extention ##### */
 
   ngOnInit() {

@@ -4,7 +4,7 @@
     <header>
       <h1>{{ isClass() ? 'Klasse' : 'Stufe' }} {{ class }}</h1>
       <div class="actions">
-        <button mat-icon-button matTooltip="Löschen">
+        <button mat-icon-button matTooltip="Löschen" (click)="onDelete()">
           <mat-icon>delete</mat-icon>
         </button>
       </div>

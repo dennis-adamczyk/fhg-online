@@ -283,7 +283,7 @@ export class AddCourseComponent implements OnInit {
         )
         .pipe(take(1))
         .subscribe((result: object[]) => {
-          var max = 1;
+          var max = 0;
           result.forEach(val => {
             if (val['id'].slice(-1).match(/\d/)) {
               if (parseInt(val['id'].slice(-1)) > max)

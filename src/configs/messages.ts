@@ -107,6 +107,12 @@ export const message = {
         color: {
           required: 'Farbe benötigt'
         }
+      },
+      classes: {
+        add: {
+          required: 'Klasse benötigt',
+          pattern: 'Gib eine gültige Klasse ein'
+        }
       }
     }
   }
