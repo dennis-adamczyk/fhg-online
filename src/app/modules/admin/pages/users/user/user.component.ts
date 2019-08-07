@@ -181,13 +181,13 @@ export class UserComponent {
     if (this.isSingleClass) {
       if (clazz.length < 2) return;
       let year = (clazz as string).charAt(0).match(/\d/)
-        ? (clazz as string).slice(0, 1)
+        ? (clazz as string).charAt(0)
         : (clazz as string);
       this.db
         .colWithIds$(
           `years/${year}/courses`,
           clazz != year
-            ? ref => ref.where('classes', 'array-contains', clazz)
+            ? ref => ref.where('class', 'array-contains', clazz)
             : undefined
         )
         .subscribe(data => {
@@ -205,7 +205,7 @@ export class UserComponent {
           .colWithIds$(
             `years/${year}/courses`,
             el != year
-              ? ref => ref.where('classes', 'array-contains', el)
+              ? ref => ref.where('class', 'array-contains', el)
               : undefined
           )
           .subscribe(data => {
