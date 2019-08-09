@@ -10,6 +10,7 @@ import * as rendering from './ssr';
 import * as login from './login';
 import * as settings from './settings';
 import * as admin_users from './admin/users';
+import * as timetable from './timetable';
 
 export const ssr = rendering.ssr;
 export const registerUser = login.registerUser;
@@ -19,3 +20,4 @@ export const onChangeSettings = settings.onChangeSettings;
 export const getUsers = admin_users.getUsers;
 export const deleteUser = admin_users.deleteUser;
 export const deleteUsers = admin_users.deleteUsers;
+export const onChangeCourse = timetable.onChangeCourse;

@@ -4,278 +4,67 @@
     <p>Wochenansicht</p>
   </div>
   <div class="body">
-    <table>
+    <div class="loading" *ngIf="isLoading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <table *ngIf="!isLoading">
       <tr class="table-header">
         <th></th>
-        <th>MO</th>
-        <th>DI</th>
-        <th>MI</th>
-        <th>DO</th>
-        <th>FR</th>
+        <th *ngFor="let day of keysOf(constant.weekDayShort)">
+          {{ constant.weekDayShort[day] }}
+        </th>
       </tr>
-      <tr>
-        <th>1.</th>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
+
+      <tr *ngFor="let period of arrayOf(constant.maxLessons)">
+        <th>
+          <span
+            class="number"
+            *ngIf="settings.get('timetable.show_lesson_number')"
+            >{{ period }}.</span
+          >
+          <span class="time" *ngIf="settings.get('timetable.show_lesson_time')">
+            {{ constant.times[period].start }}
+            <span class="divider"></span>
+            {{ constant.times[period].end }}
+          </span>
+        </th>
+        <td *ngFor="let day of keysOf(constant.weekDayShort)">
+          <div
+            class="lesson"
+            *ngIf="lessonExists(day, period) && isSingleLesson(day, period)"
+            [style.background-color]="getColor(timetable[day][period].color)"
+            [class.contrast]="
+              getContrastColor(timetable[day][period].color) == '#000000'
+            "
+            (click)="onClickLesson(day, period)"
+          >
+            <p class="subject">
+              {{
+                settings.get('timetable.subjects_abbreviation')
+                  ? timetable[day][period].short
+                  : timetable[day][period].subject
+              }}
+            </p>
+            <p class="teacher" *ngIf="settings.get('timetable.show_teacher')">
+              {{
+                settings.get('timetable.teacher_abbreviation')
+                  ? timetable[day][period].teacher.short
+                  : timetable[day][period].teacher.last_name
+              }}
+            </p>
+            <p class="room" *ngIf="settings.get('timetable.show_room')">
+              {{ getRoomPrefix(day, period) + timetable[day][period].room }}
+            </p>
           </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
+          <div
+            class="multi-lesson"
+            *ngIf="lessonExists(day, period) && !isSingleLesson(day, period)"
+            (click)="onClickLesson(day, period)"
+          >
+            <p class="count">{{ timetable[day][period].length }}</p>
           </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th>1.<br />7:55<br /><br />9:05</th>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th>1.</th>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th>1.</th>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th>1.</th>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th>1.</th>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th>1.</th>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
-          </div>
-        </td>
-        <td>
-          <div class="lesson">
-            <p class="subject">D</p>
-            <p class="teacher">VO</p>
-            <p class="room">R109</p>
+          <div class="empty" *ngIf="!lessonExists(day, period)">
+            <p>+++++</p>
           </div>
         </td>
       </tr>
