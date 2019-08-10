@@ -1,8 +1,8 @@
 export class Settings {
   appearance: {
-    style: 'colored' | 'monotone_primary' | 'monotone_gray';
+    style: 'light' | 'dark';
   } = {
-    style: 'colored'
+    style: 'light'
   };
   home: {
     calendar_entries: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
@@ -42,9 +42,8 @@ export const language = {
     style: {
       title: 'Stil',
       value: {
-        colored: 'Farbig',
-        monotone_primary: 'Monoton Primärfarbe',
-        monotone_gray: 'Monoton Grau'
+        light: 'Helles Design'
+        //dark: 'Dunkles Design'
       }
     }
   },

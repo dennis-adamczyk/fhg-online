@@ -1,0 +1,68 @@
+@import ../../../../../../../var
+
+.header
+    width: 100%
+    min-width: 230px
+    position: relative
+
+    h2
+        font-size: 20px
+        font-weight: 400
+        color: mat-color($foreground-light, secondary-text)
+
+    button
+        position: absolute
+        right: -8px
+        top: -4px
+        color: mat-color($foreground-light, icon)
+
+mat-dialog-content
+    .single,
+    .multi
+        margin: 16px 0 0 0
+        display: flex
+        align-content: stretch
+        justify-content: space-between
+
+        .data
+            div
+                display: flex
+                margin: 0 0 16px 0
+
+                mat-icon
+                    padding: 0 12px 0 0
+                    color: mat-color($foreground-light, icon)
+
+                    &.contrast
+                        text-shadow: 1px 0 2px mat-color($foreground-light, icon), 0 1px 2px mat-color($foreground-light, icon), -1px 0 2px mat-color($foreground-light, icon), 0 -1px 2px mat-color($foreground-light, icon)
+
+                p
+                    margin: 0
+                    padding: 0
+                    font-size: 16px
+                    font-weight: 400
+                    line-height: 24px
+
+    .multi
+        margin: 0
+        display: block
+
+        .course
+            margin: 16px 0 0 0
+            display: flex
+            align-content: stretch
+            justify-content: space-between
+
+
+@media ($mat-xsmall)
+    .header
+        h2
+            width: 100%
+
+        button
+            display: block
+            margin: 0 0 8px 0
+            position: relative
+            left: -8px
+            right: auto
+            top: -8px

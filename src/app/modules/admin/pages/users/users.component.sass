@@ -109,13 +109,16 @@
                 &:hover
                     background-color: mat-color($background-light, hover)
 
+                td.mat-column-select
+                    width: 32px
+
     
 @media not all and ($mat-xsmall)
     .users
         margin: 0 auto 24px auto
         width: 576px
 
-        .header
+        header
             display: block
             height: 64px
             width: 100%
@@ -123,3 +126,9 @@
 
             h1
                 margin: 0 0 0 24px
+
+        .body
+            table
+                tr.mat-row
+                    td.mat-column-select
+                        width: auto

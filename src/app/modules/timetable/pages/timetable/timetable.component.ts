@@ -14,8 +14,9 @@ import { MatDialog } from '@angular/material';
 import { SettingsService } from 'src/app/core/services/settings.service';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { LessonDetailsDialog } from './dialogs/lesson-details/lesson-details.component';
 
-interface Course {
+export interface Course {
   class: string[];
   lessons: object;
   multi: boolean;
@@ -31,6 +32,12 @@ interface Course {
   id?: string;
 }
 
+interface TimetableLocalStorage {
+  updated: number;
+  courses: Course[];
+  names: string[];
+}
+
 @Component({
   selector: 'app-timetable',
   templateUrl: './timetable.component.html',
@@ -43,6 +50,8 @@ export class TimetableComponent implements OnInit {
 
   courses: Course[] = [];
   timetable: object;
+
+  timetableKey = 'timetable';
 
   constructor(
     private auth: AuthService,
@@ -100,31 +109,25 @@ export class TimetableComponent implements OnInit {
   /* ##### LOAD DATA ##### */
 
   loadData() {
-    let first = true;
-    this.db
-      .doc$(`users/${this.auth.user.id}/singles/timetable`)
-      .subscribe((result: { outdated: boolean; timetable: object }) => {
-        if (result) {
-          if (first) {
-            if (!result.outdated) {
-              this.timetable = result.timetable;
-              first = false;
-              this.isLoading = false;
-              return;
-            } else {
-              this.reloadTimetable();
-            }
-          } else if (result.outdated) {
-            this.reloadTimetable();
-          }
-        }
-      });
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (
+      !localStorage.getItem(this.timetableKey) ||
+      !localStorage.getItem(this.timetableKey).length
+    ) {
+      this.downloadTimetable();
+    } else {
+      this.timetable = this.convertToTimetable(
+        this.getTimetableLocalStorage().courses
+      );
+      this.isLoading = false;
+      this.updateTimetable();
+    }
   }
 
-  reloadTimetable() {
+  downloadTimetable() {
     let clazz = this.auth.user.class as string;
-    let singleCourses = [],
-      multiCourses = [];
+    let singleCourses: Course[] = [],
+      multiCourses: Course[] = [];
     let singles = false,
       multis = false;
 
@@ -135,11 +138,15 @@ export class TimetableComponent implements OnInit {
         ...singleCourses,
         ...multiCourses
       ]);
-      console.log(this.timetable);
-      this.db.upsert(`users/${this.auth.user.id}/singles/timetable`, {
-        outdated: false,
-        timetable: this.timetable
-      });
+      localStorage.setItem(
+        this.timetableKey,
+        JSON.stringify({
+          updated: Date.now(),
+          courses: [...singleCourses, ...multiCourses],
+          names: [...singleCourses, ...multiCourses].map(course => course.id)
+        } as TimetableLocalStorage)
+      );
+      this.updateTimetable();
       this.isLoading = false;
     };
 
@@ -179,9 +186,68 @@ export class TimetableComponent implements OnInit {
     });
   }
 
+  updateTimetable() {
+    if (
+      JSON.stringify(
+        this.getTimetableLocalStorage()
+          .names.filter(course =>
+            this.isClass(this.auth.user.class as string)
+              ? course.charAt(1).match(/\-/)
+              : course.charAt(2).match(/\-/)
+          )
+          .sort()
+      ) !== JSON.stringify(this.auth.user.courses.sort())
+    ) {
+      return this.downloadTimetable();
+    }
+    this.db
+      .doc$(`years/${this.getYear(this.auth.user.class as string)}`)
+      .subscribe(
+        (year: {
+          classes: string[];
+          updated: { [key: string]: firebase.firestore.Timestamp };
+        }) => {
+          if (!year.updated) return;
+          let localyUpdated = this.getTimetableLocalStorage().updated;
+          this.getTimetableLocalStorage().names.forEach(courseName => {
+            if (!year.updated[courseName]) return;
+            if (year.updated[courseName].toMillis() > localyUpdated) {
+              this.db
+                .docWithId$(
+                  `years/${this.getYear(this.auth.user
+                    .class as string)}/courses/${courseName}`
+                )
+                .pipe(take(1))
+                .subscribe((course: Course) => {
+                  let newCourses = this.getTimetableLocalStorage().courses.filter(
+                    course => course.id !== courseName
+                  );
+                  newCourses.push(course);
+                  localStorage.setItem(
+                    this.timetableKey,
+                    JSON.stringify({
+                      updated: Date.now(),
+                      courses: newCourses,
+                      names: this.getTimetableLocalStorage().names
+                    })
+                  );
+                  this.timetable = this.convertToTimetable(newCourses);
+                });
+            }
+          });
+        }
+      );
+  }
+
   /* ##### TRIGGER ##### */
 
-  onClickLesson(day, period) {}
+  onClickLesson(day, period) {
+    var lesson = this.timetable[day][period];
+    this.dialog.open(LessonDetailsDialog, {
+      data: { day: day, period: period, lesson: lesson },
+      panelClass: 'mobile-full-screen-dialog'
+    });
+  }
 
   /* ##### HELPER ##### */
 
@@ -232,6 +298,14 @@ export class TimetableComponent implements OnInit {
       }
     });
     return output;
+  }
+
+  getTimetableLocalStorage(): TimetableLocalStorage {
+    return localStorage.getItem(this.timetableKey)
+      ? (JSON.parse(
+          localStorage.getItem(this.timetableKey)
+        ) as TimetableLocalStorage)
+      : null;
   }
 
   lessonExists(day: number, period: number): boolean {
