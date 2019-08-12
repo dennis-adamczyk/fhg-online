@@ -8,7 +8,7 @@
   <div class="multi" *ngIf="!isSingle">
     <mat-tab-group>
       <mat-tab *ngFor="let single of lesson">
-        <ng-template mat-tab-label>{{ single.id }}</ng-template>
+        <ng-template mat-tab-label>{{ getShortFromId(single.id) }}</ng-template>
         <div class="course">
           <div class="data">
             <div class="subject">

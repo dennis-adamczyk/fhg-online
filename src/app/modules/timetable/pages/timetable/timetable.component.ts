@@ -243,10 +243,17 @@ export class TimetableComponent implements OnInit {
 
   onClickLesson(day, period) {
     var lesson = this.timetable[day][period];
-    this.dialog.open(LessonDetailsDialog, {
-      data: { day: day, period: period, lesson: lesson },
-      panelClass: 'mobile-full-screen-dialog'
-    });
+    if (isPlatformBrowser(this.platformId))
+      history.pushState({ dialog: true }, undefined);
+    this.dialog
+      .open(LessonDetailsDialog, {
+        data: { day: day, period: period, lesson: lesson },
+        panelClass: 'mobile-full-screen-dialog',
+        closeOnNavigation: true
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(data => (data !== undefined ? history.back() : false));
   }
 
   /* ##### HELPER ##### */

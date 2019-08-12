@@ -2,6 +2,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Course } from '../../timetable.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { constant } from 'src/configs/constants';
+import { Router, RouterEvent, NavigationStart } from '@angular/router';
+import { filter, tap, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-lesson-details',
@@ -32,6 +34,10 @@ export class LessonDetailsDialog implements OnInit {
     if (!color) return undefined;
     var code = color.split(' ');
     return constant.colors[code[0]][code[1]];
+  }
+
+  getShortFromId(id: string): string {
+    return id.split(/\-(.+)/)[1];
   }
 
   getClassString(classes: string[]) {
