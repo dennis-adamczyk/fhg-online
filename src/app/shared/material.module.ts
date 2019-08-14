@@ -24,7 +24,8 @@ import {
   MatTooltipModule,
   MatTreeModule,
   MatExpansionModule,
-  MatDatepickerModule
+  MatDatepickerModule,
+  MatNativeDateModule
 } from '@angular/material';
 import { CdkStepperModule } from '@angular/cdk/stepper';
 import { OverlayModule } from '@angular/cdk/overlay';
@@ -58,7 +59,8 @@ const materialComponents = [
   MatTreeModule,
   CdkTreeModule,
   MatExpansionModule,
-  MatDatepickerModule
+  MatDatepickerModule,
+  MatNativeDateModule
 ];
 
 @NgModule({

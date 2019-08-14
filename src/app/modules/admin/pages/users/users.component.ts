@@ -19,6 +19,9 @@ import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-ca
 import { take, filter } from 'rxjs/operators';
 import { NavigationEnd, Router, ActivatedRoute } from '@angular/router';
 import { UserComponent } from './user/user.component';
+import { message } from 'src/configs/messages';
+import { userInfo } from 'os';
+import { registerUser } from 'functions/src';
 
 export interface UserElement {
   uid: string;
@@ -143,7 +146,12 @@ export class UsersComponent implements OnInit {
   refreshData(force: boolean) {
     this.isLoadingResults = true;
     this.getUsers(force)
-      .then(result => {
+      .then((result: UserElement[]) => {
+        if (force)
+          result = result.map(user => {
+            user.role = this.getRoleName(user.role);
+            return user;
+          });
         this.isLoadingResults = false;
         this.resultsLength = result.length;
         this.data = new MatTableDataSource<UserElement>(result);
@@ -167,7 +175,10 @@ export class UsersComponent implements OnInit {
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem(
             this.storageKey,
-            JSON.stringify({ data: result, updated: new Date().getTime() })
+            JSON.stringify({
+              data: result,
+              updated: new Date().getTime()
+            })
           );
         }
       })
@@ -281,7 +292,7 @@ export class UsersComponent implements OnInit {
       var data: string = localStorage.getItem(this.storageKey);
       if (data) {
         let obj = JSON.parse(data);
-        if (new Date().getTime() - obj.updated < 3.6e6) {
+        if (Date.now() - obj.updated < 3.6e6) {
           return new Promise<any>((resolve, rejcet) => resolve(obj.data));
         }
       }
@@ -302,6 +313,10 @@ export class UsersComponent implements OnInit {
     if (this.data.paginator) {
       this.data.paginator.firstPage();
     }
+  }
+
+  getRoleName(role: string): string {
+    return message.roles[role];
   }
 
   /* ##### SELECT FUNCTIONS ##### */

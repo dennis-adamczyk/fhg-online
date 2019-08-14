@@ -16,6 +16,11 @@ header
         font-weight: 400
         line-height: 64px
 
+        mat-icon
+            color: mat-color($warn-light)
+            position: relative
+            top: 4px
+
     .actions
         position: absolute
         right: 16px
@@ -51,7 +56,7 @@ header
         align-items: center
         justify-content: center
 
-    form
+    & > form
         padding: 12px 16px
         margin: 0
         display: flex
@@ -107,14 +112,124 @@ header
                 font-weight: 400
                 color: mat-color($foreground-light, secondary-text)
 
-    .info
+    & > mat-expansion-panel
         box-shadow: none
         border-radius: 0
         border-top: 1px solid mat-color($foreground-light, divider)
-        form
-            mat-form-field
-                input
-                    color: mat-color($foreground-light, text)
+
+        &.info   
+            form
+                padding: 12px 16px
+                margin: 0
+                display: flex
+                flex-wrap: wrap
+                justify-content: space-around
+
+                & > mat-form-field,
+                & > section
+                    width: 100%
+
+                mat-form-field
+                    input
+                        color: mat-color($foreground-light, text)
+
+        &.sanctions
+            .disabled
+                min-height: 64px
+                display: flex
+                justify-content: center
+                align-items: center
+
+                p
+                    margin: 0 16px
+                    font-size: 14px
+                    font-weight: 500
+                    color: mat-color($foreground-light, secondary-text)
+                    text-align: center
+
+
+            mat-accordion
+                .sanction
+                    position: relative
+
+                    &:not(.mat-expanded)
+                        box-shadow: none
+
+                    ::ng-deep .mat-content
+                        overflow: visible
+
+                    &.active
+                        mat-expansion-panel-header
+                            mat-panel-title
+                                mat-icon
+                                    color: mat-color($primary-light)
+                                
+                                span
+                                    color: mat-color($primary-light)
+
+                    mat-expansion-panel-header
+                        mat-panel-title
+                            mat-icon
+                                margin: 0 8px 0 -8px
+                                color: mat-color($foreground-light, icon)
+
+                            span
+                                line-height: 24px
+
+                    mat-action-row
+                        flex-wrap: wrap
+                        
+                        button
+                            text-transform: uppercase
+
+                            &:not(:last-child)
+                                margin: 0 8px 0 0
+
+                    form
+                        padding: 0
+                        margin: 0
+                        display: flex
+                        flex-wrap: wrap
+
+                        & > *
+                            width: 100%
+                            margin: 0 0 12px 0
+
+                            &:last-child
+                                margin: 0
+
+                        .permanent
+                            display: flex
+                            justify-content: space-between
+
+                            mat-radio-button
+                                &:first-child
+                                    width: 30%
+
+                                &:last-child
+                                    width: 70%
+
+                        div.time
+                            margin: 8px 0 0 0
+                            display: flex
+                            flex-wrap: wrap
+                            flex-direction: vertical  
+
+                            & > *
+                                width: 100%
+                                display: flex
+                                flex-wrap: wrap
+                                justify-content: space-between
+
+                                mat-form-field
+                                    width: calc(50% - 8px)
+
+                                h4
+                                    margin: 0
+                                    width: 100%
+                                    font-size: 14px
+                                    font-weight: 500
+                                    color: mat-color($foreground-light, secondary-text)
 
     
 @media not all and ($mat-xsmall)

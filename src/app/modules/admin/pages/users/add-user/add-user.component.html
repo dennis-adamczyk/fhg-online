@@ -30,14 +30,14 @@
     </mat-form-field>
     <mat-radio-group formControlName="role" class="role">
       <h4>Rolle</h4>
-      <mat-radio-button color="primary" value="student"
-        >Schüler</mat-radio-button
-      >
+      <mat-radio-button color="primary" value="student">{{
+        getRoleName('student')
+      }}</mat-radio-button>
       <mat-radio-button
         color="primary"
         value="teacher"
         (change)="onTeacherChange($event)"
-        >Lehrer</mat-radio-button
+        >{{ getRoleName('teacher') }}</mat-radio-button
       >
     </mat-radio-group>
     <mat-form-field>

@@ -164,6 +164,10 @@ export class AddUserComponent implements OnInit {
       });
   }
 
+  getRoleName(role: string): string {
+    return message.roles[role];
+  }
+
   /* ##### GETTER ##### */
 
   get first_name() {

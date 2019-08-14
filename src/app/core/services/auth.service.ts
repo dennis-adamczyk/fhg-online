@@ -9,6 +9,7 @@ import { message } from '../../../configs/messages';
 import { isPlatformBrowser } from '@angular/common';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { MatSnackBar } from '@angular/material';
+import * as firebase from 'firebase/app';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +42,12 @@ export class AuthService {
       if (isPlatformBrowser(this.platformId))
         localStorage.setItem('user', JSON.stringify(user));
       this.user = user;
+
+      if (user && (this.hasSanction('block') || this.hasSanction('ban'))) {
+        // TODO: Handle sanction
+        // this.logout();
+        // this.user = null;
+      }
     });
   }
 
@@ -137,5 +144,64 @@ export class AuthService {
       return message.roles.student;
     }
     return null;
+  }
+
+  hasSanction(sanction: 'interaction' | 'block' | 'ban'): boolean {
+    if (
+      sanction !== 'interaction' &&
+      sanction !== 'block' &&
+      sanction !== 'ban'
+    )
+      return false;
+
+    if (sanction !== 'ban' && this.checkExpiredSanction(sanction)) {
+      return false;
+    }
+
+    return !!this.user.sanctions && !!this.user.sanctions[sanction];
+  }
+
+  getSanction(
+    sanction: 'interaction' | 'block' | 'ban'
+  ): {
+    since: firebase.firestore.Timestamp | Date;
+    by: string;
+    until?: firebase.firestore.Timestamp | Date;
+    permanent?: boolean;
+    reason: string;
+  } {
+    if (
+      sanction !== 'interaction' &&
+      sanction !== 'block' &&
+      sanction !== 'ban'
+    )
+      return null;
+
+    if (sanction !== 'ban' && this.checkExpiredSanction(sanction)) {
+      return null;
+    }
+
+    return this.user.sanctions ? this.user.sanctions[sanction] : null;
+  }
+
+  private checkExpiredSanction(sanction: 'interaction' | 'block'): boolean {
+    if (
+      this.user &&
+      this.user.sanctions &&
+      this.user.sanctions[sanction] &&
+      !this.user.sanctions[sanction].permanent &&
+      this.getDateOf(this.user.sanctions[sanction].until).getTime() < Date.now()
+    ) {
+      this.db.update(`users/${this.user.id}`, {
+        [`sanction.${sanction}`]: null
+      });
+      return true;
+    }
+    return false;
+  }
+
+  private getDateOf(date: Date | firebase.firestore.Timestamp): Date {
+    if (date instanceof firebase.firestore.Timestamp) return date.toDate();
+    return date;
   }
 }

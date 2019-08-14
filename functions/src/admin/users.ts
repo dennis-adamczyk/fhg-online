@@ -32,16 +32,16 @@ export const getUsers = functions.https.onCall((data, context) => {
       student: boolean;
     };
     if (roles.guard) {
-      return 'Guard';
+      return 'guard';
     }
     if (roles.admin) {
-      return 'Admin';
+      return 'admin';
     }
     if (roles.teacher) {
-      return 'Lehrer';
+      return 'teacher';
     }
     if (roles.student) {
-      return 'Schüler';
+      return 'student';
     }
     return undefined;
   }

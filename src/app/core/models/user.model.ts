@@ -14,5 +14,28 @@ export interface User {
     teacher: boolean;
   };
   status: number;
+  sanctions?: {
+    interaction?: {
+      since: firebase.firestore.Timestamp | Date;
+      by: string;
+      until?: firebase.firestore.Timestamp | Date;
+      permanent: boolean;
+      reason: string;
+    };
+    block?: {
+      since: firebase.firestore.Timestamp | Date;
+      by: string;
+      until?: firebase.firestore.Timestamp | Date;
+      permanent: boolean;
+      reason: string;
+    };
+    ban?: {
+      since: firebase.firestore.Timestamp | Date;
+      by: string;
+      reason: string;
+    };
+  };
   settings_changed?: firebase.firestore.Timestamp;
+  created_at?: firebase.firestore.Timestamp;
+  updated_at?: firebase.firestore.Timestamp;
 }

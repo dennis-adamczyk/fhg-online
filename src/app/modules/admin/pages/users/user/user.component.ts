@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  Renderer2,
-  PLATFORM_ID,
-  Inject,
-  HostListener
-} from '@angular/core';
+import { Component, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { User } from 'src/app/core/models/user.model';
@@ -15,11 +8,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { constant } from 'src/configs/constants';
 import { message } from 'src/configs/messages';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog, MatSnackBar, MatExpansionPanel } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { take } from 'rxjs/operators';
 import { FirebaseFunctions } from '@angular/fire';
 import { AngularFireFunctions } from '@angular/fire/functions';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-user',
@@ -38,7 +32,11 @@ export class UserComponent {
 
   edited: boolean = false;
 
+  sanctionsForm: FormGroup;
+  sanctionLoading: boolean = false;
   infoForm: FormGroup;
+
+  currentDate = new Date();
 
   constant = constant;
 
@@ -51,6 +49,7 @@ export class UserComponent {
     private fb: FormBuilder,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private auth: AuthService,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
 
@@ -95,6 +94,23 @@ export class UserComponent {
       status: [null, [Validators.required]]
     });
     this.onChanges();
+
+    this.sanctionsForm = this.fb.group({
+      interaction: this.fb.group({
+        permanent: [true],
+        until: [new Date()],
+        reason: ['']
+      }),
+      block: this.fb.group({
+        permanent: [true],
+        until: [new Date()],
+        reason: ['']
+      }),
+      ban: this.fb.group({
+        reason: ['']
+      })
+    });
+
     this.infoForm = this.fb.group({
       id: '',
       settings_changed: '',
@@ -129,7 +145,7 @@ export class UserComponent {
 
   getData(uid: string) {
     this.isLoading = true;
-    this.db.docWithId$<User>(`users/${uid}`).subscribe(result => {
+    this.db.docWithId$<User>(`users/${uid}`).subscribe((result: User) => {
       if (result.email == undefined) {
         this.snackBar
           .open('Kein Benutzer mit dieser ID gefunden', 'Zurück', {
@@ -150,6 +166,36 @@ export class UserComponent {
         status: result.status
       });
       this.edited = false;
+      if (result.sanctions) {
+        if (result.sanctions.interaction) {
+          this.sanctionsForm.get('interaction').patchValue({
+            permanent: result.sanctions.interaction.permanent,
+            until:
+              result.sanctions.interaction.until instanceof
+              firebase.firestore.Timestamp
+                ? result.sanctions.interaction.until.toDate()
+                : this.currentDate,
+            reason: result.sanctions.interaction.reason
+          });
+        }
+        if (result.sanctions.block) {
+          this.sanctionsForm.get('block').patchValue({
+            permanent: result.sanctions.block.permanent,
+            until:
+              result.sanctions.block.until instanceof
+              firebase.firestore.Timestamp
+                ? result.sanctions.block.until.toDate()
+                : this.currentDate,
+            reason: result.sanctions.block.reason
+          });
+        }
+        if (result.sanctions.ban) {
+          this.sanctionsForm.get('ban').patchValue({
+            reason: result.sanctions.ban.reason
+          });
+        }
+        this.checkExpiredSanctions();
+      }
       if (!result.class || !result.class.length) this.loadClasses();
       if (!result.courses || !result.courses.length) this.loadCourses();
       this.infoForm.patchValue({
@@ -187,7 +233,10 @@ export class UserComponent {
         .colWithIds$(
           `years/${year}/courses`,
           clazz != year
-            ? ref => ref.where('class', 'array-contains', clazz)
+            ? ref =>
+                ref
+                  .where('class', 'array-contains', clazz)
+                  .where('multi', '==', true)
             : undefined
         )
         .subscribe(data => {
@@ -205,7 +254,10 @@ export class UserComponent {
           .colWithIds$(
             `years/${year}/courses`,
             el != year
-              ? ref => ref.where('class', 'array-contains', el)
+              ? ref =>
+                  ref
+                    .where('class', 'array-contains', el)
+                    .where('mutli', '==', true)
               : undefined
           )
           .subscribe(data => {
@@ -315,6 +367,137 @@ export class UserComponent {
       });
   }
 
+  onTimeChange(section: string, event) {
+    if (!(this.sanctionsForm.get(section).get('until').value instanceof Date))
+      return;
+    let current = this.sanctionsForm.get(section).get('until').value as Date;
+    current.setHours(0);
+    current.setMinutes(0);
+    current.setSeconds(0);
+    current.setMilliseconds(event.target.valueAsNumber);
+    this.sanctionsForm
+      .get(section)
+      .get('until')
+      .setValue(current);
+  }
+
+  onDateInput(section: string, event) {
+    let newValue = (event.target.value as string)
+      .split('.')
+      .map(str => parseInt(str));
+    let newDate = new Date(`${newValue[2]}-${newValue[1]}-${newValue[0]}`);
+    this.sanctionsForm
+      .get(section)
+      .get('until')
+      .setValue(newDate);
+  }
+
+  onDurationDaysChange(section: string, event) {
+    if (!(this.sanctionsForm.get(section).get('until').value instanceof Date))
+      return;
+    let days = parseInt(event.target.value);
+    let hours = parseInt(
+      ((event.target as Element)
+        .closest('.duration')
+        .querySelector('.hours input') as any).value
+    );
+    let newDate = new Date();
+    newDate.setDate(newDate.getDate() + days);
+    newDate.setHours(newDate.getHours() + hours);
+    this.sanctionsForm
+      .get(section)
+      .get('until')
+      .setValue(newDate);
+  }
+
+  onDurationHourChange(section: string, event) {
+    if (!(this.sanctionsForm.get(section).get('until').value instanceof Date))
+      return;
+    let days = parseInt(
+      ((event.target as Element)
+        .closest('.duration')
+        .querySelector('.days input') as any).value
+    );
+    let hours = parseInt(event.target.value);
+    let newDate = new Date();
+    newDate.setHours(newDate.getHours() + hours);
+    newDate.setDate(newDate.getDate() + days);
+    this.sanctionsForm
+      .get(section)
+      .get('until')
+      .setValue(newDate);
+  }
+
+  onSanctionSubmit(sanction: string) {
+    let data = this.sanctionsForm.get(sanction).value;
+    if (this.sanctionsForm.get(sanction).invalid) return;
+    if (
+      sanction != 'ban' &&
+      !data.permanent &&
+      (!data.until || !(data.until instanceof Date))
+    )
+      return;
+
+    if (
+      sanction != 'ban' &&
+      !data.permanent &&
+      data.until.getTime() - this.currentDate.getTime() < 36e5
+    )
+      return this.dialog.open(AcceptCancelDialog, {
+        data: {
+          title: 'Dauer verlängern',
+          content: `Die Dauer einer temporären Sanktion muss mehr als eine Stunde betragen.`,
+          accept: 'Korrigieren',
+          defaultCancel: false
+        }
+      });
+
+    let formatted;
+
+    switch (sanction) {
+      case 'interaction':
+      case 'block':
+        formatted = {
+          since: this.currentDate as Date,
+          by: this.auth.user.id as string,
+          until: data.permanent ? null : (data.until as Date),
+          permanent: data.permanent as boolean,
+          reason: data.reason as string
+        };
+        break;
+
+      case 'ban':
+        formatted = {
+          since: this.currentDate as Date,
+          by: this.auth.user.id as string,
+          reason: data.reason as string
+        };
+        break;
+    }
+
+    this.sanctionLoading = true;
+    this.db
+      .update(`users/${this.data.id}`, {
+        [`sanctions.${sanction}`]: formatted
+      })
+      .then(() => {
+        this.data.sanctions.interaction = formatted;
+        this.sanctionLoading = false;
+      });
+  }
+
+  onSanctionDelete(sanction: string) {
+    this.sanctionLoading = true;
+    this.db
+      .update(`users/${this.data.id}`, {
+        [`sanctions.${sanction}`]: null
+      })
+      .then(() => {
+        this.data.sanctions[sanction] = null;
+        this.sanctionLoading = false;
+      });
+  }
+
   /* ##### HELPER ##### */
 
   get isSingleClass(): boolean {
@@ -331,6 +514,108 @@ export class UserComponent {
     return email.split('@')[0];
   }
 
+  getRoleName(role: string): string {
+    return message.roles[role];
+  }
+
+  isMobile(): boolean {
+    if (!isPlatformBrowser(this.platformId)) return false;
+    return window.innerWidth < 600;
+  }
+
+  getTimeFrom(date: Date): string {
+    if (!date || !(date instanceof Date)) return '00:00';
+    return (
+      (date.getHours().toString().length == 2
+        ? date.getHours().toString()
+        : '0' + date.getHours().toString()) +
+      ':' +
+      (date.getMinutes().toString().length == 2
+        ? date.getMinutes().toString()
+        : '0' + date.getMinutes().toString())
+    );
+  }
+
+  getDurationDays(date: Date, start?: Date): number {
+    if (!date || !(date instanceof Date)) return 0;
+    if (!start || !(start instanceof Date)) start = this.now;
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return Math.max(
+      Math.floor((date.getTime() - start.getTime()) / 86400000),
+      0
+    );
+  }
+
+  getDurationHours(date: Date, start?: Date): number {
+    if (!date || !(date instanceof Date)) return 0;
+    if (!start || !(start instanceof Date)) start = this.now;
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return Math.max(
+      Math.floor(((date.getTime() - start.getTime()) % 86400000) / 3600000),
+      0
+    );
+  }
+
+  getDurationMinutes(date: Date, start?: Date): number {
+    if (!date || !(date instanceof Date)) return 0;
+    if (!start || !(start instanceof Date)) start = this.now;
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return Math.max(
+      Math.floor(
+        (((date.getTime() - start.getTime()) % 86400000) % 3600000) / 60000
+      ),
+      0
+    );
+  }
+
+  getSanctionCountdown(sanction: string): string {
+    let date = this.getDateOf(this.data.sanctions[sanction].until);
+
+    let output = '';
+    if (this.getDurationDays(date)) output += `${this.getDurationDays(date)}T `;
+    if (this.getDurationHours(date) || output.length)
+      output += `${this.getDurationHours(date)}h `;
+    if (this.getDurationMinutes(date) || output.length)
+      output += `${this.getDurationMinutes(date)}min `;
+
+    return output.slice(0, -1);
+  }
+
+  getDateOf(date: Date | firebase.firestore.Timestamp): Date {
+    if (date instanceof firebase.firestore.Timestamp) return date.toDate();
+    return date;
+  }
+
+  checkExpiredSanctions() {
+    if (this.data && this.data.sanctions) {
+      if (this.data.sanctions.interaction || this.data.sanctions.block) {
+        let sanctions = Object.keys(this.data.sanctions).filter(
+          key => this.data.sanctions[key] && !this.data.sanctions[key].permanent
+        );
+        sanctions.forEach(sanction => {
+          if (
+            this.getDateOf(this.data.sanctions[sanction].until).getTime() <=
+            Date.now()
+          ) {
+            this.onSanctionDelete(sanction);
+          }
+        });
+      }
+    }
+  }
+
+  get now(): Date {
+    let date = new Date();
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    return date;
+  }
+
+  /* ##### GETTER ##### */
+
   get email() {
     return this.userForm.get('email');
   }
@@ -346,6 +631,8 @@ export class UserComponent {
   get status() {
     return this.userForm.get('status');
   }
+
+  /* ##### ERRORS ##### */
 
   getEmailErrorMessage(): string {
     if (this.email.hasError('required')) {
