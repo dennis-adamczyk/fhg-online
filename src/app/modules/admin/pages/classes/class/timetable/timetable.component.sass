@@ -1,5 +1,8 @@
 @import ../../../../../../../var
 
+::ng-deep div.class
+    -webkit-transform: translate3d(0, 0, 0)
+
 header
     display: block
     position: relative
@@ -134,7 +137,7 @@ header
         .multi-lesson
             display: flex
             flex-wrap: wrap
-            align-content: center
+            align-items: center
             height: calc(100% - 8px)
             min-height: 64px
             margin: 4px
