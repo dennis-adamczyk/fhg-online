@@ -30,6 +30,7 @@ import {
 import { CdkStepperModule } from '@angular/cdk/stepper';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CdkTreeModule } from '@angular/cdk/tree';
+import { TextFieldModule } from '@angular/cdk/text-field';
 
 const materialComponents = [
   MatToolbarModule,
@@ -60,7 +61,8 @@ const materialComponents = [
   CdkTreeModule,
   MatExpansionModule,
   MatDatepickerModule,
-  MatNativeDateModule
+  MatNativeDateModule,
+  TextFieldModule
 ];
 
 @NgModule({

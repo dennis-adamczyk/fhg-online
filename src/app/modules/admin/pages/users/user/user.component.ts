@@ -593,7 +593,10 @@ export class UserComponent {
     if (this.data && this.data.sanctions) {
       if (this.data.sanctions.interaction || this.data.sanctions.block) {
         let sanctions = Object.keys(this.data.sanctions).filter(
-          key => this.data.sanctions[key] && !this.data.sanctions[key].permanent
+          key =>
+            this.data.sanctions[key] &&
+            !this.data.sanctions[key].permanent &&
+            key !== 'ban'
         );
         sanctions.forEach(sanction => {
           if (

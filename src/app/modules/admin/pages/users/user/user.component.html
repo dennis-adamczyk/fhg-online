@@ -160,6 +160,7 @@
         [class.active]="
           !isLoading && data.sanctions && data.sanctions.interaction
         "
+        *ngIf="!data.sanctions || !data.sanctions.ban"
         #interaction
         hideToggle
       >
@@ -271,12 +272,16 @@
             </div>
           </div>
           <mat-form-field>
-            <mat-label>Grund</mat-label>
-            <input
+            <mat-label>Anmerkungen</mat-label>
+            <textarea
               matInput
-              placeholder="z. B. Bedingung zur Aufhebung der Sperre"
+              cdkTextareaAutosize
+              #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="5"
+              placeholder="z. B. Grund, Bedingung zur Aufhebung"
               formControlName="reason"
-            />
+            ></textarea>
           </mat-form-field>
         </form>
         <mat-action-row>
@@ -307,6 +312,7 @@
         class="sanction block"
         [class.active]="!isLoading && data.sanctions && data.sanctions.block"
         #block
+        *ngIf="!data.sanctions || !data.sanctions.ban"
         hideToggle
       >
         <mat-expansion-panel-header>
@@ -414,12 +420,16 @@
             </div>
           </div>
           <mat-form-field>
-            <mat-label>Grund</mat-label>
-            <input
+            <mat-label>Anmerkungen</mat-label>
+            <textarea
               matInput
-              placeholder="z. B. Bedingung zur Aufhebung der Sperre"
+              cdkTextareaAutosize
+              #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="5"
+              placeholder="z. B. Grund, Bedingung zur Aufhebung"
               formControlName="reason"
-            />
+            ></textarea>
           </mat-form-field>
         </form>
         <mat-action-row>
@@ -467,8 +477,16 @@
         </div>
         <form formGroupName="ban">
           <mat-form-field>
-            <mat-label>Grund</mat-label>
-            <input matInput formControlName="reason" />
+            <mat-label>Anmerkungen</mat-label>
+            <textarea
+              matInput
+              cdkTextareaAutosize
+              #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="5"
+              formControlName="reason"
+              placeholder="z. B. Grund"
+            ></textarea>
           </mat-form-field>
         </form>
         <mat-action-row>
