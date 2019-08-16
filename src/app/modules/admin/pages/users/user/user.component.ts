@@ -459,7 +459,12 @@ export class UserComponent {
       case 'block':
         formatted = {
           since: this.currentDate as Date,
-          by: this.auth.user.id as string,
+          by: {
+            id: this.auth.user.id as string,
+            name: (this.auth.user.name.first_name +
+              ' ' +
+              this.auth.user.name.last_name) as string
+          },
           until: data.permanent ? null : (data.until as Date),
           permanent: data.permanent as boolean,
           reason: data.reason as string
@@ -469,7 +474,12 @@ export class UserComponent {
       case 'ban':
         formatted = {
           since: this.currentDate as Date,
-          by: this.auth.user.id as string,
+          by: {
+            id: this.auth.user.id as string,
+            name: (this.auth.user.name.first_name +
+              ' ' +
+              this.auth.user.name.last_name) as string
+          },
           reason: data.reason as string
         };
         break;

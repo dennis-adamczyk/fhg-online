@@ -19,6 +19,7 @@ import { SharedModule } from '../shared/shared.module';
 import { AcceptCancelDialog } from './dialogs/accept-cancel/accept-cancel.component';
 import { EditLessonsDialog } from './dialogs/edit-lessons/edit-lessons.component';
 import { ColorPickerDialog } from './dialogs/color-picker/color-picker.component';
+import { SanctionDialog } from './dialogs/sanction/sanction.component';
 
 // TODO: Add Angular Fire Performance
 
@@ -39,7 +40,8 @@ if (
     NavigationComponent,
     AcceptCancelDialog,
     EditLessonsDialog,
-    ColorPickerDialog
+    ColorPickerDialog,
+    SanctionDialog
   ],
   imports: [
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -54,7 +56,12 @@ if (
     LayoutModule,
     SharedModule
   ],
-  entryComponents: [AcceptCancelDialog, EditLessonsDialog, ColorPickerDialog],
+  entryComponents: [
+    AcceptCancelDialog,
+    EditLessonsDialog,
+    ColorPickerDialog,
+    SanctionDialog
+  ],
   exports: [NavigationComponent],
   providers: [...providerscoll]
 })

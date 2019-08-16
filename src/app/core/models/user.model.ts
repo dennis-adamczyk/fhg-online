@@ -17,21 +17,21 @@ export interface User {
   sanctions?: {
     interaction?: {
       since: firebase.firestore.Timestamp | Date;
-      by: string;
+      by: { id: string; name: string };
       until?: firebase.firestore.Timestamp | Date;
       permanent: boolean;
       reason: string;
     };
     block?: {
       since: firebase.firestore.Timestamp | Date;
-      by: string;
+      by: { id: string; name: string };
       until?: firebase.firestore.Timestamp | Date;
       permanent: boolean;
       reason: string;
     };
     ban?: {
       since: firebase.firestore.Timestamp | Date;
-      by: string;
+      by: { id: string; name: string };
       reason: string;
     };
   };

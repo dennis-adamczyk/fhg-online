@@ -8,8 +8,9 @@ import { switchMap, startWith, tap, map } from 'rxjs/operators';
 import { message } from '../../../configs/messages';
 import { isPlatformBrowser } from '@angular/common';
 import { AngularFireFunctions } from '@angular/fire/functions';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatDialog } from '@angular/material';
 import * as firebase from 'firebase/app';
+import { SanctionDialog } from '../dialogs/sanction/sanction.component';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,7 @@ export class AuthService {
     private db: FirestoreService,
     private afFunc: AngularFireFunctions,
     private snackBar: MatSnackBar,
+    private dialog: MatDialog,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -44,9 +46,11 @@ export class AuthService {
       this.user = user;
 
       if (user && (this.hasSanction('block') || this.hasSanction('ban'))) {
-        // TODO: Handle sanction
-        // this.logout();
-        // this.user = null;
+        this.logout().then(() => this.router.navigate(['/login']));
+        this.user = null;
+        this.dialog.open(SanctionDialog, {
+          data: user.sanctions
+        });
       }
     });
   }
@@ -165,7 +169,10 @@ export class AuthService {
     sanction: 'interaction' | 'block' | 'ban'
   ): {
     since: firebase.firestore.Timestamp | Date;
-    by: string;
+    by: {
+      id: string;
+      name: string;
+    };
     until?: firebase.firestore.Timestamp | Date;
     permanent?: boolean;
     reason: string;

@@ -26,8 +26,7 @@ const routes: Routes = [
   },
   {
     path: 'help',
-    loadChildren: './modules/help/help.module#HelpModule',
-    canActivate: [AuthGuard]
+    loadChildren: './modules/help/help.module#HelpModule'
   },
   {
     path: 'settings',
