@@ -19,7 +19,7 @@ import {
 import { AuthService } from '../../../../core/services/auth.service';
 import { message } from '../../../../../configs/messages';
 import { constant } from '../../../../../configs/constants';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, tap, take } from 'rxjs/operators';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
@@ -38,6 +38,7 @@ export class ActionComponent implements OnInit {
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.XSmall)
     .pipe(map(result => result.matches));
+  handsetSub: Subscription;
 
   mode: string;
   actionCode: string;
@@ -135,7 +136,7 @@ export class ActionComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.toolbar = document.querySelector('.main-toolbar');
       this.sidenavContent = document.querySelector('mat-sidenav-content');
-      this.isHandset$.subscribe(handset => {
+      this.handsetSub = this.isHandset$.subscribe(handset => {
         if (!handset) {
           let scrollHandler = () => {
             if (this.sidenavContent.scrollTop > 64) {
@@ -159,8 +160,9 @@ export class ActionComponent implements OnInit {
 
   ngOnDestroy() {
     if (isPlatformBrowser(this.platformId)) {
-      if (typeof this.scrollListener == 'function') this.scrollListener();
+      if (this.scrollListener) this.scrollListener();
       this.renderer.removeStyle(this.toolbar, 'box-shadow');
+      this.handsetSub.unsubscribe();
     }
   }
 

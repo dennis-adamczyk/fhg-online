@@ -5,7 +5,7 @@ import {
   PLATFORM_ID,
   Inject
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { map, take } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
@@ -71,14 +71,16 @@ export class TimetableComponent implements OnInit {
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.XSmall)
     .pipe(map(result => result.matches));
+  handsetSub: Subscription;
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.toolbar = document.querySelector('.main-toolbar');
       this.sidenavContent = document.querySelector('mat-sidenav-content');
-      this.isHandset$.subscribe(handset => {
+      this.handsetSub = this.handsetSub = this.isHandset$.subscribe(handset => {
         if (!handset) {
           let scrollHandler = () => {
+            console.log('HI');
             if (this.sidenavContent.scrollTop > 64) {
               this.renderer.removeStyle(this.toolbar, 'box-shadow');
             } else {
@@ -101,8 +103,9 @@ export class TimetableComponent implements OnInit {
 
   ngOnDestroy() {
     if (isPlatformBrowser(this.platformId)) {
-      if (typeof this.scrollListener == 'function') this.scrollListener();
+      if (this.scrollListener) this.scrollListener();
       this.renderer.removeStyle(this.toolbar, 'box-shadow');
+      this.handsetSub.unsubscribe();
     }
   }
 

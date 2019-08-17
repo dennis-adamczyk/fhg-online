@@ -77,7 +77,7 @@ export class ClassComponent implements OnInit {
 
   ngOnDestroy() {
     if (isPlatformBrowser(this.platformId)) {
-      if (typeof this.scrollListener == 'function') this.scrollListener();
+      if (this.scrollListener) this.scrollListener();
       this.renderer.removeStyle(this.toolbar, 'box-shadow');
     }
   }
