@@ -30,9 +30,7 @@ export class SettingsComponent implements OnInit {
     public settings: SettingsService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
-  ) {
-    settings.sync();
-  }
+  ) {}
 
   ngOnInit() {
     this.route.fragment.subscribe(fragment => {

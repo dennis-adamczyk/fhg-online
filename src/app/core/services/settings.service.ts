@@ -58,10 +58,11 @@ export class SettingsService {
   }
 
   set(key: string, value: any): Promise<void> {
-    return this.sync().then(() => {
-      var settings = this.getAll();
-      this.setToValue(settings, value, key);
-      return this.setAll(settings);
+    let settings = this.getAll();
+    this.setToValue(settings, value, key);
+    this.setLocalSettings(settings);
+    return this.db.update(`users/${this.auth.user.id}/singles/settings`, {
+      [key]: value
     });
   }
 
@@ -70,45 +71,41 @@ export class SettingsService {
     return this.db.set(`users/${this.auth.user.id}/singles/settings`, settings);
   }
 
-  sync(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (this.isNotLoggedIn) return this.router.navigate(['/login']);
-      if (this.isWrongPlattform) return null;
+  private sync() {
+    if (this.isNotLoggedIn) return this.router.navigate(['/login']);
+    if (this.isWrongPlattform) return null;
 
-      if (!this.auth.user.settings_changed) {
-        this.db.set(
-          `users/${this.auth.user.id}/singles/settings`,
-          this.defaultSettings
-        );
-        this.setLocalSettings(this.defaultSettings, 0);
-        resolve();
-        return;
-      }
+    if (!this.auth.user.settings_changed) {
+      this.db.upsert(
+        `users/${this.auth.user.id}/singles/settings`,
+        this.defaultSettings
+      );
+      this.setLocalSettings(this.defaultSettings, 0);
+      return;
+    }
 
-      if (!this.getLocalSettings()) {
-        this.setLocalSettings(this.defaultSettings, 0);
-      }
+    this.auth.user$.subscribe(user => {
+      const serverChanged = user.settings_changed.toMillis();
+      const localChanged = this.getLocalSettings()
+        ? this.getLocalSettings()['changed']
+        : 0;
 
-      const serverChanged = this.auth.user.settings_changed.seconds;
-      const localChanged = this.getLocalSettings()['changed'];
+      console.log(serverChanged, localChanged, serverChanged > localChanged);
 
       if (serverChanged > localChanged) {
         this.db
           .doc$<Settings>(`users/${this.auth.user.id}/singles/settings`)
           .pipe(take(1))
           .subscribe(data => {
-            var settings = this.strictSettings(data);
+            let settings = this.strictSettings(data);
             this.setLocalSettings(settings);
-            resolve();
           });
-      } else {
-        resolve();
       }
     });
   }
 
   reset(): Promise<void> {
-    return this.setAll(this.defaultSettings).then(() => this.sync());
+    return this.setAll(this.defaultSettings);
   }
 
   private setToValue(obj, value, path) {
@@ -131,8 +128,16 @@ export class SettingsService {
     return new Settings();
   }
 
-  private getLocalSettings(): object {
-    return JSON.parse(localStorage.getItem(this.storageKey));
+  private getLocalSettings(): Settings {
+    if (!localStorage.getItem(this.storageKey))
+      this.db
+        .doc$<Settings>(`users/${this.auth.user.id}/singles/settings`)
+        .pipe(take(1))
+        .subscribe(data => {
+          let settings = this.strictSettings(data);
+          this.setLocalSettings(settings);
+        });
+    return JSON.parse(localStorage.getItem(this.storageKey)) || new Settings();
   }
 
   private setLocalSettings(data: Settings, changed?: number) {
@@ -140,13 +145,9 @@ export class SettingsService {
       this.storageKey,
       JSON.stringify({
         ...data,
-        changed: changed != undefined ? changed : this.currentTime
+        changed: changed != undefined ? changed : Date.now()
       })
     );
-  }
-
-  private get currentTime(): number {
-    return Math.floor(Date.now() / 1000);
   }
 
   private get isNotLoggedIn(): boolean {
