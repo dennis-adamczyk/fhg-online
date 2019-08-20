@@ -65,7 +65,12 @@
             <mat-icon mat-list-icon>list</mat-icon>
             <p mat-line>Hausaufgaben</p>
           </a>
-          <a mat-list-item routerLink="/calendar" routerLinkActive="active">
+          <a
+            mat-list-item
+            routerLink="/calendar"
+            routerLinkActive="active"
+            *ngIf="false"
+          >
             <mat-icon mat-list-icon>event</mat-icon>
             <p mat-line>Kalender</p>
           </a>

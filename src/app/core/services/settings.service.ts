@@ -5,6 +5,8 @@ import { AuthService } from './auth.service';
 import { FirestoreService } from './firestore.service';
 import { Router } from '@angular/router';
 import { take, tap } from 'rxjs/operators';
+import { MatDialog } from '@angular/material';
+import { AcceptCancelDialog } from '../dialogs/accept-cancel/accept-cancel.component';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +17,29 @@ export class SettingsService {
   constructor(
     private auth: AuthService,
     private db: FirestoreService,
+    private dialog: MatDialog,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    try {
+      if (
+        isPlatformBrowser(this.platformId) &&
+        typeof localStorage == 'undefined'
+      ) {
+        throw 'not supported';
+      }
+    } catch (ex) {
+      this.dialog.open(AcceptCancelDialog, {
+        data: {
+          title: 'Cookies aktivieren',
+          content:
+            'Um diese Seite nutzen zu können, musst du Cookies und das lokale Speichern aktivieren.',
+          accept: 'OK'
+        }
+      });
+      this.router.navigate(['/start']);
+      return;
+    }
     this.sync();
   }
 

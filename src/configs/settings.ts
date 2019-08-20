@@ -33,7 +33,7 @@ export class Settings {
     sort_by: 'due_day',
     max_days: 5
   };
-  calendar: {} = {};
+  // calendar: {} = {};
 }
 
 export const language = {
@@ -100,8 +100,8 @@ export const language = {
         suffix: 'Tage'
       }
     }
-  },
-  calendar: {
-    title: 'Kalender'
   }
+  // calendar: {
+  //   title: 'Kalender'
+  // }
 };

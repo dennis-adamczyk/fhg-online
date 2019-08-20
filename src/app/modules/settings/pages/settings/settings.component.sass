@@ -10,6 +10,9 @@
         padding: 0 0 4px 0
         border-bottom: 1px solid mat-color($foreground-light, divider)
 
+        &:last-child
+            border-bottom: none
+
         & > h3
             padding: 24px 16px 8px 16px
             color: mat-color($primary-light)
@@ -41,7 +44,7 @@
 
 @media not all and ($mat-xsmall)
     .settings
-        margin: 4px auto 0 auto
+        margin: 4px auto 24px auto
         width: 576px
 
         .group

@@ -1,3 +1,85 @@
-<p>
-  homework works!
-</p>
+<div class="toolbar-extention"></div>
+<div class="due_day" *ngIf="sort_by == 'due_day'">
+  <div class="header">
+    <h2>Fällig bis...</h2>
+  </div>
+  <div class="body">
+    <div class="loading" *ngIf="isLoading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <article class="day" *ngFor="let date of getDisplayDates()">
+      <div class="heading">
+        <div class="date">
+          <p class="day">{{ getDisplayDay(date) }}</p>
+          <p class="month">{{ getDisplayMonth(date) }}</p>
+        </div>
+        <h4>{{ getDisplayWeekDay(date) }}</h4>
+      </div>
+      <div class="content" *ngIf="homework">
+        <ng-template #itemList let-items="items" let-type="type">
+          <div class="item" *ngFor="let item of items">
+            <div
+              class="subject"
+              [style.background-color]="getColor(item.course.color)"
+            >
+              <p [style.color]="getContrastColor(item.course.color)">
+                {{ item.course.short }}
+              </p>
+            </div>
+            <p class="title">{{ item.title }}</p>
+            <mat-checkbox
+              [checked]="type == 'done'"
+              (change)="onChangeItemCheck($event, item.id)"
+            ></mat-checkbox>
+          </div>
+        </ng-template>
+        <div
+          class="pending"
+          *ngIf="getHomeworkContent('pending', homework[date]) as items"
+        >
+          <ng-container
+            *ngTemplateOutlet="
+              itemList;
+              context: { items: items, type: 'pending' }
+            "
+          ></ng-container>
+        </div>
+        <div
+          class="done"
+          *ngIf="getHomeworkContent('done', homework[date]) as items"
+        >
+          <div
+            class="expander opened"
+            (click)="doneClosed[date] = !doneClosed[date]"
+            [class.opened]="!doneClosed[date]"
+          >
+            <p>Erledigt</p>
+            <button mat-icon-button disableRipple>
+              <mat-icon
+                [style.transform]="
+                  !doneClosed[date] ? 'rotate(180deg)' : 'none'
+                "
+              >
+                expand_more
+              </mat-icon>
+            </button>
+          </div>
+          <div
+            class="expansion"
+            [@expandCollapse]="doneClosed[date] ? 'close' : 'open'"
+          >
+            <ng-container
+              *ngTemplateOutlet="
+                itemList;
+                context: { items: items, type: 'done' }
+              "
+            ></ng-container>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+<div class="entered" *ngIf="sort_by == 'entered'">
+  <div class="header"></div>
+</div>

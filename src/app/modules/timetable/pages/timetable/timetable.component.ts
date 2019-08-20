@@ -15,6 +15,9 @@ import { SettingsService } from 'src/app/core/services/settings.service';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { LessonDetailsDialog } from './dialogs/lesson-details/lesson-details.component';
+import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
+import { Router } from '@angular/router';
+import { HomeworkComponent } from 'src/app/modules/homework/pages/homework/homework.component';
 
 export interface Course {
   class: string[];
@@ -35,8 +38,9 @@ export interface Course {
 interface TimetableLocalStorage {
   updated: number;
   courses: Course[];
-  names: string[];
 }
+
+export const timetableKey = 'timetable';
 
 @Component({
   selector: 'app-timetable',
@@ -51,12 +55,13 @@ export class TimetableComponent implements OnInit {
   courses: Course[] = [];
   timetable: object;
 
-  timetableKey = 'timetable';
+  courseNamesKey = 'course_names';
 
   constructor(
     private auth: AuthService,
     private dialog: MatDialog,
     public settings: SettingsService,
+    public router: Router,
     private db: FirestoreService,
     private renderer: Renderer2,
     private breakpointObserver: BreakpointObserver,
@@ -80,7 +85,6 @@ export class TimetableComponent implements OnInit {
       this.handsetSub = this.handsetSub = this.isHandset$.subscribe(handset => {
         if (!handset) {
           let scrollHandler = () => {
-            console.log('HI');
             if (this.sidenavContent.scrollTop > 64) {
               this.renderer.removeStyle(this.toolbar, 'box-shadow');
             } else {
@@ -113,9 +117,28 @@ export class TimetableComponent implements OnInit {
 
   loadData() {
     if (!isPlatformBrowser(this.platformId)) return;
+    try {
+      if (
+        isPlatformBrowser(this.platformId) &&
+        typeof localStorage == 'undefined'
+      ) {
+        throw 'not supported';
+      }
+    } catch (ex) {
+      this.dialog.open(AcceptCancelDialog, {
+        data: {
+          title: 'Cookies aktivieren',
+          content:
+            'Um diese Seite nutzen zu können, musst du Cookies und das lokale Speichern aktivieren.',
+          accept: 'OK'
+        }
+      });
+      this.router.navigate(['/start']);
+      return;
+    }
     if (
-      !localStorage.getItem(this.timetableKey) ||
-      !localStorage.getItem(this.timetableKey).length
+      !localStorage.getItem(timetableKey) ||
+      !localStorage.getItem(timetableKey).length
     ) {
       this.downloadTimetable();
     } else {
@@ -142,14 +165,20 @@ export class TimetableComponent implements OnInit {
         ...multiCourses
       ]);
       localStorage.setItem(
-        this.timetableKey,
+        timetableKey,
         JSON.stringify({
           updated: Date.now(),
-          courses: [...singleCourses, ...multiCourses],
-          names: [...singleCourses, ...multiCourses].map(course => course.id)
+          courses: [...singleCourses, ...multiCourses]
         } as TimetableLocalStorage)
       );
+      localStorage.setItem(
+        this.courseNamesKey,
+        JSON.stringify({
+          names: [...singleCourses, ...multiCourses].map(course => course.id)
+        })
+      );
       this.updateTimetable();
+      localStorage.removeItem('homework');
       this.isLoading = false;
     };
 
@@ -170,6 +199,7 @@ export class TimetableComponent implements OnInit {
         });
     }
     if (!this.auth.user.courses.length) multis = true;
+    if (!this.auth.user.courses.length && !this.isClass(clazz)) setTimetable();
     this.auth.user.courses.forEach((courseName, index) => {
       this.db
         .docWithId$(`years/${this.getYear(clazz)}/courses/${courseName}`)
@@ -192,7 +222,7 @@ export class TimetableComponent implements OnInit {
   updateTimetable() {
     if (
       JSON.stringify(
-        this.getTimetableLocalStorage()
+        JSON.parse(localStorage.getItem(this.courseNamesKey))
           .names.filter(course =>
             this.isClass(this.auth.user.class as string)
               ? course.charAt(1).match(/\-/)
@@ -212,32 +242,36 @@ export class TimetableComponent implements OnInit {
         }) => {
           if (!year.updated) return;
           let localyUpdated = this.getTimetableLocalStorage().updated;
-          this.getTimetableLocalStorage().names.forEach(courseName => {
-            if (!year.updated[courseName]) return;
-            if (year.updated[courseName].toMillis() > localyUpdated) {
-              this.db
-                .docWithId$(
-                  `years/${this.getYear(this.auth.user
-                    .class as string)}/courses/${courseName}`
-                )
-                .pipe(take(1))
-                .subscribe((course: Course) => {
-                  let newCourses = this.getTimetableLocalStorage().courses.filter(
-                    course => course.id !== courseName
-                  );
-                  newCourses.push(course);
-                  localStorage.setItem(
-                    this.timetableKey,
-                    JSON.stringify({
-                      updated: Date.now(),
-                      courses: newCourses,
-                      names: this.getTimetableLocalStorage().names
-                    })
-                  );
-                  this.timetable = this.convertToTimetable(newCourses);
-                });
+          JSON.parse(localStorage.getItem(this.courseNamesKey)).names.forEach(
+            courseName => {
+              if (!year.updated[courseName]) return;
+              if (year.updated[courseName].toMillis() > localyUpdated) {
+                this.db
+                  .docWithId$(
+                    `years/${this.getYear(this.auth.user
+                      .class as string)}/courses/${courseName}`
+                  )
+                  .pipe(take(1))
+                  .subscribe((course: Course) => {
+                    let newCourses = this.getTimetableLocalStorage().courses.filter(
+                      course => course.id !== courseName
+                    );
+                    newCourses.push(course);
+                    localStorage.setItem(
+                      timetableKey,
+                      JSON.stringify({
+                        updated: Date.now(),
+                        courses: newCourses,
+                        names: JSON.parse(
+                          localStorage.getItem(this.courseNamesKey)
+                        ).names
+                      })
+                    );
+                    this.timetable = this.convertToTimetable(newCourses);
+                  });
+              }
             }
-          });
+          );
         }
       );
   }
@@ -311,9 +345,9 @@ export class TimetableComponent implements OnInit {
   }
 
   getTimetableLocalStorage(): TimetableLocalStorage {
-    return localStorage.getItem(this.timetableKey)
+    return localStorage.getItem(timetableKey)
       ? (JSON.parse(
-          localStorage.getItem(this.timetableKey)
+          localStorage.getItem(timetableKey)
         ) as TimetableLocalStorage)
       : null;
   }

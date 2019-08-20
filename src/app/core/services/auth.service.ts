@@ -11,6 +11,7 @@ import { AngularFireFunctions } from '@angular/fire/functions';
 import { MatSnackBar, MatDialog } from '@angular/material';
 import * as firebase from 'firebase/app';
 import { SanctionDialog } from '../dialogs/sanction/sanction.component';
+import { AcceptCancelDialog } from '../dialogs/accept-cancel/accept-cancel.component';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,26 @@ export class AuthService {
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    try {
+      if (
+        isPlatformBrowser(this.platformId) &&
+        typeof localStorage == 'undefined'
+      ) {
+        throw 'not supported';
+      }
+    } catch (ex) {
+      this.dialog.open(AcceptCancelDialog, {
+        data: {
+          title: 'Cookies aktivieren',
+          content:
+            'Um diese Seite nutzen zu können, musst du Cookies und das lokale Speichern aktivieren.',
+          accept: 'OK'
+        }
+      });
+      this.router.navigate(['/start']);
+      return;
+    }
+
     this.user = isPlatformBrowser(this.platformId)
       ? JSON.parse(localStorage.getItem('user'))
       : null;
@@ -41,6 +62,12 @@ export class AuthService {
       })
     );
     this.user$.subscribe(user => {
+      if (
+        this.user &&
+        this.user.class !== user.class &&
+        isPlatformBrowser(this.platformId)
+      )
+        localStorage.clear();
       if (isPlatformBrowser(this.platformId))
         localStorage.setItem('user', JSON.stringify(user));
       this.user = user;

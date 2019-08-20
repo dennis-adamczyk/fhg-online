@@ -11,6 +11,7 @@ import * as login from './login';
 import * as settings from './settings';
 import * as admin_users from './admin/users';
 import * as timetable from './timetable';
+import * as homework from './homework';
 
 export const ssr = rendering.ssr;
 export const registerUser = login.registerUser;
@@ -21,3 +22,4 @@ export const getUsers = admin_users.getUsers;
 export const deleteUser = admin_users.deleteUser;
 export const deleteUsers = admin_users.deleteUsers;
 export const onChangeCourse = timetable.onChangeCourse;
+export const onChangeHomework = homework.onChangeHomework;
