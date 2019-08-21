@@ -1,0 +1,209 @@
+[debug] [2019-08-21T15:24:10.948Z] ----------------------------------------------------------------------
+[debug] [2019-08-21T15:24:10.950Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\denni\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions:ssr
+[debug] [2019-08-21T15:24:10.950Z] CLI Version:   7.2.4
+[debug] [2019-08-21T15:24:10.950Z] Platform:      win32
+[debug] [2019-08-21T15:24:10.951Z] Node Version:  v10.15.1
+[debug] [2019-08-21T15:24:10.953Z] Time:          Wed Aug 21 2019 17:24:10 GMT+0200 (GMT+02:00)
+[debug] [2019-08-21T15:24:10.953Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-08-21T15:24:10.964Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-08-21T15:24:10.965Z] > authorizing via signed-in user
+[debug] [2019-08-21T15:24:10.965Z] [iam] checking project fhg-online for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2019-08-21T15:24:10.967Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2019-08-21T15:24:10.967Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2019-08-21T15:24:11.128Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:11.135Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/fhg-online:testIamPermissions  
+
+[debug] [2019-08-21T15:24:11.978Z] <<< HTTP RESPONSE 200
+[warn] !  functions: package.json indicates an outdated version of firebase-functions.
+ Please upgrade using npm install --save firebase-functions@latest in your functions directory.
+[info] 
+[info] === Deploying to 'fhg-online'...
+[info] 
+[info] i  deploying functions
+[info] Running command: npm --prefix "$RESOURCE_DIR" run build
+[info] +  functions: Finished running predeploy script.
+[debug] [2019-08-21T15:24:29.608Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "build": "webpack && node cp-angular",
+    "serve": "npm run build && firebase serve --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "8"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "firebase": "^6.1.0",
+    "firebase-admin": "^8.0.0",
+    "firebase-functions": "^2.3.0",
+    "firebase-tools": "^7.0.1",
+    "fs-extra": "^8.0.1",
+    "webpack": "^4.33.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^0.1.6",
+    "ts-loader": "^6.0.2",
+    "typescript": "^3.2.2",
+    "webpack-cli": "^3.3.2",
+    "webpack-node-externals": "^1.7.2",
+    "ws": "^7.0.0"
+  },
+  "private": true
+}
+[info] i  functions: ensuring necessary APIs are enabled...
+[debug] [2019-08-21T15:24:29.609Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/fhg-online/services/cloudfunctions.googleapis.com  
+ 
+[debug] [2019-08-21T15:24:29.610Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/fhg-online/services/runtimeconfig.googleapis.com  
+ 
+[debug] [2019-08-21T15:24:30.518Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:30.549Z] <<< HTTP RESPONSE 200
+[info] +  functions: all necessary APIs are enabled
+[debug] [2019-08-21T15:24:30.551Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/fhg-online/adminSdkConfig  
+ 
+[debug] [2019-08-21T15:24:30.819Z] <<< HTTP RESPONSE 200
+[info] i  functions: preparing functions directory for uploading...
+[debug] [2019-08-21T15:24:30.821Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/fhg-online/configs  
+ 
+[debug] [2019-08-21T15:24:31.133Z] <<< HTTP RESPONSE 200
+[info] i  functions: packaged functions (8.24 MB) for uploading
+[debug] [2019-08-21T15:24:35.509Z] >>> HTTP REQUEST POST https://cloudfunctions.googleapis.com/v1/projects/fhg-online/locations/us-central1/functions:generateUploadUrl  
+ 
+[debug] [2019-08-21T15:24:36.329Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:36.330Z] >>> HTTP REQUEST PUT https://storage.googleapis.com/gcf-upload-us-central1-4a07c8d4-464d-45c6-a760-db3316b57d26/4579edf7-22d9-439c-b453-1343c2463191.zip?GoogleAccessId=service-482394872244@gcf-admin-robot.iam.gserviceaccount.com&Expires=1566402876&Signature=iXsqWiw3pkRpbtFVd3xZ8edrCuoKb8fqwN6UeRABlgAB9MeB%2FCim1F1whzK9rws7lqFMYuJG5uzKc0VHrebJvPVfvD9Zf49%2B09GXgZyCIGGCbyPNou9WYE8zgjuLMhnbSJZIO%2FG4zuD%2FRFtA5WA7yn15iGDGKzZSQJThuadFVqXTqcCD23zlY9nXylteADiifXixHmFIBy07%2B3hjUUnBPujDJ3raPFl8UEfjn7pycOMe7%2BeYOoPL7qfmc6BSye%2Bv40%2F5TZwF6XT%2FxnQgCnVyOKk03NEJNUU0%2BkF9Wi8VAwK0%2FrP5ffj6THAX41a%2F8RK9aZYrdLXaxpZP5rSsSMIsDQ%3D%3D  
+ <request body omitted>
+[debug] [2019-08-21T15:24:41.268Z] <<< HTTP RESPONSE 200
+[info] +  functions: functions folder uploaded successfully
+[debug] [2019-08-21T15:24:41.270Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/projects/fhg-online/locations/-/functions  
+ 
+[debug] [2019-08-21T15:24:41.702Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:41.703Z] > [functions] filtering triggers to: [
+  "projects/fhg-online/locations/us-central1/functions/ssr"
+]
+[info] i  functions: current functions in project: deleteUser(us-central1), deleteUsers(us-central1), getUsers(us-central1), onChangeCourse(us-central1), onChangeHomework(us-central1), onChangeSettings(us-central1), onChangeUser(us-central1), onDeleteUser(us-central1), registerUser(us-central1), ssr(us-central1)
+[info] i  functions: uploading functions in project: ssr(us-central1)
+[info] i  functions: updating Node.js 8 function ssr(us-central1)...
+[debug] [2019-08-21T15:24:41.707Z] Trigger is:  {"httpsTrigger":{}}
+[debug] [2019-08-21T15:24:41.707Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/fhg-online/services/cloudscheduler.googleapis.com  
+ 
+[debug] [2019-08-21T15:24:42.544Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:42.544Z] >>> HTTP REQUEST PATCH https://cloudfunctions.googleapis.com/v1/projects/fhg-online/locations/us-central1/functions/ssr {"updateMask":"sourceUploadUrl,name,labels,runtime,httpsTrigger"} 
+
+[debug] [2019-08-21T15:24:43.546Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:43.547Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/projects/fhg-online/locations/-/functions  
+ 
+[debug] [2019-08-21T15:24:43.958Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:43.960Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:24:44.187Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:46.190Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:24:46.395Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:48.396Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:24:48.605Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:50.605Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:24:50.821Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:52.821Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:24:53.051Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:55.052Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:24:55.281Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:57.281Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:24:57.497Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:24:59.501Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:24:59.746Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:01.748Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:01.966Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:03.966Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:04.187Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:06.187Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:06.411Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:08.412Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:08.642Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:10.642Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:10.874Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:12.875Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:13.089Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:15.089Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:15.320Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:17.321Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:17.540Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:19.541Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:19.751Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:21.752Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:21.958Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:23.957Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:24.188Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:26.190Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:26.405Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:28.406Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:28.642Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:30.643Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:30.879Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:32.881Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:33.109Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:35.110Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:35.316Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:37.316Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:37.533Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:39.535Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:39.759Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:41.759Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:41.987Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:43.988Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:44.219Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:46.220Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:46.441Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:48.442Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:48.661Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:50.662Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:50.876Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:52.876Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:53.082Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:55.082Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:55.294Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:57.294Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:57.505Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:25:59.506Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:25:59.710Z] <<< HTTP RESPONSE 200
+[debug] [2019-08-21T15:26:01.710Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/ZmhnLW9ubGluZS91cy1jZW50cmFsMS9zc3IvUV9rTmZ6UlNUZ0U  
+ 
+[debug] [2019-08-21T15:26:01.986Z] <<< HTTP RESPONSE 200

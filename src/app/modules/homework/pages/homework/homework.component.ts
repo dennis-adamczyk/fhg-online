@@ -92,6 +92,9 @@ export class HomeworkComponent implements OnInit {
   done: object;
   doneClosed: object = {};
 
+  week = new Date();
+  loadedWeeks: number[] = [];
+
   constructor(
     private db: FirestoreService,
     private auth: AuthService,
@@ -132,6 +135,8 @@ export class HomeworkComponent implements OnInit {
             'scroll',
             event => scrollHandler()
           );
+        } else if (handset && this.sort_by == 'entered') {
+          this.renderer.setStyle(this.toolbar, 'box-shadow', 'none');
         } else {
           this.renderer.removeStyle(this.toolbar, 'box-shadow');
         }
@@ -297,6 +302,10 @@ export class HomeworkComponent implements OnInit {
                       );
                       this.homework = this.convertToDateList(newHomework);
                       console.log(this.homework);
+                      this.loadedWeeks.push(this.getWeekNumber(this.week));
+                      let previousWeek = new Date(this.week);
+                      previousWeek.setDate(previousWeek.getDate() - 7);
+                      this.loadedWeeks.push(this.getWeekNumber(previousWeek));
                     });
                 }
               }
@@ -321,6 +330,83 @@ export class HomeworkComponent implements OnInit {
           })
         );
       });
+  }
+
+  loadWeeksHomework() {
+    if (this.getWeekNumber(this.week) > this.getWeekNumber(new Date()) - 2)
+      return;
+    if (!this.loadedWeeks.includes(this.getWeekNumber(this.week)))
+      this.isLoading = true;
+    let monday = new Date(this.week);
+    let day = monday.getDay() || 7;
+    if (day !== 1) monday.setDate(monday.getDate() - (day - 1));
+    monday.setHours(0);
+    monday.setMinutes(0);
+    monday.setSeconds(0);
+    monday.setMilliseconds(0);
+    let sunday = new Date(monday);
+    sunday.setDate(sunday.getDate() + 6);
+    sunday.setHours(23);
+    sunday.setMinutes(59);
+    sunday.setSeconds(59);
+    sunday.setMilliseconds(999);
+    this.checkCourseNames().then(() => {
+      JSON.parse(localStorage.getItem(this.courseNamesKey)).names.forEach(
+        (courseName, i) => {
+          this.db
+            .colWithIds$(
+              `years/${this.getYear(this.auth.user
+                .class as string)}/courses/${courseName}/homework`,
+              ref =>
+                ref
+                  .where('entered.date', '>=', monday)
+                  .where('entered.date', '<=', sunday)
+            )
+            .pipe(take(1))
+            .subscribe((homeworkList: Homework[]) => {
+              if (
+                i ==
+                JSON.parse(localStorage.getItem(this.courseNamesKey)).names
+                  .length -
+                  1
+              ) {
+                this.isLoading = false;
+                this.loadedWeeks.push(this.getWeekNumber(this.week));
+              }
+
+              if (!homeworkList.length) return;
+
+              let courseDetails = JSON.parse(
+                localStorage.getItem(this.timetableKey)
+              ).courses.filter(c => c.id == courseName)[0] as Course;
+
+              let newHomework = JSON.parse(
+                localStorage.getItem(this.storageKey)
+              ).homework;
+              homeworkList.forEach(homework => {
+                newHomework.push({
+                  ...homework,
+                  course: {
+                    id: courseName,
+                    subject: courseDetails.subject,
+                    short: courseDetails.short,
+                    color: courseDetails.color
+                  }
+                });
+              });
+              localStorage.setItem(
+                this.storageKey,
+                JSON.stringify({
+                  homework: newHomework,
+                  updated: JSON.parse(localStorage.getItem(this.storageKey))
+                    .updated
+                })
+              );
+              this.homework = this.convertToDateList(newHomework);
+            });
+        }
+      );
+    });
   }
 
   checkCourseNames() {
@@ -434,6 +520,11 @@ export class HomeworkComponent implements OnInit {
     this.done[id] = event.checked;
   }
 
+  onChangeWeek(add: number) {
+    this.week.setDate(this.week.getDate() + 7 * add);
+    this.loadWeeksHomework();
+  }
+
   /* ##### HELPER ##### */
 
   convertToDateList(homework: Homework[]): object {
@@ -456,7 +547,7 @@ export class HomeworkComponent implements OnInit {
   getDisplayDates(): string[] {
     let output: string[] = [];
     if (this.sort_by == 'entered') {
-      let monday = new Date();
+      let monday = new Date(this.week);
       let day = monday.getDay() || 7;
       if (day !== 1) monday.setDate(monday.getDate() - (day - 1));
       for (let index = 0; index < 5; index++) {
@@ -487,6 +578,20 @@ export class HomeworkComponent implements OnInit {
     return output;
   }
 
+  getWeekNumber(date: Date): number {
+    var dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    var yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    return Math.ceil(
+      ((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+    );
+  }
+
+  getOptionalYear(date: Date): number {
+    if (this.week.getFullYear() == new Date().getFullYear()) return;
+    return this.week.getFullYear();
+  }
+
   getDisplayWeekDay(date: string): string {
     let tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -498,8 +603,10 @@ export class HomeworkComponent implements OnInit {
     );
     const formatter = new Intl.DateTimeFormat('de', { weekday: 'long' });
     let output = formatter.format(current);
-    if (current.toDateString() == new Date().toDateString()) output = 'Heute';
-    if (current.toDateString() == tomorrow.toDateString()) output = 'Morgen';
+    if (this.sort_by == 'due_day') {
+      if (current.toDateString() == new Date().toDateString()) output = 'Heute';
+      if (current.toDateString() == tomorrow.toDateString()) output = 'Morgen';
+    }
     return output;
   }
 
@@ -582,6 +689,31 @@ export class HomeworkComponent implements OnInit {
     });
     if (max == 0) return;
     return constant.times[max].end;
+  }
+
+  isInFuture(date: string): boolean {
+    let parts = date.split('-');
+    let current = new Date(
+      parseInt(parts[0]),
+      parseInt(parts[1]) - 1,
+      parseInt(parts[2])
+    );
+    let maxTime: any = this.getMaxSchoolTime(current.getDay());
+    if (maxTime) {
+      maxTime = maxTime.split(':');
+      current.setHours(maxTime[0]);
+      current.setMinutes(maxTime[1]);
+    }
+    let today = new Date();
+    if (current.getTime() > today.getTime()) return true;
+    return false;
+  }
+
+  isThisWeek(): boolean {
+    return (
+      this.week.getFullYear() == new Date().getFullYear() &&
+      this.getWeekNumber(this.week) >= this.getWeekNumber(new Date())
+    );
   }
 
   getColor(code: string): string {

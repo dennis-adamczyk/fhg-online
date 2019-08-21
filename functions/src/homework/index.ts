@@ -48,7 +48,7 @@ export const onChangeHomework = functions.firestore
     };
 
     let min = new Date();
-    min.setDate(min.getDate() - 7);
+    min.setDate(min.getDate() - 14);
     min.setHours(0);
     min.setMinutes(0);
     min.setSeconds(0);
@@ -62,9 +62,11 @@ export const onChangeHomework = functions.firestore
     max.setMilliseconds(0);
 
     if (
-      (getDate(newValue.entered.date).getTime() >= min.getTime() &&
+      (newValue &&
+        getDate(newValue.entered.date).getTime() >= min.getTime() &&
         getDate(newValue.until.date).getDate() <= max.getTime()) ||
-      (getDate(previousValue.entered.date).getTime() >= min.getTime() &&
+      (previousValue &&
+        getDate(previousValue.entered.date).getTime() >= min.getTime() &&
         getDate(previousValue.until.date).getDate() <= max.getTime())
     ) {
       let addCurrent =
@@ -115,7 +117,8 @@ export const onChangeHomework = functions.firestore
                       entered: newValue.entered,
                       until: newValue.until
                     }
-                  ]
+                  ],
+                  index: true
                 })
                 .then(() => {
                   return admin
