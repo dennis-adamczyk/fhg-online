@@ -90,8 +90,6 @@ export class SettingsService {
         ? this.getLocalSettings()['changed']
         : 0;
 
-      console.log(serverChanged, localChanged, serverChanged > localChanged);
-
       if (serverChanged > localChanged) {
         this.db
           .doc$<Settings>(`users/${this.auth.user.id}/singles/settings`)

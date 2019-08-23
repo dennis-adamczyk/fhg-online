@@ -5,7 +5,12 @@ import { DocPipe } from './pipes/doc.pipe';
 import { ColPipe } from './pipes/col.pipe';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
-import { MAT_DATE_LOCALE } from '@angular/material';
+import {
+  MAT_DATE_LOCALE,
+  DateAdapter,
+  MAT_DATE_FORMATS
+} from '@angular/material';
+import { AppDateAdapter, APP_DATE_FORMATS } from './adapters/app-date-adapters';
 
 @NgModule({
   declarations: [DocPipe, ColPipe],
@@ -18,6 +23,10 @@ import { MAT_DATE_LOCALE } from '@angular/material';
     ReactiveFormsModule,
     NgxTrimDirectiveModule
   ],
-  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'de-DE' }]
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
+    { provide: DateAdapter, useClass: AppDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS }
+  ]
 })
 export class SharedModule {}

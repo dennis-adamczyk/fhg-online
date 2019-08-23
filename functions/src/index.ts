@@ -23,3 +23,4 @@ export const deleteUser = admin_users.deleteUser;
 export const deleteUsers = admin_users.deleteUsers;
 export const onChangeCourse = timetable.onChangeCourse;
 export const onChangeHomework = homework.onChangeHomework;
+export const onChangePersonalHomework = homework.onChangePersonalHomework;

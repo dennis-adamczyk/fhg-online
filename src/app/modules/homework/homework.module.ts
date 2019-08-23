@@ -4,9 +4,10 @@ import { CommonModule } from '@angular/common';
 import { HomeworkRoutingModule } from './homework-routing.module';
 import { HomeworkComponent } from './pages/homework/homework.component';
 import { SharedModule } from '../../shared/shared.module';
+import { AddHomeworkComponent } from './pages/homework/add-homework/add-homework.component';
 
 @NgModule({
-  declarations: [HomeworkComponent],
+  declarations: [HomeworkComponent, AddHomeworkComponent],
   imports: [CommonModule, HomeworkRoutingModule, SharedModule]
 })
 export class HomeworkModule {}

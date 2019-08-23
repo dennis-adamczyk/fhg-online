@@ -20,6 +20,9 @@ import { AcceptCancelDialog } from './dialogs/accept-cancel/accept-cancel.compon
 import { EditLessonsDialog } from './dialogs/edit-lessons/edit-lessons.component';
 import { ColorPickerDialog } from './dialogs/color-picker/color-picker.component';
 import { SanctionDialog } from './dialogs/sanction/sanction.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppRoutingModule } from '../app-routing.module';
 
 // TODO: Add Angular Fire Performance
 

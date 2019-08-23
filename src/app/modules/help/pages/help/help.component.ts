@@ -15,8 +15,8 @@ export class HelpComponent implements OnInit {
     .pipe(map(result => result.matches));
 
   constructor(
-    private breakpointObserver: BreakpointObserver,
-    public location: Location
+    public location: Location,
+    private breakpointObserver: BreakpointObserver
   ) {}
 
   ngOnInit() {}

@@ -3,7 +3,8 @@ import {
   OnInit,
   Inject,
   PLATFORM_ID,
-  Renderer2
+  Renderer2,
+  ElementRef
 } from '@angular/core';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { SettingsService } from 'src/app/core/services/settings.service';
@@ -18,7 +19,7 @@ import {
   TimetableComponent,
   timetableKey
 } from 'src/app/modules/timetable/pages/timetable/timetable.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import * as firebase from 'firebase/app';
 import { constants } from 'os';
 import { constant } from 'src/configs/constants';
@@ -51,6 +52,7 @@ interface Homework {
     short: string;
     color: string;
   };
+  personal?: boolean;
 }
 
 @Component({
@@ -93,15 +95,17 @@ export class HomeworkComponent implements OnInit {
   doneClosed: object = {};
 
   week = new Date();
-  loadedWeeks: number[] = [];
+  loadedWeeks: string[] = [];
 
   constructor(
     private db: FirestoreService,
     private auth: AuthService,
     private router: Router,
     private settings: SettingsService,
+    private snackbar: MatSnackBar,
     private dialog: MatDialog,
     private renderer: Renderer2,
+    private elem: ElementRef,
     private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
@@ -199,6 +203,27 @@ export class HomeworkComponent implements OnInit {
       let courses = JSON.parse(localStorage.getItem(this.courseNamesKey))
         .names as string[];
       let homeworkList = [];
+
+      this.db
+        .doc$(`users/${this.auth.user.id}/personalHomework/--index--`)
+        .pipe(take(1))
+        .subscribe((index: { homework: Homework[] }) => {
+          if (index && index.homework && index.homework.length) {
+            index.homework.forEach(homework => {
+              let courseDetails = JSON.parse(
+                localStorage.getItem(this.timetableKey)
+              ).courses.filter(c => c.id == homework.course)[0] as Course;
+              homework.course = {
+                id: courseDetails.id,
+                subject: courseDetails.subject,
+                short: courseDetails.short,
+                color: courseDetails.color
+              };
+              homework.personal = true;
+              homeworkList.push(homework);
+            });
+          }
+        });
 
       if (!courses.length) {
         this.homework = this.convertToDateList(homeworkList);
@@ -302,16 +327,60 @@ export class HomeworkComponent implements OnInit {
                       );
                       this.homework = this.convertToDateList(newHomework);
                       console.log(this.homework);
-                      this.loadedWeeks.push(this.getWeekNumber(this.week));
+                      this.loadedWeeks.push(
+                        this.getWeekNumber(this.week) +
+                          '-' +
+                          this.week.getFullYear()
+                      );
                       let previousWeek = new Date(this.week);
                       previousWeek.setDate(previousWeek.getDate() - 7);
-                      this.loadedWeeks.push(this.getWeekNumber(previousWeek));
+                      this.loadedWeeks.push(
+                        this.getWeekNumber(previousWeek) +
+                          '-' +
+                          previousWeek.getFullYear()
+                      );
                     });
                 }
               }
             );
           }
         );
+    });
+    this.auth.user$.subscribe(user => {
+      if (!user.homework_updated) return;
+      let localyUpdated = JSON.parse(localStorage.getItem(this.storageKey))
+        .updated;
+      if (user.homework_updated.toMillis() > localyUpdated) {
+        this.db
+          .doc$(`users/${user.id}/personalHomework/--index--`)
+          .pipe(take(1))
+          .subscribe((index: { homework: Homework[] }) => {
+            let newHomework = JSON.parse(
+              localStorage.getItem(this.storageKey)
+            ).homework.filter((h: Homework) => !h.personal);
+            index.homework.forEach(homework => {
+              let courseDetails = JSON.parse(
+                localStorage.getItem(this.timetableKey)
+              ).courses.filter(c => c.id == homework.course)[0] as Course;
+              homework.course = {
+                id: courseDetails.id,
+                subject: courseDetails.subject,
+                short: courseDetails.short,
+                color: courseDetails.color
+              };
+              homework.personal = true;
+              newHomework.push(homework);
+            });
+            localStorage.setItem(
+              this.storageKey,
+              JSON.stringify({
+                homework: newHomework,
+                updated: Date.now()
+              })
+            );
+            this.homework = this.convertToDateList(newHomework);
+          });
+      }
     });
     this.db
       .doc$(`users/${this.auth.user.id}/singles/homework`)
@@ -333,9 +402,16 @@ export class HomeworkComponent implements OnInit {
   }
 
   loadWeeksHomework() {
-    if (this.getWeekNumber(this.week) > this.getWeekNumber(new Date()) - 2)
+    if (
+      this.week.getFullYear() == new Date().getFullYear() &&
+      this.getWeekNumber(this.week) > this.getWeekNumber(new Date()) - 2
+    )
       return;
-    if (!this.loadedWeeks.includes(this.getWeekNumber(this.week)))
+    if (
+      !this.loadedWeeks.includes(
+        this.getWeekNumber(this.week) + '-' + this.week.getFullYear()
+      )
+    )
       this.isLoading = true;
     let monday = new Date(this.week);
     let day = monday.getDay() || 7;
@@ -371,7 +447,9 @@ export class HomeworkComponent implements OnInit {
                   1
               ) {
                 this.isLoading = false;
-                this.loadedWeeks.push(this.getWeekNumber(this.week));
+                this.loadedWeeks.push(
+                  this.getWeekNumber(this.week) + '-' + this.week.getFullYear()
+                );
               }
 
               if (!homeworkList.length) return;
@@ -539,8 +617,15 @@ export class HomeworkComponent implements OnInit {
           ? homework.entered.lesson
           : homework.until.lesson;
       if (!output[date]) output[date] = {};
-      output[date][lesson] = homework;
+      if (output[date][lesson]) {
+        if (!Array.isArray(output[date][lesson]))
+          output[date][lesson] = [output[date][lesson]];
+        output[date][lesson] = [...output[date][lesson], homework];
+      } else {
+        output[date][lesson] = homework;
+      }
     });
+    console.log(output);
     return output;
   }
 
@@ -641,10 +726,26 @@ export class HomeworkComponent implements OnInit {
     for (const lesson of keys) {
       if (homework.hasOwnProperty(lesson)) {
         const assignment = homework[lesson];
-        if (type == 'done' && this.done && this.done[assignment.id] === true)
-          output.push(assignment);
-        if (type == 'pending' && (!this.done || !this.done[assignment.id]))
-          output.push(assignment);
+        if (Array.isArray(assignment)) {
+          assignment.forEach(subAssignment => {
+            if (
+              type == 'done' &&
+              this.done &&
+              this.done[subAssignment.id] === true
+            )
+              output.push(subAssignment);
+            if (
+              type == 'pending' &&
+              (!this.done || !this.done[subAssignment.id])
+            )
+              output.push(subAssignment);
+          });
+        } else {
+          if (type == 'done' && this.done && this.done[assignment.id] === true)
+            output.push(assignment);
+          if (type == 'pending' && (!this.done || !this.done[assignment.id]))
+            output.push(assignment);
+        }
       }
     }
     if (!output.length) return;
@@ -714,6 +815,20 @@ export class HomeworkComponent implements OnInit {
       this.week.getFullYear() == new Date().getFullYear() &&
       this.getWeekNumber(this.week) >= this.getWeekNumber(new Date())
     );
+  }
+
+  getFlatArray(arr: any[]): any[] {
+    let output = [];
+    arr.forEach(item => {
+      if (Array.isArray(item)) {
+        item.forEach(subItem => {
+          output.push(subItem);
+        });
+      } else {
+        output.push(item);
+      }
+    });
+    return output;
   }
 
   getColor(code: string): string {

@@ -1,0 +1,237 @@
+@import ../../../../../../var
+
+.add-homework
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: mat-color($background-light, background)
+    z-index: 6
+
+    mat-toolbar
+        position: sticky
+        top: 0
+        flex-wrap: wrap
+        padding: 0 16px
+        height: auto
+        background-color: mat-color($background-light, card)
+        border-bottom: 1px solid mat-color($foreground-light, divider)
+        z-index: 4
+
+        .navigation
+            display: flex
+            justify-content: space-between
+            align-items: center
+            height: 56px
+            width: 100%
+
+            .close
+                color: mat-color($foreground-light, icon)
+
+            .done,
+            .close
+                margin: -8px
+
+        .title-bar
+            width: 100%
+            min-height: 56px
+            padding: 0 0 0 36px
+
+            mat-form-field
+                width: 100%
+                font-size: 20px
+                font-weight: 400
+                padding: 12px 0 0 0
+
+                ::ng-deep .mat-form-field-underline
+                    display: none
+
+                ::ng-deep .mat-form-field-infix
+                    border: none
+
+                ::ng-deep .mat-form-field-wrapper
+                    padding: 0
+
+                &.mat-focused,
+                &:not(.mat-form-field-invalid)
+                    ::ng-deep .mat-form-field-label
+                        color: mat-color($foreground-light, disabled)
+
+    .container
+        width: 100%
+        height: auto
+
+        .loading
+            position: absolute
+            top: 0
+            left: 0
+            bottom: 0
+            right: 0
+            background: mat-color($background-light, disabled-button)
+            z-index: 1
+            display: flex
+            align-items: center
+            justify-content: center
+
+        .field
+            display: flex
+            justify-content: space-between
+            align-items: center
+            margin: 0
+            padding: 4px 16px
+            min-height: 56px
+            border-bottom: 1px solid mat-color($foreground-light, divider)
+
+            mat-icon.prefix
+                color: mat-color($foreground-light, icon)
+                margin: 0 12px 0 0
+
+            p.label
+                flex-grow: 1
+                font-size: 16px
+                font-weight: 400
+                color: mat-color($foreground-light, secondary-text)
+
+            mat-slide-toggle
+                width: 100%
+                height: 100%
+
+                ::ng-deep
+                    .mat-slide-toggle-content
+                        display: flex
+                        justify-content: space-between
+                        align-items: center
+
+                    .mat-slide-toggle-label
+                        justify-content: space-between
+
+
+            &.multi-line
+                flex-wrap: wrap
+
+                & > *
+                    height: 32px
+
+                    &:first-child
+                        height: 56px
+
+                .line
+                    width: 100%
+                    display: flex
+                    justify-content: center
+                    align-items: center
+
+            .suggestions
+                width: 100%
+                padding: 4px 0
+                overflow-x: auto
+                overflow-y: hidden
+
+                mat-chip
+                    // color: mat-color($foreground-light, secondary-text)
+                    min-width: fit-content
+
+                &::ng-deep .mat-chip-list-wrapper
+                    flex-wrap: nowrap
+                    justify-content: center
+                    width: max-content
+                    min-width: 100%
+
+            mat-form-field
+                width: 100%
+                font-size: 16px
+                font-weight: 400
+
+                ::ng-deep .mat-form-field-underline
+                    display: none
+
+                ::ng-deep .mat-form-field-wrapper
+                    padding: 0
+
+                ::ng-deep .mat-form-field-infix
+                    border: none
+
+                &.mat-form-field-can-float.mat-form-field-should-float
+                    ::ng-deep .mat-form-field-label
+                        transform: translateY(-1em) scale(0.75) perspective(100px) translateZ(0.001px)
+
+                ::ng-deep .mat-form-field-flex
+                    align-items: center
+
+                ::ng-deep .mat-select-arrow-wrapper
+                    opacity: 0
+
+                &.mat-focused,
+                &:not(.mat-form-field-invalid)
+                    ::ng-deep .mat-form-field-label
+                        color: mat-color($foreground-light, secondary-text)
+
+                &.mat-form-field-invalid
+                    ::ng-deep .mat-form-field-prefix mat-icon
+                        color: mat-color($warn-light)
+
+                textarea
+                    padding: 0
+                    margin: 0
+
+                mat-icon
+                    color: mat-color($foreground-light, icon)
+                    margin: 0 12px 0 0
+
+                .icon
+                    display: flex
+                    justify-content: center
+                    align-items: center
+                    width: 32px
+                    height: 32px
+                    background-color: mat-color($primary-light)
+                    margin: -4px 8px -4px -4px
+                    overflow: hidden
+                    border-radius: 50%
+
+                    .short
+                        margin: 0
+                        padding: 0
+                        font-size: 14px
+                        font-weight: 400
+                        text-transform: uppercase
+                        text-align: center
+                        line-height: normal
+                        color: mat-color($foreground-dark, text)
+
+::ng-deep .courseSelect
+    margin-left: -32px
+
+    .mat-option
+        padding: 0 12px
+
+        .mat-option-text
+            display: flex
+            align-items: center
+            overflow: visible
+
+            .icon
+                display: flex
+                justify-content: center
+                align-items: center
+                width: 32px
+                height: 32px
+                background-color: mat-color($primary-light)
+                margin: -4px 8px -4px -4px
+                overflow: hidden
+                border-radius: 50%
+
+                .short
+                    margin: 0
+                    padding: 0
+                    font-size: 14px
+                    font-weight: 400
+                    text-transform: uppercase
+                    text-align: center
+                    line-height: normal
+                    color: mat-color($foreground-dark, text)
+
+@media not all and ($mat-xsmall)
+    .add-homework
+        mat-toolbar
