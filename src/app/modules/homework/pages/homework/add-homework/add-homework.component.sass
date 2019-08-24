@@ -160,7 +160,9 @@
                     align-items: center
 
                 ::ng-deep .mat-select-arrow-wrapper
-                    opacity: 0
+                    // opacity: 0
+                    .mat-select-arrow
+                        color: mat-color($foreground-light, icon)
 
                 &.mat-focused,
                 &:not(.mat-form-field-invalid)
@@ -171,9 +173,9 @@
                     ::ng-deep .mat-form-field-prefix mat-icon
                         color: mat-color($warn-light)
 
-                textarea
-                    padding: 0
-                    margin: 0
+                // textarea
+                //     padding: 0
+                //     margin: 0
 
                 mat-icon
                     color: mat-color($foreground-light, icon)
@@ -235,3 +237,23 @@
 @media not all and ($mat-xsmall)
     .add-homework
         mat-toolbar
+            padding: 0 24px
+
+            .navigation
+                height: 64px
+
+            .title-bar
+                margin: 0 auto
+                width: 576px - 52px
+                min-height: 64px
+                padding: 0 0 0 52px
+
+                mat-form-field
+                    padding: 16px 0 8px 0
+
+        .container
+            margin: 0 auto
+            width: 576px
+
+            .field
+                border-bottom: none

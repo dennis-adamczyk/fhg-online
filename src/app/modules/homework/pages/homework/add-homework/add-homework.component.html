@@ -120,7 +120,10 @@
             [matDatepicker]="untilPicker"
             [matDatepickerFilter]="lessonFilter"
           />
-          <mat-datepicker touchUi #untilPicker></mat-datepicker>
+          <mat-datepicker
+            [touchUi]="isHandset$ | async"
+            #untilPicker
+          ></mat-datepicker>
           <p matSuffix>
             {{ getDisplayLesson(homeworkForm.get('until').value) }}
           </p>
@@ -166,7 +169,10 @@
           [matDatepicker]="enteredPicker"
           [matDatepickerFilter]="lessonFilter"
         />
-        <mat-datepicker touchUi #enteredPicker></mat-datepicker>
+        <mat-datepicker
+          [touchUi]="isHandset$ | async"
+          #enteredPicker
+        ></mat-datepicker>
         <p matSuffix>
           {{ getDisplayLesson(homeworkForm.get('entered').value) }}
         </p>

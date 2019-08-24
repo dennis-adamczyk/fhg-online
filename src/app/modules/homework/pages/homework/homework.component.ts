@@ -413,6 +413,7 @@ export class HomeworkComponent implements OnInit {
       )
     )
       this.isLoading = true;
+
     let monday = new Date(this.week);
     let day = monday.getDay() || 7;
     if (day !== 1) monday.setDate(monday.getDate() - (day - 1));
@@ -420,12 +421,42 @@ export class HomeworkComponent implements OnInit {
     monday.setMinutes(0);
     monday.setSeconds(0);
     monday.setMilliseconds(0);
+
     let sunday = new Date(monday);
     sunday.setDate(sunday.getDate() + 6);
     sunday.setHours(23);
     sunday.setMinutes(59);
     sunday.setSeconds(59);
     sunday.setMilliseconds(999);
+
+    let newHomework = JSON.parse(localStorage.getItem(this.storageKey))
+      .homework as Homework[];
+
+    this.db
+      .colWithIds$(`users/${this.auth.user.id}/personalHomework`, ref =>
+        ref
+          .where('entered.date', '>=', monday)
+          .where('entered.date', '<=', sunday)
+      )
+      .pipe(take(1))
+      .subscribe((homeworkList: Homework[]) => {
+        if (!homeworkList.length) return;
+        homeworkList.forEach(homework => {
+          let courseDetails = JSON.parse(
+            localStorage.getItem(this.timetableKey)
+          ).courses.filter(c => c.id == homework.course)[0] as Course;
+          homework.course = {
+            id: courseDetails.id,
+            subject: courseDetails.subject,
+            short: courseDetails.short,
+            color: courseDetails.color
+          };
+          homework.personal = true;
+          newHomework.push(homework);
+        });
+        this.homework = this.convertToDateList(newHomework);
+      });
+
     this.checkCourseNames().then(() => {
       JSON.parse(localStorage.getItem(this.courseNamesKey)).names.forEach(
         (courseName, i) => {
@@ -458,9 +489,6 @@ export class HomeworkComponent implements OnInit {
                 localStorage.getItem(this.timetableKey)
               ).courses.filter(c => c.id == courseName)[0] as Course;
 
-              let newHomework = JSON.parse(
-                localStorage.getItem(this.storageKey)
-              ).homework;
               homeworkList.forEach(homework => {
                 newHomework.push({
                   ...homework,
@@ -472,14 +500,6 @@ export class HomeworkComponent implements OnInit {
                   }
                 });
               });
-              localStorage.setItem(
-                this.storageKey,
-                JSON.stringify({
-                  homework: newHomework,
-                  updated: JSON.parse(localStorage.getItem(this.storageKey))
-                    .updated
-                })
-              );
               this.homework = this.convertToDateList(newHomework);
             });
         }

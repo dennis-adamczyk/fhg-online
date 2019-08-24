@@ -3,20 +3,23 @@ import {
   OnInit,
   Inject,
   PLATFORM_ID,
-  HostListener
+  HostListener,
+  NgZone,
+  ViewChild
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser, Location } from '@angular/common';
-import { platform } from 'os';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { take } from 'rxjs/operators';
+import { take, map } from 'rxjs/operators';
 import { Course } from 'src/app/modules/timetable/pages/timetable/timetable.component';
 import { constant } from 'src/configs/constants';
 import { MatSnackBar, MatDialog } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { Observable } from 'rxjs';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 @Component({
   selector: 'app-add-homework',
@@ -33,6 +36,13 @@ export class AddHomeworkComponent implements OnInit {
 
   isLoading: boolean = false;
 
+  @ViewChild('autosize', { static: false }) autosize: CdkTextareaAutosize;
+  triggerResize() {
+    this._ngZone.onStable
+      .pipe(take(1))
+      .subscribe(() => this.autosize.resizeToFitContent(true));
+  }
+
   constructor(
     private db: FirestoreService,
     private fb: FormBuilder,
@@ -41,10 +51,17 @@ export class AddHomeworkComponent implements OnInit {
     private dialog: MatDialog,
     private location: Location,
     private router: Router,
+    private _ngZone: NgZone,
+    private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
 
+  isHandset$: Observable<boolean> = this.breakpointObserver
+    .observe(Breakpoints.Handset)
+    .pipe(map(result => result.matches));
+
   ngOnInit() {
+    this.triggerResize();
     this.homeworkForm = this.fb.group({
       title: ['', [Validators.required]],
       course: [null, [Validators.required]],
@@ -115,6 +132,13 @@ export class AddHomeworkComponent implements OnInit {
     if (!until || !(until instanceof Date)) return;
     if (!entered || !(entered instanceof Date)) return;
     if (share == undefined || share == null) return;
+
+    if (until.getTime() < entered.getTime())
+      return this.snackbar.open(
+        'Das Fälligkeitsdatum muss nach dem Aufgabedatum liegen',
+        null,
+        { duration: 4000 }
+      );
 
     if (!this.getLesson(until))
       return this.homeworkForm.get('until').setErrors(['required']);
