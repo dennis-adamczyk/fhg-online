@@ -20,6 +20,7 @@ import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-ca
 import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { Homework } from '../homework.component';
 
 @Component({
   selector: 'app-add-homework',
@@ -152,45 +153,299 @@ export class AddHomeworkComponent implements OnInit {
       entered.getDate()
     );
 
-    this.isLoading = true;
-    let data = {
-      title: title,
+    let untilMax = new Date(
+      until.getFullYear(),
+      until.getMonth(),
+      until.getDate(),
+      23,
+      59,
+      59,
+      999
+    );
+    let enteredMax = new Date(
+      entered.getFullYear(),
+      entered.getMonth(),
+      entered.getDate(),
+      23,
+      59,
+      59,
+      999
+    );
+
+    let existing = {
       until: {
-        date: until,
-        lesson: this.getLesson(until)
+        shared: [],
+        personal: []
       },
       entered: {
-        date: entered,
-        lesson: this.getLesson(entered)
-      },
-      details: details,
-      attachments: [],
-      by: {
-        id: this.auth.user.id,
-        name: this.auth.user.name,
-        roles: this.auth.user.roles
+        shared: [],
+        personal: []
       }
     };
-    let operation: Promise<any>;
-    if (share) {
-      operation = this.db.add(
+
+    let getExistingUntilShared = this.db
+      .colWithIds$(
         `years/${this.getYear()}/courses/${
           this.homeworkForm.get('course').value.id
         }/homework`,
-        data
-      );
-    } else {
-      data['course'] = course.id;
-      delete data.by;
-      operation = this.db.add(
-        `users/${this.auth.user.id}/personalHomework`,
-        data
-      );
-    }
-    operation.then(() => {
-      this.homeworkForm.markAsPristine();
-      this.isLoading = false;
-      this.navigateBack();
+        ref =>
+          ref
+            .where('until.date', '>=', until)
+            .where('until.date', '<=', untilMax)
+      )
+      .pipe(take(1))
+      .toPromise()
+      .then(existingHomework => {
+        console.log(existingHomework, until, untilMax, course.id);
+        if (!existingHomework) return;
+        existing.until.shared = [...existing.until.shared, ...existingHomework];
+      });
+    let getExistingEnteredShared = this.db
+      .colWithIds$(
+        `years/${this.getYear()}/courses/${
+          this.homeworkForm.get('course').value.id
+        }/homework`,
+        ref =>
+          ref
+            .where('entered.date', '>=', entered)
+            .where('entered.date', '<=', enteredMax)
+      )
+      .pipe(take(1))
+      .toPromise()
+      .then(existingHomework => {
+        console.log(existingHomework, entered, enteredMax, course.id);
+        if (!existingHomework) return;
+        existing.entered.shared = [
+          ...existing.entered.shared,
+          ...existingHomework
+        ];
+      });
+    let getExistingUntilPersonal = this.db
+      .colWithIds$(`users/${this.auth.user.id}/personalHomework`, ref =>
+        ref
+          .where('until.date', '>=', until)
+          .where('until.date', '<=', untilMax)
+          .where('course', '==', course.id)
+      )
+      .pipe(take(1))
+      .toPromise()
+      .then(existingHomework => {
+        console.log(existingHomework, until, untilMax, course.id);
+        if (!existingHomework) return;
+        existing.until.personal = [
+          ...existing.until.personal,
+          ...existingHomework
+        ];
+      });
+    let getExistingEnteredPersonal = this.db
+      .colWithIds$(`users/${this.auth.user.id}/personalHomework`, ref =>
+        ref
+          .where('entered.date', '>=', entered)
+          .where('entered.date', '<=', enteredMax)
+          .where('course', '==', course.id)
+      )
+      .pipe(take(1))
+      .toPromise()
+      .then(existingHomework => {
+        console.log(existingHomework, entered, enteredMax, course.id);
+        if (!existingHomework) return;
+        existing.entered.personal = [
+          ...existing.entered.personal,
+          ...existingHomework
+        ];
+      });
+
+    this.isLoading = true;
+    Promise.all([
+      getExistingUntilShared,
+      getExistingEnteredShared,
+      getExistingUntilPersonal,
+      getExistingEnteredPersonal
+    ]).then(() => {
+      console.log(existing);
+      let addHomework = () => {
+        let data = {
+          title: title,
+          until: {
+            date: until,
+            lesson: this.getLesson(until)
+          },
+          entered: {
+            date: entered,
+            lesson: this.getLesson(entered)
+          },
+          details: details,
+          attachments: [],
+          by: {
+            id: this.auth.user.id,
+            name: this.auth.user.name,
+            roles: this.auth.user.roles
+          }
+        };
+        let operation: Promise<any>;
+        if (share) {
+          operation = this.db.add(
+            `years/${this.getYear()}/courses/${
+              this.homeworkForm.get('course').value.id
+            }/homework`,
+            data
+          );
+        } else {
+          data['course'] = course.id;
+          delete data.by;
+          operation = this.db.add(
+            `users/${this.auth.user.id}/personalHomework`,
+            data
+          );
+        }
+        operation.then(() => {
+          this.homeworkForm.markAsPristine();
+          this.isLoading = false;
+          this.navigateBack();
+        });
+      };
+
+      let arrayUnique = array => {
+        var a = array.concat();
+        for (var i = 0; i < a.length; ++i) {
+          for (var j = i + 1; j < a.length; ++j) {
+            if (a[i].id === a[j].id) a.splice(j--, 1);
+          }
+        }
+
+        return a;
+      };
+
+      let dialogContent = '';
+      if (existing.until.shared.length || existing.entered.shared.length) {
+        let shared = arrayUnique([
+          ...existing.until.shared,
+          ...existing.entered.shared
+        ]);
+        let both = existing.until.shared.filter(
+          value =>
+            existing.entered.shared.filter(value2 => value.id == value2.id)
+              .length
+        );
+        dialogContent +=
+          'Folgende geteilte Hausaufgaben im gleichen Zeitraum wurden gefunden:\n';
+        shared.forEach((h: Homework) => {
+          dialogContent += `${
+            both.filter(value => h.id == value.id).length
+              ? '<span class="warn">'
+              : ''
+          }<a href="/homework/${h.id}">${h.title}</a> – Aufgegeben: ${
+            existing.entered.shared.filter(s => s.id == h.id).length
+              ? '<b>'
+              : ''
+          }${
+            h.entered.date instanceof Date
+              ? h.entered.date.toLocaleDateString()
+              : h.entered.date.toDate().toLocaleDateString()
+          }${
+            existing.entered.shared.filter(s => s.id == h.id).length
+              ? '</b>'
+              : ''
+          }, Fällig bis: ${
+            existing.until.shared.filter(s => s.id == h.id).length ? '<b>' : ''
+          }${
+            h.until.date instanceof Date
+              ? h.until.date.toLocaleDateString()
+              : h.until.date.toDate().toLocaleDateString()
+          }${
+            existing.until.shared.filter(s => s.id == h.id).length ? '</b>' : ''
+          }${both.filter(value => h.id == value.id).length ? '</span>' : ''}\n`;
+        });
+        dialogContent += '\n';
+      }
+      if (existing.until.personal.length || existing.entered.personal.length) {
+        let personal = arrayUnique([
+          ...existing.until.personal,
+          ...existing.entered.personal
+        ]);
+        let both = existing.until.personal.filter(
+          value =>
+            existing.entered.personal.filter(value2 => value.id == value2.id)
+              .length
+        );
+        dialogContent +=
+          'Folgende persönliche Hausaufgaben im gleichen Zeitraum wurden gefunden:\n';
+        personal.forEach((h: Homework) => {
+          dialogContent += `${
+            both.filter(value => h.id == value.id).length
+              ? '<span class="warn">'
+              : ''
+          }<a href="/homework/p/${h.id}">${h.title}</a> – Aufgegeben: ${
+            existing.entered.personal.filter(s => s.id == h.id).length
+              ? '<b>'
+              : ''
+          }${
+            h.entered.date instanceof Date
+              ? h.entered.date.toLocaleDateString()
+              : h.entered.date.toDate().toLocaleDateString()
+          }${
+            existing.entered.personal.filter(s => s.id == h.id).length
+              ? '</b>'
+              : ''
+          }, Fällig bis: ${
+            existing.until.personal.filter(s => s.id == h.id).length
+              ? '<b>'
+              : ''
+          }${
+            h.until.date instanceof Date
+              ? h.until.date.toLocaleDateString()
+              : h.until.date.toDate().toLocaleDateString()
+          }${
+            existing.until.personal.filter(s => s.id == h.id).length
+              ? '</b>'
+              : ''
+          }${both.filter(value => h.id == value.id).length ? '</span>' : ''}\n`;
+        });
+        dialogContent += '\n';
+      }
+      if (dialogContent.length) {
+        this.isLoading = false;
+        let bothPersonal = existing.until.personal.filter(
+          value =>
+            existing.entered.personal.filter(value2 => value.id == value2.id)
+              .length
+        );
+        let bothShared = existing.until.shared.filter(
+          value =>
+            existing.entered.shared.filter(value2 => value.id == value2.id)
+              .length
+        );
+        if ((share && bothShared.length) || (!share && bothPersonal.length)) {
+          dialogContent +=
+            'Bitte ändere das Aufgabe- oder Fälligkeitsdatum der neuen Hausaufgabe.';
+          return this.dialog.open(AcceptCancelDialog, {
+            data: {
+              title: 'Existierende Hausaufgaben gefunden',
+              content: dialogContent,
+              accept: 'OK'
+            }
+          });
+        } else {
+          dialogContent += `Soll die ${
+            share ? 'geteilte' : 'persönliche'
+          } Hausaufgabe trotzdem erstellt werden?`;
+          return this.dialog
+            .open(AcceptCancelDialog, {
+              data: {
+                title: 'Existierende Hausaufgaben gefunden',
+                content: dialogContent,
+                accept: 'Ja',
+                defaultChancel: true
+              }
+            })
+            .afterClosed()
+            .pipe(take(1))
+            .subscribe(accepted => {
+              if (accepted) addHomework();
+            });
+        }
+      }
+      return addHomework();
     });
   }
 

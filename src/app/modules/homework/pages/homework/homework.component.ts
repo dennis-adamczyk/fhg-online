@@ -33,7 +33,7 @@ import {
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { Router } from '@angular/router';
 
-interface Homework {
+export interface Homework {
   id?: string;
   title: string;
   details?: string;
