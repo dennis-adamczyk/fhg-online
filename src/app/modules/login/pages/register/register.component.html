@@ -47,7 +47,7 @@
         [stepControl]="formArray?.get([1])"
         [editable]="!loading"
       >
-        <ng-template matStepLabel>Deine iServ-E-Mail eingeben</ng-template>
+        <ng-template matStepLabel>Deine IServ-E-Mail eingeben</ng-template>
         <div class="content email">
           <mat-form-field>
             <mat-label>E-Mail</mat-label>
@@ -224,6 +224,13 @@
               getPassword2ErrorMessage()
             }}</mat-error>
           </mat-form-field>
+          <mat-checkbox color="primary" formControlName="terms" class="terms">
+            Ich erkläre mich mit den
+            <a href="/info#privacy" target="_blank">Datenschutzbestimmungen</a>
+            und den
+            <a href="/info#terms" target="_blank">Nutzungsbedingungen</a> von
+            FHG Online einverstanden.
+          </mat-checkbox>
         </div>
         <div class="loading" *ngIf="loading">
           <mat-spinner diameter="32"></mat-spinner>
@@ -254,7 +261,7 @@
       <p class="headline">Verifiziere deine E-Mail</p>
       <p>
         Dein Konto wurde erfolgreich erstellt. Um dich anmelden zu können, musst
-        du auf den Link, den wir dir an deine iServ-E-Mail gesendet haben,
+        du auf den Link, den wir dir an deine IServ-E-Mail gesendet haben,
         klicken.
       </p>
       <div class="buttons">

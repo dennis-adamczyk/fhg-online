@@ -85,7 +85,11 @@
     </section>
     <mat-form-field (click)="loadClasses()">
       <mat-label>Klasse/Stufe</mat-label>
-      <mat-select formControlName="class" *ngIf="isSingleClass">
+      <mat-select
+        formControlName="class"
+        (selectionChange)="onClassChange($event)"
+        *ngIf="isSingleClass"
+      >
         <mat-option
           [value]="userForm.get('class').value"
           *ngIf="!classes.length"

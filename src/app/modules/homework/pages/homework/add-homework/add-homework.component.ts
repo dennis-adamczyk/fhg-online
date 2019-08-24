@@ -15,7 +15,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { take, map } from 'rxjs/operators';
 import { Course } from 'src/app/modules/timetable/pages/timetable/timetable.component';
 import { constant } from 'src/configs/constants';
-import { MatSnackBar, MatDialog } from '@angular/material';
+import { MatSnackBar, MatDialog, MatInput } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -36,6 +36,8 @@ export class AddHomeworkComponent implements OnInit {
   courses: Course[] = [];
 
   isLoading: boolean = false;
+
+  @ViewChild('titleInput', { static: true }) titleInput: MatInput;
 
   @ViewChild('autosize', { static: false }) autosize: CdkTextareaAutosize;
   triggerResize() {
@@ -81,6 +83,7 @@ export class AddHomeworkComponent implements OnInit {
           c => !c.multi || this.auth.user.courses.includes(c.id)
         );
       });
+    this.titleInput.focus();
   }
 
   @HostListener('window:beforeunload')
@@ -114,8 +117,7 @@ export class AddHomeworkComponent implements OnInit {
   /* ##### TRIGGERS ##### */
 
   navigateBack() {
-    if (this.isNewTab) this.router.navigate(['/homework']);
-    else this.location.back();
+    this.router.navigate(['/homework'], { replaceUrl: true });
   }
 
   onSubmit() {
@@ -196,7 +198,6 @@ export class AddHomeworkComponent implements OnInit {
       .pipe(take(1))
       .toPromise()
       .then(existingHomework => {
-        console.log(existingHomework, until, untilMax, course.id);
         if (!existingHomework) return;
         existing.until.shared = [...existing.until.shared, ...existingHomework];
       });
@@ -213,7 +214,6 @@ export class AddHomeworkComponent implements OnInit {
       .pipe(take(1))
       .toPromise()
       .then(existingHomework => {
-        console.log(existingHomework, entered, enteredMax, course.id);
         if (!existingHomework) return;
         existing.entered.shared = [
           ...existing.entered.shared,
@@ -230,7 +230,6 @@ export class AddHomeworkComponent implements OnInit {
       .pipe(take(1))
       .toPromise()
       .then(existingHomework => {
-        console.log(existingHomework, until, untilMax, course.id);
         if (!existingHomework) return;
         existing.until.personal = [
           ...existing.until.personal,
@@ -247,7 +246,6 @@ export class AddHomeworkComponent implements OnInit {
       .pipe(take(1))
       .toPromise()
       .then(existingHomework => {
-        console.log(existingHomework, entered, enteredMax, course.id);
         if (!existingHomework) return;
         existing.entered.personal = [
           ...existing.entered.personal,
@@ -262,7 +260,6 @@ export class AddHomeworkComponent implements OnInit {
       getExistingUntilPersonal,
       getExistingEnteredPersonal
     ]).then(() => {
-      console.log(existing);
       let addHomework = () => {
         let data = {
           title: title,
@@ -298,11 +295,22 @@ export class AddHomeworkComponent implements OnInit {
             data
           );
         }
-        operation.then(() => {
-          this.homeworkForm.markAsPristine();
-          this.isLoading = false;
-          this.navigateBack();
-        });
+        operation
+          .then(() => {
+            this.homeworkForm.markAsPristine();
+            this.isLoading = false;
+            this.navigateBack();
+          })
+          .catch(error => {
+            this.isLoading = false;
+            this.snackbar.open(
+              `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
+              null,
+              {
+                duration: 4000
+              }
+            );
+          });
       };
 
       let arrayUnique = array => {
@@ -334,7 +342,7 @@ export class AddHomeworkComponent implements OnInit {
             both.filter(value => h.id == value.id).length
               ? '<span class="warn">'
               : ''
-          }<a href="/homework/${h.id}">${h.title}</a> – Aufgegeben: ${
+          }<a href="/homework/${h.id}">${h.title}</a>\nAufgabedatum: ${
             existing.entered.shared.filter(s => s.id == h.id).length
               ? '<b>'
               : ''
@@ -346,7 +354,7 @@ export class AddHomeworkComponent implements OnInit {
             existing.entered.shared.filter(s => s.id == h.id).length
               ? '</b>'
               : ''
-          }, Fällig bis: ${
+          }\nFälligkeitsdatum: ${
             existing.until.shared.filter(s => s.id == h.id).length ? '<b>' : ''
           }${
             h.until.date instanceof Date
@@ -354,9 +362,10 @@ export class AddHomeworkComponent implements OnInit {
               : h.until.date.toDate().toLocaleDateString()
           }${
             existing.until.shared.filter(s => s.id == h.id).length ? '</b>' : ''
-          }${both.filter(value => h.id == value.id).length ? '</span>' : ''}\n`;
+          }${
+            both.filter(value => h.id == value.id).length ? '</span>' : ''
+          }\n\n`;
         });
-        dialogContent += '\n';
       }
       if (existing.until.personal.length || existing.entered.personal.length) {
         let personal = arrayUnique([
@@ -375,7 +384,7 @@ export class AddHomeworkComponent implements OnInit {
             both.filter(value => h.id == value.id).length
               ? '<span class="warn">'
               : ''
-          }<a href="/homework/p/${h.id}">${h.title}</a> – Aufgegeben: ${
+          }<a href="/homework/p/${h.id}">${h.title}</a>\nAufgabedatum: ${
             existing.entered.personal.filter(s => s.id == h.id).length
               ? '<b>'
               : ''
@@ -387,7 +396,7 @@ export class AddHomeworkComponent implements OnInit {
             existing.entered.personal.filter(s => s.id == h.id).length
               ? '</b>'
               : ''
-          }, Fällig bis: ${
+          }\nFälligkeitsdatum: ${
             existing.until.personal.filter(s => s.id == h.id).length
               ? '<b>'
               : ''
@@ -399,9 +408,10 @@ export class AddHomeworkComponent implements OnInit {
             existing.until.personal.filter(s => s.id == h.id).length
               ? '</b>'
               : ''
-          }${both.filter(value => h.id == value.id).length ? '</span>' : ''}\n`;
+          }${
+            both.filter(value => h.id == value.id).length ? '</span>' : ''
+          }\n\n`;
         });
-        dialogContent += '\n';
       }
       if (dialogContent.length) {
         this.isLoading = false;

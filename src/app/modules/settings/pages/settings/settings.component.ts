@@ -1,4 +1,11 @@
-import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChildren,
+  QueryList,
+  Inject,
+  PLATFORM_ID
+} from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { constant } from '../../../../../configs/constants';
@@ -7,6 +14,7 @@ import { language, Settings } from '../../../../../configs/settings';
 import { MatSelect, MatDialog, MatSnackBar } from '@angular/material';
 import { take, filter } from 'rxjs/operators';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-settings',
@@ -29,7 +37,8 @@ export class SettingsComponent implements OnInit {
     private router: Router,
     public settings: SettingsService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
@@ -146,6 +155,17 @@ export class SettingsComponent implements OnInit {
           );
         }
       });
+  }
+
+  resetLocalStorage() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    let storages = ['timetable', 'homework', 'admin_users', 'course_names'];
+    storages.forEach(storage => {
+      localStorage.removeItem(storage);
+    });
+    this.snackBar.open('Geräte-Speicher zurückgesetzt', null, {
+      duration: 4000
+    });
   }
 
   deleteAccount() {

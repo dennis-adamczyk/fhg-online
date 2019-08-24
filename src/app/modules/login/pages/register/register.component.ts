@@ -89,7 +89,8 @@ export class RegisterComponent implements OnInit {
           this.fb.group(
             {
               password1: ['', [Validators.required, Validators.minLength(6)]],
-              password2: ['', [Validators.required]]
+              password2: ['', [Validators.required]],
+              terms: [false, [Validators.required, Validators.requiredTrue]]
             },
             { validator: RegisterValidator.passwordConfirmed }
           )
@@ -255,9 +256,7 @@ export class RegisterComponent implements OnInit {
           this.loading = false;
           this.registered = false;
           this.snackBar.open(
-            `Fehler aufgetreten (${error.code}: ${
-              error.message
-            }). Bitte versuche es später erneut`,
+            `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
             null,
             { duration: 4000 }
           );

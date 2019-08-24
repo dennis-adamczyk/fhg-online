@@ -36,6 +36,7 @@
           cdkAutosizeMaxRows="3"
           formControlName="title"
           trim="blur"
+          #titleInput="matInput"
         ></textarea>
       </mat-form-field>
     </div>
@@ -103,7 +104,7 @@
     </div>
     <div class="field multi-line">
       <div
-        class="line"
+        class="line datepicker"
         (click)="
           !homeworkForm.get('course').value
             ? showSnackbar('Wähle erst ein Fach aus')
@@ -127,6 +128,7 @@
           <p matSuffix>
             {{ getDisplayLesson(homeworkForm.get('until').value) }}
           </p>
+          <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
         </mat-form-field>
       </div>
 
@@ -152,7 +154,7 @@
       </mat-chip-list>
     </div>
     <div
-      class="field"
+      class="field datepicker"
       (click)="
         !homeworkForm.get('course').value
           ? showSnackbar('Wähle erst ein Fach aus')
@@ -176,6 +178,7 @@
         <p matSuffix>
           {{ getDisplayLesson(homeworkForm.get('entered').value) }}
         </p>
+        <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
       </mat-form-field>
     </div>
     <div class="field">

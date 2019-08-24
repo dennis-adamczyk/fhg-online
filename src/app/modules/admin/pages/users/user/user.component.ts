@@ -123,9 +123,7 @@ export class UserComponent {
   ngOnDestroy() {
     if (this.edited) {
       this.snackBar.open(
-        `Änderungen am Benutzer "${this.data.name.first_name} ${
-          this.data.name.last_name
-        }" wurden verworfen`,
+        `Änderungen am Benutzer "${this.data.name.first_name} ${this.data.name.last_name}" wurden verworfen`,
         null,
         {
           duration: 4000
@@ -297,6 +295,11 @@ export class UserComponent {
         this.userForm.get('class').setValue(clazz[0]);
       }
     }
+  }
+
+  onClassChange(event) {
+    this.userForm.get('courses').setValue([]);
+    this.loadCourses();
   }
 
   onSave() {

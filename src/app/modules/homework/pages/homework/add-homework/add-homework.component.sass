@@ -106,6 +106,10 @@
                     .mat-slide-toggle-label
                         justify-content: space-between
 
+            &.datepicker,
+            .datepicker
+                cursor: pointer
+
 
             &.multi-line
                 flex-wrap: wrap
@@ -131,6 +135,7 @@
                 mat-chip
                     // color: mat-color($foreground-light, secondary-text)
                     min-width: fit-content
+                    cursor: pointer
 
                 &::ng-deep .mat-chip-list-wrapper
                     flex-wrap: nowrap
@@ -163,6 +168,13 @@
                     // opacity: 0
                     .mat-select-arrow
                         color: mat-color($foreground-light, icon)
+
+                ::ng-deep .mat-form-field-suffix
+                    display: flex
+                    align-items: center
+
+                    .mat-datepicker-toggle
+                        margin: 0 0 0 12px
 
                 &.mat-focused,
                 &:not(.mat-form-field-invalid)
