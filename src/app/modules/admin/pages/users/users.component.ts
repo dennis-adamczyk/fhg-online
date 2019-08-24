@@ -146,15 +146,15 @@ export class UsersComponent implements OnInit {
   refreshData(force: boolean) {
     this.isLoadingResults = true;
     this.getUsers(force)
-      .then((result: UserElement[]) => {
-        if (force)
-          result = result.map(user => {
+      .then((result: { data: UserElement[]; cached: boolean }) => {
+        if (!result.cached)
+          result.data = result.data.map(user => {
             user.role = this.getRoleName(user.role);
             return user;
           });
         this.isLoadingResults = false;
-        this.resultsLength = result.length;
-        this.data = new MatTableDataSource<UserElement>(result);
+        this.resultsLength = result.data.length;
+        this.data = new MatTableDataSource<UserElement>(result.data);
         this.selection = new SelectionModel<UserElement>(true, []);
         this.data.sort = this.sort;
         this.data.paginator = this.paginator;
@@ -176,7 +176,7 @@ export class UsersComponent implements OnInit {
           localStorage.setItem(
             this.storageKey,
             JSON.stringify({
-              data: result,
+              data: result.data,
               updated: new Date().getTime()
             })
           );
@@ -246,9 +246,7 @@ export class UsersComponent implements OnInit {
         .open(AcceptCancelDialog, {
           data: {
             title: 'Konto löschen?',
-            content: `Das Konto von <b>${
-              selected.name
-            }</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
+            content: `Das Konto von <b>${selected.name}</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
             accept: 'Unwiederruflich löschen',
             defaultCancel: true
           }
@@ -293,14 +291,16 @@ export class UsersComponent implements OnInit {
       if (data) {
         let obj = JSON.parse(data);
         if (Date.now() - obj.updated < 3.6e6) {
-          return new Promise<any>((resolve, rejcet) => resolve(obj.data));
+          return new Promise<any>((resolve, rejcet) =>
+            resolve({ data: obj.data, cached: true })
+          );
         }
       }
     }
     let getUsers = this.afFunc.functions.httpsCallable('getUsers');
     return getUsers({})
       .then(result => {
-        return result.data;
+        return { data: result.data, cached: false };
       })
       .catch(error => {
         console.error(error);
