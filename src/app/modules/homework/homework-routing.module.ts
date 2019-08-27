@@ -6,19 +6,27 @@ import { PendingChangesGuard } from 'src/app/core/guards/pending-changes.guard';
 
 const routes: Routes = [
   {
-    path: '',
-    component: HomeworkComponent,
-    data: {
-      title: 'Hausaufgaben'
-    }
-  },
-  {
     path: 'add',
     component: AddHomeworkComponent,
     data: {
       title: 'Neue Hausaufgabe'
     },
     canDeactivate: [PendingChangesGuard]
+  },
+  {
+    path: '',
+    component: HomeworkComponent,
+    data: {
+      title: 'Hausaufgaben'
+    },
+    children: [
+      {
+        path: ':course/:id'
+      },
+      {
+        path: 'p/:id'
+      }
+    ]
   }
 ];
 

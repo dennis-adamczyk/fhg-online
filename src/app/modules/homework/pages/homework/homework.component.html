@@ -1,210 +1,232 @@
-<div class="toolbar-extention"></div>
-<a mat-fab color="primary" class="fab" routerLink="add" replaceUrl>
-  <mat-icon>
-    add
-  </mat-icon>
-</a>
-<div class="due_day" *ngIf="sort_by == 'due_day'">
-  <div class="header">
-    <h2>Fällig bis...</h2>
-  </div>
-  <div class="body">
-    <div class="loading" *ngIf="isLoading">
-      <mat-spinner diameter="32"></mat-spinner>
+<app-homework-details
+  [data]="detailsData"
+  *ngIf="details && (isHandset$ | async)"
+></app-homework-details>
+<ng-container *ngIf="!(details && (isHandset$ | async))">
+  <div class="toolbar-extention"></div>
+  <a mat-fab color="primary" class="fab" routerLink="add" replaceUrl>
+    <mat-icon>
+      add
+    </mat-icon>
+  </a>
+  <div class="due_day" *ngIf="sort_by == 'due_day'">
+    <div class="header">
+      <h2>Fällig bis...</h2>
     </div>
-    <article class="day" *ngFor="let date of getDisplayDates()">
-      <div class="heading">
-        <div class="date">
-          <p class="day">{{ getDisplayDay(date) }}</p>
-          <p class="month">{{ getDisplayMonth(date) }}</p>
-        </div>
-        <h4>{{ getDisplayWeekDay(date) }}</h4>
+    <div class="body">
+      <div class="loading" *ngIf="isLoading">
+        <mat-spinner diameter="32"></mat-spinner>
       </div>
-      <div class="content" *ngIf="homework">
-        <div
-          class="no-homework"
-          *ngIf="
-            !getHomeworkContent('pending', homework[date]) &&
-            !getHomeworkContent('done', homework[date])
-          "
-        >
-          <div class="icon">
-            <mat-icon>
-              mood
-            </mat-icon>
+      <article class="day" *ngFor="let date of getDisplayDates()">
+        <div class="heading">
+          <div class="date">
+            <p class="day">{{ getDisplayDay(date) }}</p>
+            <p class="month">{{ getDisplayMonth(date) }}</p>
           </div>
-          <p>Keine Hausaufgaben für diesen Tag</p>
+          <h4>{{ getDisplayWeekDay(date) }}</h4>
         </div>
-        <ng-template #itemList let-items="items" let-type="type">
-          <div class="item" *ngFor="let item of items">
-            <div
-              class="subject"
-              [style.background-color]="getColor(item.course.color)"
-            >
-              <p [style.color]="getContrastColor(item.course.color)">
-                {{ item.course.short }}
-              </p>
-            </div>
-            <p class="title">{{ item.title }}</p>
-            <mat-checkbox
-              [checked]="type == 'done'"
-              (change)="onChangeItemCheck($event, item.id)"
-            ></mat-checkbox>
-          </div>
-        </ng-template>
-        <div
-          class="pending"
-          *ngIf="getHomeworkContent('pending', homework[date]) as items"
-        >
-          <ng-container
-            *ngTemplateOutlet="
-              itemList;
-              context: { items: items, type: 'pending' }
+        <div class="content" *ngIf="homework">
+          <div
+            class="no-homework"
+            *ngIf="
+              !getHomeworkContent('pending', homework[date]) &&
+              !getHomeworkContent('done', homework[date])
             "
-          ></ng-container>
-        </div>
-        <div
-          class="done"
-          *ngIf="getHomeworkContent('done', homework[date]) as items"
-        >
-          <div
-            class="expander opened"
-            (click)="doneClosed[date] = !doneClosed[date]"
-            [class.opened]="!doneClosed[date]"
           >
-            <p>Erledigt</p>
-            <button mat-icon-button disableRipple>
-              <mat-icon
-                [style.transform]="
-                  !doneClosed[date] ? 'rotate(180deg)' : 'none'
-                "
-              >
-                expand_more
+            <div class="icon">
+              <mat-icon>
+                mood
               </mat-icon>
-            </button>
+            </div>
+            <p>Keine Hausaufgaben für diesen Tag</p>
           </div>
+          <ng-template #itemList let-items="items" let-type="type">
+            <a
+              class="item"
+              *ngFor="let item of items"
+              [routerLink]="
+                item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
+              "
+            >
+              <div
+                class="subject"
+                [style.background-color]="getColor(item.course.color)"
+              >
+                <p [style.color]="getContrastColor(item.course.color)">
+                  {{ item.course.short }}
+                </p>
+              </div>
+              <p class="title">{{ item.title }}</p>
+              <mat-checkbox
+                [checked]="type == 'done'"
+                (change)="onChangeItemCheck($event, item.id)"
+              ></mat-checkbox>
+            </a>
+          </ng-template>
           <div
-            class="expansion"
-            [@expandCollapse]="doneClosed[date] ? 'close' : 'open'"
+            class="pending"
+            *ngIf="getHomeworkContent('pending', homework[date]) as items"
           >
             <ng-container
               *ngTemplateOutlet="
                 itemList;
-                context: { items: items, type: 'done' }
+                context: { items: items, type: 'pending' }
               "
             ></ng-container>
           </div>
-        </div>
-      </div>
-    </article>
-  </div>
-</div>
-<div class="entered" *ngIf="sort_by == 'entered'">
-  <div class="header">
-    <button mat-icon-button (click)="onChangeWeek(-1)">
-      <mat-icon>
-        chevron_left
-      </mat-icon>
-    </button>
-    <h2>
-      Woche {{ getWeekNumber(week) }}
-      {{ getOptionalYear(week) ? '– ' + getOptionalYear(week) : '' }}
-    </h2>
-    <button mat-icon-button (click)="onChangeWeek(1)" [disabled]="isThisWeek()">
-      <mat-icon>
-        chevron_right
-      </mat-icon>
-    </button>
-  </div>
-  <div class="body">
-    <div class="loading" *ngIf="isLoading">
-      <mat-spinner diameter="32"></mat-spinner>
-    </div>
-    <article class="day" *ngFor="let date of getDisplayDates()">
-      <div class="heading" [class.future]="isInFuture(date)">
-        <div class="date">
-          <p class="day">{{ getDisplayDay(date) }}</p>
-          <p class="month">{{ getDisplayMonth(date) }}</p>
-        </div>
-        <h4>{{ getDisplayWeekDay(date) }}</h4>
-      </div>
-      <div class="content" *ngIf="homework">
-        <div
-          class="no-homework"
-          [class.future]="isInFuture(date)"
-          *ngIf="
-            !getHomeworkContent('pending', homework[date]) &&
-            !getHomeworkContent('done', homework[date])
-          "
-        >
-          <div class="icon">
-            <mat-icon>
-              mood
-            </mat-icon>
-          </div>
-          <p>Keine Hausaufgaben an diesen Tag</p>
-        </div>
-        <ng-template #itemList let-items="items" let-type="type">
-          <div class="item" *ngFor="let item of items">
-            <div
-              class="subject"
-              [style.background-color]="getColor(item.course.color)"
-            >
-              <p [style.color]="getContrastColor(item.course.color)">
-                {{ item.course.short }}
-              </p>
-            </div>
-            <p class="title">{{ item.title }}</p>
-            <mat-checkbox
-              [checked]="type == 'done'"
-              (change)="onChangeItemCheck($event, item.id)"
-            ></mat-checkbox>
-          </div>
-        </ng-template>
-        <div
-          class="pending"
-          *ngIf="getHomeworkContent('pending', homework[date]) as items"
-        >
-          <ng-container
-            *ngTemplateOutlet="
-              itemList;
-              context: { items: items, type: 'pending' }
-            "
-          ></ng-container>
-        </div>
-        <div
-          class="done"
-          *ngIf="getHomeworkContent('done', homework[date]) as items"
-        >
           <div
-            class="expander opened"
-            (click)="doneClosed[date] = !doneClosed[date]"
-            [class.opened]="!doneClosed[date]"
+            class="done"
+            *ngIf="getHomeworkContent('done', homework[date]) as items"
           >
-            <p>Erledigt</p>
-            <button mat-icon-button disableRipple>
-              <mat-icon
-                [style.transform]="
-                  !doneClosed[date] ? 'rotate(180deg)' : 'none'
+            <div
+              class="expander opened"
+              (click)="doneClosed[date] = !doneClosed[date]"
+              [class.opened]="!doneClosed[date]"
+            >
+              <p>Erledigt</p>
+              <button mat-icon-button disableRipple>
+                <mat-icon
+                  [style.transform]="
+                    !doneClosed[date] ? 'rotate(180deg)' : 'none'
+                  "
+                >
+                  expand_more
+                </mat-icon>
+              </button>
+            </div>
+            <div
+              class="expansion"
+              [@expandCollapse]="doneClosed[date] ? 'close' : 'open'"
+            >
+              <ng-container
+                *ngTemplateOutlet="
+                  itemList;
+                  context: { items: items, type: 'done' }
                 "
-              >
-                expand_more
-              </mat-icon>
-            </button>
+              ></ng-container>
+            </div>
           </div>
+        </div>
+      </article>
+    </div>
+  </div>
+  <div class="entered" *ngIf="sort_by == 'entered'">
+    <div class="header">
+      <button mat-icon-button (click)="onChangeWeek(-1)">
+        <mat-icon>
+          chevron_left
+        </mat-icon>
+      </button>
+      <h2>
+        Woche {{ getWeekNumber(week) }}
+        {{ getOptionalYear(week) ? '– ' + getOptionalYear(week) : '' }}
+      </h2>
+      <button
+        mat-icon-button
+        (click)="onChangeWeek(1)"
+        [disabled]="isThisWeek()"
+      >
+        <mat-icon>
+          chevron_right
+        </mat-icon>
+      </button>
+    </div>
+    <div class="body">
+      <div class="loading" *ngIf="isLoading">
+        <mat-spinner diameter="32"></mat-spinner>
+      </div>
+      <article class="day" *ngFor="let date of getDisplayDates()">
+        <div class="heading" [class.future]="isInFuture(date)">
+          <div class="date">
+            <p class="day">{{ getDisplayDay(date) }}</p>
+            <p class="month">{{ getDisplayMonth(date) }}</p>
+          </div>
+          <h4>{{ getDisplayWeekDay(date) }}</h4>
+        </div>
+        <div class="content" *ngIf="homework">
           <div
-            class="expansion"
-            [@expandCollapse]="doneClosed[date] ? 'close' : 'open'"
+            class="no-homework"
+            [class.future]="isInFuture(date)"
+            *ngIf="
+              !getHomeworkContent('pending', homework[date]) &&
+              !getHomeworkContent('done', homework[date])
+            "
+          >
+            <div class="icon">
+              <mat-icon>
+                mood
+              </mat-icon>
+            </div>
+            <p>Keine Hausaufgaben an diesen Tag</p>
+          </div>
+          <ng-template #itemList let-items="items" let-type="type">
+            <a
+              class="item"
+              *ngFor="let item of items"
+              [routerLink]="
+                item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
+              "
+            >
+              <div
+                class="subject"
+                [style.background-color]="getColor(item.course.color)"
+              >
+                <p [style.color]="getContrastColor(item.course.color)">
+                  {{ item.course.short }}
+                </p>
+              </div>
+              <p class="title">{{ item.title }}</p>
+              <mat-checkbox
+                [checked]="type == 'done'"
+                (change)="onChangeItemCheck($event, item.id)"
+              ></mat-checkbox>
+            </a>
+          </ng-template>
+          <div
+            class="pending"
+            *ngIf="getHomeworkContent('pending', homework[date]) as items"
           >
             <ng-container
               *ngTemplateOutlet="
                 itemList;
-                context: { items: items, type: 'done' }
+                context: { items: items, type: 'pending' }
               "
             ></ng-container>
           </div>
+          <div
+            class="done"
+            *ngIf="getHomeworkContent('done', homework[date]) as items"
+          >
+            <div
+              class="expander opened"
+              (click)="doneClosed[date] = !doneClosed[date]"
+              [class.opened]="!doneClosed[date]"
+            >
+              <p>Erledigt</p>
+              <button mat-icon-button disableRipple>
+                <mat-icon
+                  [style.transform]="
+                    !doneClosed[date] ? 'rotate(180deg)' : 'none'
+                  "
+                >
+                  expand_more
+                </mat-icon>
+              </button>
+            </div>
+            <div
+              class="expansion"
+              [@expandCollapse]="doneClosed[date] ? 'close' : 'open'"
+            >
+              <ng-container
+                *ngTemplateOutlet="
+                  itemList;
+                  context: { items: items, type: 'done' }
+                "
+              ></ng-container>
+            </div>
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </div>
   </div>
-</div>
+</ng-container>

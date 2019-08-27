@@ -12,7 +12,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { settings } from 'cluster';
 import { isPlatformBrowser } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { map, take, filter } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
 import {
   Course,
@@ -31,7 +31,12 @@ import {
   animate
 } from '@angular/animations';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
-import { Router } from '@angular/router';
+import {
+  Router,
+  NavigationEnd,
+  ActivatedRoute,
+  ActivatedRouteSnapshot
+} from '@angular/router';
 
 export interface Homework {
   id?: string;
@@ -46,13 +51,16 @@ export interface Homework {
     lesson: number;
   };
   attachments?: object[];
-  course?: {
-    id: string;
-    subject: string;
-    short: string;
-    color: string;
-  };
+  course?:
+    | {
+        id: string;
+        subject: string;
+        short: string;
+        color: string;
+      }
+    | Course;
   personal?: boolean;
+  done?: boolean;
 }
 
 @Component({
@@ -97,6 +105,14 @@ export class HomeworkComponent implements OnInit {
   week = new Date();
   loadedWeeks: string[] = [];
 
+  subs: Subscription[] = [];
+
+  details: boolean = false;
+  detailsId: string;
+  detailsPersonal: boolean;
+  detailsCourseName: string;
+  detailsData: Homework;
+
   constructor(
     private db: FirestoreService,
     private auth: AuthService,
@@ -106,9 +122,113 @@ export class HomeworkComponent implements OnInit {
     private dialog: MatDialog,
     private renderer: Renderer2,
     private elem: ElementRef,
+    private route: ActivatedRoute,
     private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  ) {
+    let isHandset: boolean = false;
+    this.isHandset$.subscribe(res => {
+      isHandset = res;
+    });
+    this.subs[0] = this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        map(() => this.route.snapshot),
+        map(route => {
+          while (route.firstChild) {
+            route = route.firstChild;
+          }
+          return route;
+        })
+      )
+      .subscribe((route: ActivatedRouteSnapshot) => {
+        if (route.url.length) {
+          this.loadHomeworkDetails(route);
+        } else this.details = false;
+      });
+  }
+
+  loadHomeworkDetails(route: ActivatedRouteSnapshot) {
+    this.detailsCourseName = route.params['course'];
+    this.detailsId = route.params['id'];
+    this.detailsPersonal = route.url[0].path == 'p';
+
+    this.isLoading = true;
+
+    let homeworkRef: string;
+    if (this.detailsPersonal)
+      homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.detailsId}`;
+    else
+      homeworkRef = `years/${this.getYear(this.auth.user
+        .class as string)}/courses/${this.detailsCourseName}/homework/${
+        this.detailsId
+      }`;
+    this.db.docWithId$(homeworkRef).subscribe((homework: Homework) => {
+      this.isLoading = false;
+      if (!homework) {
+        this.router.navigate(['/homework'], { replaceUrl: true });
+        return this.snackbar.open(
+          'Diese Hausaufgabe wurde nicht gefunden',
+          null,
+          { duration: 4000 }
+        );
+      }
+      let courseDetails = JSON.parse(localStorage.getItem(timetableKey));
+      if (!courseDetails) {
+        return this.snackbar
+          .open('Ein Fehler ist aufgetreten', 'Erneut versuchen', {
+            duration: 4000
+          })
+          .onAction()
+          .pipe(take(1))
+          .subscribe(() => {
+            if (!isPlatformBrowser(this.platformId)) return;
+            location.reload();
+          });
+      }
+      console.log(courseDetails, homework, this.detailsCourseName);
+      courseDetails = courseDetails.courses.filter(
+        c =>
+          c.id ==
+          (this.detailsPersonal ? homework.course : this.detailsCourseName)
+      )[0] as Course;
+      if (!courseDetails) {
+        this.router.navigate(['/homework'], { replaceUrl: true });
+        return this.snackbar.open(
+          'Du bist kein Mitglied des Kurses der Hausaufgabe',
+          null,
+          { duration: 4000 }
+        );
+      }
+      if (this.detailsPersonal) homework.personal = true;
+      homework.course = courseDetails;
+      homework.done = this.done && this.done[this.detailsId] === true;
+      if (homework.done == undefined) {
+        return this.db
+          .doc$(`users/${this.auth.user.id}/singles/homework`)
+          .subscribe((singleHomework: { done: { [key: string]: boolean } }) => {
+            if (!singleHomework || !singleHomework.done)
+              this.db.upsert(`users/${this.auth.user.id}/singles/homework`, {
+                done: {}
+              });
+
+            this.done = singleHomework.done;
+            localStorage.setItem(
+              this.storageKey,
+              JSON.stringify({
+                ...JSON.parse(localStorage.getItem(this.storageKey)),
+                done: singleHomework.done
+              })
+            );
+            homework.done = this.done && this.done[this.detailsId] === true;
+            this.detailsData = homework;
+            this.details = true;
+          });
+      }
+      this.detailsData = homework;
+      this.details = true;
+    });
+  }
 
   /* ##### TOOLBAR EXTENTION ##### */
 
@@ -305,7 +425,7 @@ export class HomeworkComponent implements OnInit {
                       let newHomework = JSON.parse(
                         localStorage.getItem(this.storageKey)
                       ).homework.filter(
-                        (h: Homework) => h.course.id !== courseName
+                        (h: Homework) => h.course['id'] !== courseName
                       );
                       index.homework.forEach(homework => {
                         newHomework.push({

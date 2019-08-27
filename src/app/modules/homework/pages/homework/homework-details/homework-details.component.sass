@@ -1,0 +1,128 @@
+@import ../../../../../../var
+
+.homework-details
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: mat-color($background-light, background)
+    z-index: 6
+
+    mat-toolbar 
+        margin: 0
+        padding: 0 16px
+        display: flex
+        justify-content: space-between
+        align-items: center
+        background-color: transparent
+        height: 56px
+
+        button
+            color: mat-color($foreground-light, icon)
+        
+        mat-checkbox
+            padding: 8px 11px
+
+            ::ng-deep
+                .mat-checkbox-inner-container
+                    height: 18px
+                    width: 18px
+
+            &.mat-checkbox-checked,
+            &:active
+                ::ng-deep .mat-checkbox-background,
+                ::ng-deep .mat-ripple-element
+                    background-color: #757575
+
+            
+
+        button,
+        mat-checkbox
+            margin-right: 4px
+
+            &:last-child,
+            &.close
+                margin-right: 0
+
+            &.close
+                margin: -8px
+
+            &.done
+                padding-right: 3px
+
+    .container
+        display: flex
+        flex-direction: column
+        padding: 16px 16px 0 16px
+
+        .title
+            padding: 0
+            margin: 0
+            display: flex
+            justify-content: space-between
+            align-items: center
+
+            .icon
+                display: flex
+                justify-content: center
+                align-items: center
+                flex-shrink: 1
+                padding: 0
+                margin: 0 16px 0 0
+                width: 40px
+                height: 40px
+                background-color: mat-color($primary-light)
+                border-radius: 50%
+
+                .subject
+                    margin: 0
+                    padding: 0
+                    font-size: 16px
+                    font-weight: 400
+                    color: mat-color($foreground-dark, text)
+
+            h2
+                margin: 0
+                padding: 4px 0
+                flex-grow: 1
+                font-size: 18px
+                font-weight: 400
+                text-align: left
+                color: mat-color($foreground-light, text)
+
+        .details
+            margin: 16px 0 0 0
+            padding: 0
+            display: flex
+            flex-direction: column
+            width: 100%
+
+            .item
+                margin: 0
+                padding: 8px 0
+                display: flex
+                justify-content: space-between
+                align-items: center
+                width: 100%
+                min-height: 24px
+
+                mat-icon
+                    margin: 0 12px 0 0
+                    padding: 0
+                    flex-shrink: 1
+                    color: mat-color($foreground-light, icon)
+
+                p
+                    margin: 0 
+                    padding: 4px 0
+                    flex-grow: 1
+                    font-size: 14px
+                    font-weight: 400
+                    text-align: left
+                    color: mat-color($foreground-light, text)
+                    white-space: pre-line
+
+                    span
+                        color: mat-color($foreground-light, secondary-text)
+                

@@ -1,0 +1,93 @@
+<div class="homework-details">
+  <mat-toolbar>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      mat-icon-button
+      (click)="navigateBack()"
+    >
+      <mat-icon aria-label="Close homework icon">close</mat-icon>
+    </button>
+    <div class="actions">
+      <button type="button" class="share" mat-icon-button (click)="onShare()">
+        <mat-icon>share</mat-icon>
+      </button>
+      <button type="button" class="report" mat-icon-button (click)="onReport()">
+        <mat-icon>report</mat-icon>
+      </button>
+      <button type="button" class="edit" mat-icon-button (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button type="button" class="delete" mat-icon-button (click)="onDelete()">
+        <mat-icon>delete</mat-icon>
+      </button>
+      <mat-checkbox
+        class="done"
+        [checked]="data.done"
+        (change)="onChangeDone($event)"
+      ></mat-checkbox>
+    </div>
+  </mat-toolbar>
+  <div class="container">
+    <div class="title">
+      <div class="icon" [style.background-color]="getColor(data.course.color)">
+        <p class="subject" [style.color]="getContrastColor(data.course.color)">
+          {{ data.course.short }}
+        </p>
+      </div>
+      <h2>{{ data.title }}</h2>
+    </div>
+    <div class="details">
+      <div class="item">
+        <mat-icon>
+          subject
+        </mat-icon>
+        <p>
+          {{ data.details }}
+          <span *ngIf="!data.details">Keine Details</span>
+        </p>
+      </div>
+      <div class="item">
+        <mat-icon>
+          widgets
+        </mat-icon>
+        <p>
+          {{ data.course.subject }}
+        </p>
+      </div>
+      <div class="item" *ngIf="!data.personal">
+        <mat-icon>
+          share
+        </mat-icon>
+        <p>
+          {{ getDisplayClass(data.course.class) }}
+        </p>
+      </div>
+      <div class="item" *ngIf="data.personal">
+        <mat-icon>
+          lock
+        </mat-icon>
+        <p>
+          Persönliche Hausaufgabe
+        </p>
+      </div>
+      <div class="item">
+        <mat-icon>
+          event_available
+        </mat-icon>
+        <p>
+          {{ getDisplayLesson(data.until) }}
+        </p>
+      </div>
+      <div class="item">
+        <mat-icon>
+          event
+        </mat-icon>
+        <p>
+          {{ getDisplayLesson(data.entered) }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
