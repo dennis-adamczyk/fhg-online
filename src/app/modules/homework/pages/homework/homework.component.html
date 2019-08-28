@@ -1,4 +1,5 @@
 <app-homework-details
+  [handset$]="isHandset$"
   [data]="detailsData"
   *ngIf="details && (isHandset$ | async)"
 ></app-homework-details>
@@ -17,6 +18,87 @@
       <div class="loading" *ngIf="isLoading">
         <mat-spinner diameter="32"></mat-spinner>
       </div>
+      <article
+        class="day outside"
+        *ngIf="detailsOutsideSorting('before') as detail"
+      >
+        <div class="heading">
+          <div class="date">
+            <p class="day">{{ getDisplayDay(detail.until.date) }}</p>
+            <p class="month">{{ getDisplayMonth(detail.until.date) }}</p>
+          </div>
+          <h4>{{ getDisplayWeekDay(detail.until.date) }}</h4>
+        </div>
+        <div class="content" *ngIf="homework">
+          <ng-template #itemList let-item="item" let-type="type">
+            <a
+              class="item"
+              *ngIf="(isHandset$ | async) || !details"
+              [routerLink]="
+                item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
+              "
+            >
+              <div
+                class="subject"
+                [style.background-color]="getColor(item.course.color)"
+              >
+                <p [style.color]="getContrastColor(item.course.color)">
+                  {{ item.course.short }}
+                </p>
+              </div>
+              <p class="title">{{ item.title }}</p>
+              <mat-checkbox
+                [checked]="type == 'done'"
+                (change)="onChangeItemCheck($event, item.id)"
+                (click)="$event.stopPropagation()"
+              ></mat-checkbox>
+            </a>
+            <app-homework-details
+              [handset$]="isHandset$"
+              [done]="type == 'done'"
+              [data]="detailsData"
+              *ngIf="!(isHandset$ | async) && details"
+            ></app-homework-details>
+          </ng-template>
+          <div class="pending" *ngIf="!done[detail.id]">
+            <ng-container
+              *ngTemplateOutlet="
+                itemList;
+                context: { item: detail, type: 'pending' }
+              "
+            ></ng-container>
+          </div>
+          <div class="done" *ngIf="done[detail.id]">
+            <div
+              class="expander opened"
+              (click)="doneClosed[date] = !doneClosed[date]"
+              [class.opened]="!doneClosed[date]"
+            >
+              <p>Erledigt</p>
+              <button mat-icon-button disableRipple>
+                <mat-icon
+                  [style.transform]="
+                    !doneClosed[date] ? 'rotate(180deg)' : 'none'
+                  "
+                >
+                  expand_more
+                </mat-icon>
+              </button>
+            </div>
+            <div
+              class="expansion"
+              [@expandCollapse]="doneClosed[date] ? 'close' : 'open'"
+            >
+              <ng-container
+                *ngTemplateOutlet="
+                  itemList;
+                  context: { items: detail, type: 'done' }
+                "
+              ></ng-container>
+            </div>
+          </div>
+        </div>
+      </article>
       <article class="day" *ngFor="let date of getDisplayDates()">
         <div class="heading">
           <div class="date">
@@ -41,27 +123,40 @@
             <p>Keine Hausaufgaben für diesen Tag</p>
           </div>
           <ng-template #itemList let-items="items" let-type="type">
-            <a
-              class="item"
-              *ngFor="let item of items"
-              [routerLink]="
-                item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
-              "
-            >
-              <div
-                class="subject"
-                [style.background-color]="getColor(item.course.color)"
+            <ng-container *ngFor="let item of items">
+              <a
+                class="item"
+                *ngIf="
+                  (isHandset$ | async) || !details || detailsId !== item.id
+                "
+                [routerLink]="
+                  item.personal
+                    ? 'p/' + item.id
+                    : item.course.id + '/' + item.id
+                "
               >
-                <p [style.color]="getContrastColor(item.course.color)">
-                  {{ item.course.short }}
-                </p>
-              </div>
-              <p class="title">{{ item.title }}</p>
-              <mat-checkbox
-                [checked]="type == 'done'"
-                (change)="onChangeItemCheck($event, item.id)"
-              ></mat-checkbox>
-            </a>
+                <div
+                  class="subject"
+                  [style.background-color]="getColor(item.course.color)"
+                >
+                  <p [style.color]="getContrastColor(item.course.color)">
+                    {{ item.course.short }}
+                  </p>
+                </div>
+                <p class="title">{{ item.title }}</p>
+                <mat-checkbox
+                  [checked]="type == 'done'"
+                  (change)="onChangeItemCheck($event, item.id)"
+                  (click)="$event.stopPropagation()"
+                ></mat-checkbox>
+              </a>
+              <app-homework-details
+                [handset$]="isHandset$"
+                [done]="type == 'done'"
+                [data]="detailsData"
+                *ngIf="!(isHandset$ | async) && details && detailsId == item.id"
+              ></app-homework-details>
+            </ng-container>
           </ng-template>
           <div
             class="pending"
@@ -102,6 +197,87 @@
                 *ngTemplateOutlet="
                   itemList;
                   context: { items: items, type: 'done' }
+                "
+              ></ng-container>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article
+        class="day outside"
+        *ngIf="detailsOutsideSorting('after') as detail"
+      >
+        <div class="heading">
+          <div class="date">
+            <p class="day">{{ getDisplayDay(detail.until.date) }}</p>
+            <p class="month">{{ getDisplayMonth(detail.until.date) }}</p>
+          </div>
+          <h4>{{ getDisplayWeekDay(detail.until.date) }}</h4>
+        </div>
+        <div class="content" *ngIf="homework">
+          <ng-template #itemList let-item="item" let-type="type">
+            <a
+              class="item"
+              *ngIf="(isHandset$ | async) || !details"
+              [routerLink]="
+                item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
+              "
+            >
+              <div
+                class="subject"
+                [style.background-color]="getColor(item.course.color)"
+              >
+                <p [style.color]="getContrastColor(item.course.color)">
+                  {{ item.course.short }}
+                </p>
+              </div>
+              <p class="title">{{ item.title }}</p>
+              <mat-checkbox
+                [checked]="type == 'done'"
+                (change)="onChangeItemCheck($event, item.id)"
+                (click)="$event.stopPropagation()"
+              ></mat-checkbox>
+            </a>
+            <app-homework-details
+              [handset$]="isHandset$"
+              [done]="type == 'done'"
+              [data]="detailsData"
+              *ngIf="!(isHandset$ | async) && details"
+            ></app-homework-details>
+          </ng-template>
+          <div class="pending" *ngIf="!done[detail.id]">
+            <ng-container
+              *ngTemplateOutlet="
+                itemList;
+                context: { item: detail, type: 'pending' }
+              "
+            ></ng-container>
+          </div>
+          <div class="done" *ngIf="done[detail.id]">
+            <div
+              class="expander opened"
+              (click)="doneClosed[date] = !doneClosed[date]"
+              [class.opened]="!doneClosed[date]"
+            >
+              <p>Erledigt</p>
+              <button mat-icon-button disableRipple>
+                <mat-icon
+                  [style.transform]="
+                    !doneClosed[date] ? 'rotate(180deg)' : 'none'
+                  "
+                >
+                  expand_more
+                </mat-icon>
+              </button>
+            </div>
+            <div
+              class="expansion"
+              [@expandCollapse]="doneClosed[date] ? 'close' : 'open'"
+            >
+              <ng-container
+                *ngTemplateOutlet="
+                  itemList;
+                  context: { items: detail, type: 'done' }
                 "
               ></ng-container>
             </div>
@@ -160,27 +336,40 @@
             <p>Keine Hausaufgaben an diesen Tag</p>
           </div>
           <ng-template #itemList let-items="items" let-type="type">
-            <a
-              class="item"
-              *ngFor="let item of items"
-              [routerLink]="
-                item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
-              "
-            >
-              <div
-                class="subject"
-                [style.background-color]="getColor(item.course.color)"
+            <ng-container *ngFor="let item of items">
+              <a
+                class="item"
+                *ngIf="
+                  (isHandset$ | async) || !details || detailsId !== item.id
+                "
+                [routerLink]="
+                  item.personal
+                    ? 'p/' + item.id
+                    : item.course.id + '/' + item.id
+                "
               >
-                <p [style.color]="getContrastColor(item.course.color)">
-                  {{ item.course.short }}
-                </p>
-              </div>
-              <p class="title">{{ item.title }}</p>
-              <mat-checkbox
-                [checked]="type == 'done'"
-                (change)="onChangeItemCheck($event, item.id)"
-              ></mat-checkbox>
-            </a>
+                <div
+                  class="subject"
+                  [style.background-color]="getColor(item.course.color)"
+                >
+                  <p [style.color]="getContrastColor(item.course.color)">
+                    {{ item.course.short }}
+                  </p>
+                </div>
+                <p class="title">{{ item.title }}</p>
+                <mat-checkbox
+                  [checked]="type == 'done'"
+                  (change)="onChangeItemCheck($event, item.id)"
+                  (click)="$event.stopPropagation()"
+                ></mat-checkbox>
+              </a>
+              <app-homework-details
+                [handset$]="isHandset$"
+                [done]="type == 'done'"
+                [data]="detailsData"
+                *ngIf="!(isHandset$ | async) && details && detailsId == item.id"
+              ></app-homework-details>
+            </ng-container>
           </ng-template>
           <div
             class="pending"

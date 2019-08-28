@@ -1,4 +1,4 @@
-<div class="homework-details">
+<div class="homework-details" [class.desktop]="!(handset$ | async)">
   <mat-toolbar>
     <button
       type="button"

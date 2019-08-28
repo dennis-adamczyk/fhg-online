@@ -35,8 +35,6 @@
                 ::ng-deep .mat-ripple-element
                     background-color: #757575
 
-            
-
         button,
         mat-checkbox
             margin-right: 4px
@@ -100,7 +98,7 @@
 
             .item
                 margin: 0
-                padding: 8px 0
+                padding: 12px 0
                 display: flex
                 justify-content: space-between
                 align-items: center
@@ -125,4 +123,85 @@
 
                     span
                         color: mat-color($foreground-light, secondary-text)
-                
+    &.desktop
+        margin: 8px 0
+        position: static
+        background-color: mat-color($background-light, card)
+        z-index: 4
+        +mat-elevation(4)
+
+        mat-toolbar 
+            padding: 0 24px
+            height: 56px
+            
+            mat-checkbox
+                padding: 8px 12px
+
+                ::ng-deep
+                    .mat-checkbox-inner-container
+                        height: 16px
+                        width: 16px
+
+                &.mat-checkbox-checked,
+                &:active
+                    ::ng-deep .mat-checkbox-background,
+                    ::ng-deep .mat-ripple-element
+                        background-color: #757575
+
+            button,
+            mat-checkbox
+                margin-right: 4px
+
+                &:last-child,
+                &.close
+                    margin-right: 0
+
+                &.close
+                    margin: -8px
+
+                &.done
+                    padding-right: 0
+
+        .container
+            display: flex
+            flex-direction: column
+            padding: 8px 24px 0 24px
+
+            .details
+                margin: 16px 0 0 0
+                padding: 0 0 24px 0
+                display: block
+                flex-direction: column
+                width: 100%
+                column-count: 2
+
+                .item
+                    margin: 0
+                    padding: 12px 0
+                    display: flex
+                    justify-content: space-between
+                    align-items: center
+                    width: 100%
+                    min-height: 24px
+                    -webkit-column-break-inside: avoid
+                    page-break-inside: avoid
+                    break-inside: avoid
+
+                    mat-icon
+                        margin: 0 12px 0 0
+                        padding: 0
+                        flex-shrink: 1
+                        color: mat-color($foreground-light, icon)
+
+                    p
+                        margin: 0 
+                        padding: 4px 0
+                        flex-grow: 1
+                        font-size: 14px
+                        font-weight: 400
+                        text-align: left
+                        color: mat-color($foreground-light, text)
+                        white-space: pre-line
+
+                        span
+                            color: mat-color($foreground-light, secondary-text)

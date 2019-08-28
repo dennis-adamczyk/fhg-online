@@ -4,7 +4,8 @@ import {
   Inject,
   PLATFORM_ID,
   Renderer2,
-  ElementRef
+  ElementRef,
+  ViewChild
 } from '@angular/core';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { SettingsService } from 'src/app/core/services/settings.service';
@@ -126,10 +127,6 @@ export class HomeworkComponent implements OnInit {
     private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string
   ) {
-    let isHandset: boolean = false;
-    this.isHandset$.subscribe(res => {
-      isHandset = res;
-    });
     this.subs[0] = this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
@@ -144,7 +141,13 @@ export class HomeworkComponent implements OnInit {
       .subscribe((route: ActivatedRouteSnapshot) => {
         if (route.url.length) {
           this.loadHomeworkDetails(route);
-        } else this.details = false;
+        } else {
+          this.details = false;
+          this.detailsId = undefined;
+          this.detailsPersonal = undefined;
+          this.detailsCourseName = undefined;
+          this.detailsData = undefined;
+        }
       });
   }
 
@@ -186,7 +189,6 @@ export class HomeworkComponent implements OnInit {
             location.reload();
           });
       }
-      console.log(courseDetails, homework, this.detailsCourseName);
       courseDetails = courseDetails.courses.filter(
         c =>
           c.id ==
@@ -227,6 +229,25 @@ export class HomeworkComponent implements OnInit {
       }
       this.detailsData = homework;
       this.details = true;
+      if (this.sort_by == 'entered') {
+        this.week = this.getDateOf(homework.entered.date);
+        this.loadWeeksHomework();
+        setTimeout(() =>
+          !document.querySelector('mat-sidenav-content').scrollTop
+            ? (document.querySelector('mat-sidenav-content').scrollTop =
+                this.elem.nativeElement.querySelector('app-homework-details')
+                  .offsetTop || undefined)
+            : null
+        );
+      } else if (this.detailsOutsideSorting('after')) {
+        setTimeout(() =>
+          !document.querySelector('mat-sidenav-content').scrollTop
+            ? (document.querySelector('mat-sidenav-content').scrollTop =
+                this.elem.nativeElement.querySelector('app-homework-details')
+                  .offsetTop || undefined)
+            : null
+        );
+      }
     });
   }
 
@@ -347,7 +368,6 @@ export class HomeworkComponent implements OnInit {
 
       if (!courses.length) {
         this.homework = this.convertToDateList(homeworkList);
-        console.log(this.homework);
         localStorage.setItem(
           this.storageKey,
           JSON.stringify({ homework: homeworkList, updated: Date.now() })
@@ -379,7 +399,6 @@ export class HomeworkComponent implements OnInit {
             }
             if (i == courses.length - 1) {
               this.homework = this.convertToDateList(homeworkList);
-              console.log(this.homework);
               localStorage.setItem(
                 this.storageKey,
                 JSON.stringify({ homework: homeworkList, updated: Date.now() })
@@ -446,7 +465,6 @@ export class HomeworkComponent implements OnInit {
                         })
                       );
                       this.homework = this.convertToDateList(newHomework);
-                      console.log(this.homework);
                       this.loadedWeeks.push(
                         this.getWeekNumber(this.week) +
                           '-' +
@@ -765,7 +783,6 @@ export class HomeworkComponent implements OnInit {
         output[date][lesson] = homework;
       }
     });
-    console.log(output);
     return output;
   }
 
@@ -804,9 +821,9 @@ export class HomeworkComponent implements OnInit {
   }
 
   getWeekNumber(date: Date): number {
-    var dayNum = date.getUTCDay() || 7;
-    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-    var yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    var dayNum = date.getDay() || 7;
+    date.setDate(date.getDate() + 4 - dayNum);
+    var yearStart = new Date(date.getFullYear(), 0, 1);
     return Math.ceil(
       ((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
     );
@@ -817,15 +834,23 @@ export class HomeworkComponent implements OnInit {
     return this.week.getFullYear();
   }
 
-  getDisplayWeekDay(date: string): string {
+  getDisplayWeekDay(
+    date: string | Date | firebase.firestore.Timestamp
+  ): string {
     let tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    let parts = date.split('-');
-    let current = new Date(
-      parseInt(parts[0]),
-      parseInt(parts[1]) - 1,
-      parseInt(parts[2])
-    );
+    let current;
+    if (date instanceof Date) current = date;
+    if (date instanceof firebase.firestore.Timestamp) current = date.toDate();
+    if (!current) {
+      let parts = (date as string).split('-');
+      current = new Date(
+        parseInt(parts[0]),
+        parseInt(parts[1]) - 1,
+        parseInt(parts[2])
+      );
+    }
+
     const formatter = new Intl.DateTimeFormat('de', { weekday: 'long' });
     let output = formatter.format(current);
     if (this.sort_by == 'due_day') {
@@ -835,7 +860,13 @@ export class HomeworkComponent implements OnInit {
     return output;
   }
 
-  getDisplayDay(date: string): string {
+  getDisplayDay(date: string | Date | firebase.firestore.Timestamp): string {
+    if (date instanceof Date) return date.getDate().toString();
+    if (date instanceof firebase.firestore.Timestamp)
+      return date
+        .toDate()
+        .getDate()
+        .toString();
     let parts = date.split('-');
     let current = new Date(
       parseInt(parts[0]),
@@ -845,15 +876,48 @@ export class HomeworkComponent implements OnInit {
     return current.getDate().toString();
   }
 
-  getDisplayMonth(date: string): string {
-    let parts = date.split('-');
-    let current = new Date(
-      parseInt(parts[0]),
-      parseInt(parts[1]) - 1,
-      parseInt(parts[2])
-    );
+  getDisplayMonth(date: string | Date | firebase.firestore.Timestamp): string {
+    let current;
+    if (date instanceof Date) current = date;
+    if (date instanceof firebase.firestore.Timestamp) current = date.toDate();
+    if (!current) {
+      let parts = (date as string).split('-');
+      current = new Date(
+        parseInt(parts[0]),
+        parseInt(parts[1]) - 1,
+        parseInt(parts[2])
+      );
+    }
+
     const formatter = new Intl.DateTimeFormat('de', { month: 'short' });
     return formatter.format(current);
+  }
+
+  detailsOutsideSorting(where: 'before' | 'after') {
+    if (!this.details || !this.detailsData) return;
+    if (this.sort_by !== 'due_day') return;
+
+    let until = this.getDateOf(this.detailsData.until.date);
+
+    if (where == 'before') {
+      let minParts = this.getDisplayDates()[0]
+        .split('-')
+        .map(s => parseInt(s));
+      let min = new Date(minParts[0], minParts[1] - 1, minParts[2]);
+
+      if (until.getTime() >= min.getTime()) return;
+
+      return this.detailsData;
+    } else {
+      let maxParts = this.getDisplayDates()
+        [this.getDisplayDates().length - 1].split('-')
+        .map(s => parseInt(s));
+      let max = new Date(maxParts[0], maxParts[1] - 1, maxParts[2]);
+
+      if (until.getTime() <= max.getTime()) return;
+
+      return this.detailsData;
+    }
   }
 
   getHomeworkContent(
