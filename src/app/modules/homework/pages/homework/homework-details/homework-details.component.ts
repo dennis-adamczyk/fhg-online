@@ -6,6 +6,16 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { timetableKey } from 'src/app/modules/timetable/pages/timetable/timetable.component';
 import { Course } from 'src/app/modules/admin/pages/classes/course/course.component';
 import { constant } from 'src/configs/constants';
+import { Observable } from 'rxjs';
+import {
+  state,
+  trigger,
+  style,
+  transition,
+  animate,
+  query,
+  group
+} from '@angular/animations';
 
 @Component({
   selector: 'app-homework-details',
@@ -14,6 +24,8 @@ import { constant } from 'src/configs/constants';
 })
 export class HomeworkDetailsComponent implements OnInit {
   @Input() data: Homework;
+  @Input() handset$: Observable<boolean>;
+  @Input() done?: boolean;
 
   constructor(
     private router: Router,
@@ -22,6 +34,7 @@ export class HomeworkDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    if (this.done !== undefined) this.data.done = this.done;
     console.log(this.data);
   }
 
@@ -65,7 +78,7 @@ export class HomeworkDetailsComponent implements OnInit {
   }
 
   getDisplayLesson(lesson: {
-    date: firebase.firestore.Timestamp;
+    date: firebase.firestore.Timestamp | Date;
     lesson: number;
   }): string {
     if (!lesson) return;
@@ -74,7 +87,9 @@ export class HomeworkDetailsComponent implements OnInit {
       day: 'numeric',
       month: 'long'
     });
-    let date = formatter.format(lesson.date.toDate());
+    let date = formatter.format(
+      lesson.date instanceof Date ? lesson.date : lesson.date.toDate()
+    );
     let period = `${lesson.lesson}. Stunde (${constant.times[lesson.lesson].start} - ${constant.times[lesson.lesson].end})`;
     return date + '\n' + period;
   }

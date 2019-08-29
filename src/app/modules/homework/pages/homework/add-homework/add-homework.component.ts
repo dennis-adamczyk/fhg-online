@@ -117,7 +117,9 @@ export class AddHomeworkComponent implements OnInit {
   /* ##### TRIGGERS ##### */
 
   navigateBack() {
-    this.router.navigate(['/homework'], { replaceUrl: true });
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (document.referrer.match(/\/homework(\/\w*)*$/)) this.location.back();
+    else this.router.navigate(['/homework'], { replaceUrl: true });
   }
 
   onSubmit() {

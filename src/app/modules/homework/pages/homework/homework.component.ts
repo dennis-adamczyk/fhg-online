@@ -29,7 +29,9 @@ import {
   state,
   style,
   transition,
-  animate
+  animate,
+  query,
+  group
 } from '@angular/animations';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import {
@@ -86,6 +88,43 @@ export interface Homework {
         'open <=> close',
         animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
       )
+    ]),
+    trigger('detailsAnimation', [
+      transition(':enter', [
+        query('.homework-details', [
+          style({
+            margin: 0,
+            boxShadow: 'none',
+            backgroundColor: 'transparent',
+            height: '48px'
+          })
+        ]),
+        query('mat-toolbar', [style({ height: 0, opacity: 0 })]),
+        query('.container .title h2', [style({ fontSize: '14px' })]),
+        query('.container .details', [style({ opacity: 0 })]),
+        query(':self, *', [animate(200, style('*'))])
+      ]),
+      transition(':leave', [
+        group([
+          query('.homework-details', [
+            animate(
+              200,
+              style({
+                margin: 0,
+                boxShadow: 'none',
+                height: '48px'
+              })
+            )
+          ]),
+          query('mat-toolbar', [
+            animate(200, style({ height: 0, opacity: 0 }))
+          ]),
+          query('.container .title h2', [
+            animate(200, style({ fontSize: '14px' }))
+          ]),
+          query('.container .details', [animate(200, style({ opacity: 0 }))])
+        ])
+      ])
     ])
   ]
 })
@@ -113,6 +152,7 @@ export class HomeworkComponent implements OnInit {
   detailsPersonal: boolean;
   detailsCourseName: string;
   detailsData: Homework;
+  detailsAnimating: boolean;
 
   constructor(
     private db: FirestoreService,
@@ -143,9 +183,6 @@ export class HomeworkComponent implements OnInit {
           this.loadHomeworkDetails(route);
         } else {
           this.details = false;
-          this.detailsId = undefined;
-          this.detailsPersonal = undefined;
-          this.detailsCourseName = undefined;
           this.detailsData = undefined;
         }
       });

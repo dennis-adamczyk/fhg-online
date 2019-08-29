@@ -10,16 +10,40 @@
       <mat-icon aria-label="Close homework icon">close</mat-icon>
     </button>
     <div class="actions">
-      <button type="button" class="share" mat-icon-button (click)="onShare()">
+      <button
+        type="button"
+        class="share"
+        mat-icon-button
+        (click)="onShare()"
+        matTooltip="Teilen"
+      >
         <mat-icon>share</mat-icon>
       </button>
-      <button type="button" class="report" mat-icon-button (click)="onReport()">
+      <button
+        type="button"
+        class="report"
+        mat-icon-button
+        (click)="onReport()"
+        matTooltip="Melden"
+      >
         <mat-icon>report</mat-icon>
       </button>
-      <button type="button" class="edit" mat-icon-button (click)="onEdit()">
+      <button
+        type="button"
+        class="edit"
+        mat-icon-button
+        (click)="onEdit()"
+        matTooltip="Bearbeiten"
+      >
         <mat-icon>edit</mat-icon>
       </button>
-      <button type="button" class="delete" mat-icon-button (click)="onDelete()">
+      <button
+        type="button"
+        class="delete"
+        mat-icon-button
+        (click)="onDelete()"
+        matTooltip="Löschen"
+      >
         <mat-icon>delete</mat-icon>
       </button>
       <mat-checkbox

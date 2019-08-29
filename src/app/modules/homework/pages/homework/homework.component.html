@@ -5,7 +5,7 @@
 ></app-homework-details>
 <ng-container *ngIf="!(details && (isHandset$ | async))">
   <div class="toolbar-extention"></div>
-  <a mat-fab color="primary" class="fab" routerLink="add" replaceUrl>
+  <a mat-fab color="primary" class="fab" routerLink="add">
     <mat-icon>
       add
     </mat-icon>
@@ -33,7 +33,7 @@
           <ng-template #itemList let-item="item" let-type="type">
             <a
               class="item"
-              *ngIf="(isHandset$ | async) || !details"
+              *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
                 item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
               "
@@ -54,6 +54,9 @@
               ></mat-checkbox>
             </a>
             <app-homework-details
+              [@detailsAnimation]="!(handset$ | async)"
+              (@detailsAnimation.start)="detailsAnimating = true"
+              (@detailsAnimation.done)="detailsAnimating = false"
               [handset$]="isHandset$"
               [done]="type == 'done'"
               [data]="detailsData"
@@ -127,7 +130,9 @@
               <a
                 class="item"
                 *ngIf="
-                  (isHandset$ | async) || !details || detailsId !== item.id
+                  (isHandset$ | async) ||
+                  (!details && !detailsAnimating) ||
+                  detailsId !== item.id
                 "
                 [routerLink]="
                   item.personal
@@ -151,6 +156,9 @@
                 ></mat-checkbox>
               </a>
               <app-homework-details
+                [@detailsAnimation]="!(handset$ | async)"
+                (@detailsAnimation.start)="detailsAnimating = true"
+                (@detailsAnimation.done)="detailsAnimating = false"
                 [handset$]="isHandset$"
                 [done]="type == 'done'"
                 [data]="detailsData"
@@ -218,7 +226,7 @@
           <ng-template #itemList let-item="item" let-type="type">
             <a
               class="item"
-              *ngIf="(isHandset$ | async) || !details"
+              *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
                 item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
               "
@@ -239,6 +247,9 @@
               ></mat-checkbox>
             </a>
             <app-homework-details
+              [@detailsAnimation]="!(handset$ | async)"
+              (@detailsAnimation.start)="detailsAnimating = true"
+              (@detailsAnimation.done)="detailsAnimating = false"
               [handset$]="isHandset$"
               [done]="type == 'done'"
               [data]="detailsData"
@@ -340,7 +351,9 @@
               <a
                 class="item"
                 *ngIf="
-                  (isHandset$ | async) || !details || detailsId !== item.id
+                  (isHandset$ | async) ||
+                  (!details && !detailsAnimating) ||
+                  detailsId !== item.id
                 "
                 [routerLink]="
                   item.personal
@@ -364,6 +377,9 @@
                 ></mat-checkbox>
               </a>
               <app-homework-details
+                [@detailsAnimation]="!(handset$ | async)"
+                (@detailsAnimation.start)="detailsAnimating = true"
+                (@detailsAnimation.done)="detailsAnimating = false"
                 [handset$]="isHandset$"
                 [done]="type == 'done'"
                 [data]="detailsData"
