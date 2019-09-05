@@ -96,6 +96,14 @@
           Persönliche Hausaufgabe
         </p>
       </div>
+      <div class="item" *ngIf="isAdmin() && !data.personal">
+        <mat-icon>person</mat-icon>
+        <p>
+          <a [routerLink]="'/admin/users/' + data.by.id">{{
+            data.by.name.first_name + ' ' + data.by.name.last_name
+          }}</a>
+        </p>
+      </div>
       <div class="item">
         <mat-icon>
           event_available

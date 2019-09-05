@@ -188,7 +188,7 @@ export class HomeworkComponent implements OnInit {
     private auth: AuthService,
     private router: Router,
     private settings: SettingsService,
-    private snackbar: MatSnackBar,
+    private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private renderer: Renderer2,
     private elem: ElementRef,
@@ -236,7 +236,7 @@ export class HomeworkComponent implements OnInit {
       this.isLoading = false;
       if (!homework) {
         this.router.navigate(['/homework'], { replaceUrl: true });
-        return this.snackbar.open(
+        return this.snackBar.open(
           'Diese Hausaufgabe wurde nicht gefunden',
           null,
           { duration: 4000 }
@@ -244,7 +244,7 @@ export class HomeworkComponent implements OnInit {
       }
       let courseDetails = JSON.parse(localStorage.getItem(timetableKey));
       if (!courseDetails) {
-        return this.snackbar
+        return this.snackBar
           .open('Ein Fehler ist aufgetreten', 'Erneut versuchen', {
             duration: 4000
           })
@@ -262,7 +262,7 @@ export class HomeworkComponent implements OnInit {
       )[0] as Course;
       if (!courseDetails) {
         this.router.navigate(['/homework'], { replaceUrl: true });
-        return this.snackbar.open(
+        return this.snackBar.open(
           'Du bist kein Mitglied des Kurses der Hausaufgabe',
           null,
           { duration: 4000 }

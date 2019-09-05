@@ -34,7 +34,7 @@ export class AddHomeworkComponent {
 
   constructor(
     private fb: FormBuilder,
-    private snackbar: MatSnackBar,
+    private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private db: FirestoreService,
     private auth: AuthService,
@@ -88,7 +88,7 @@ export class AddHomeworkComponent {
     if (share == undefined || share == null) return;
 
     if (until.getTime() < entered.getTime())
-      return this.snackbar.open(
+      return this.snackBar.open(
         'Das Fälligkeitsdatum muss nach dem Aufgabedatum liegen',
         null,
         { duration: 4000 }
@@ -254,7 +254,7 @@ export class AddHomeworkComponent {
           })
           .catch(error => {
             this.homeworkFormComponent.isLoading = false;
-            this.snackbar.open(
+            this.snackBar.open(
               `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
               null,
               {

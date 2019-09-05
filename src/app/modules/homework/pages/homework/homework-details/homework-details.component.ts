@@ -16,6 +16,9 @@ import {
   query,
   group
 } from '@angular/animations';
+import { MatDialog, MatSnackBar } from '@angular/material';
+import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-homework-details',
@@ -30,7 +33,9 @@ export class HomeworkDetailsComponent implements OnInit {
   constructor(
     private router: Router,
     private db: FirestoreService,
-    private auth: AuthService
+    private auth: AuthService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -56,7 +61,125 @@ export class HomeworkDetailsComponent implements OnInit {
   }
 
   onDelete() {
-    // TODO:
+    // TODO: Teacher's course
+    let canModify =
+      this.data.personal ||
+      this.data.by.id == this.auth.user.id ||
+      this.auth.user.roles.guard ||
+      (this.auth.user.roles.admin &&
+        this.getClass(this.data.course.id) ==
+          this.auth.user.class.toLocaleLowerCase());
+
+    let existingCorrection: string[] = this.data.corrections
+      ? Object.keys(this.data.corrections).filter(
+          co =>
+            this.data.corrections[co] &&
+            this.data.corrections[co].by.id == this.auth.user.id
+        )
+      : [];
+
+    let dialogData = {
+      title: 'Hausaufgabe löschen?',
+      content:
+        'Bist du sicher, dass du die Hausaufgabe unwiederruflich löschen möchtest?',
+      defaultCancel: true,
+      accept: 'Unwiederruflich löschen'
+    };
+    if (!canModify && !existingCorrection.length)
+      dialogData = {
+        title: 'Hausaufgabenlöschung vorschlagen?',
+        content:
+          'Bist du sicher, dass du die Löschung dieser Hausaufgabe beantragen möchtest?',
+        defaultCancel: true,
+        accept: 'Löschen'
+      };
+    if (!canModify && existingCorrection.length)
+      dialogData = {
+        title: 'Hausaufgabenlöschung vorschlagen?',
+        content:
+          'Bist du sicher, dass du deine vorigen Korrekturvorschläge entfernen und stattdessen die Löschung dieser Hausaufgabe beantragen möchtest?',
+        defaultCancel: true,
+        accept: 'Löschen'
+      };
+
+    this.dialog
+      .open(AcceptCancelDialog, {
+        data: dialogData
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(accept => {
+        if (!accept) return;
+        if (canModify) {
+          let homeworkRef = '';
+          if (!this.data.personal)
+            homeworkRef = `years/${this.getYearOfCourse(
+              this.data.course.id
+            )}/courses/${this.data.course.id}/homework/${this.data.id}`;
+          else
+            homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.data.id}`;
+
+          return this.db.delete(homeworkRef).then(() => {
+            this.snackBar.open('Hausaufgabe unwiederruflich gelöscht', null, {
+              duration: 4000
+            });
+          });
+        } else {
+          let homeworkRef = `years/${this.getYearOfCourse(
+            this.data.course.id
+          )}/courses/${this.data.course.id}/homework/${this.data.id}`;
+
+          if (existingCorrection.length) {
+            let correctionId = existingCorrection[0];
+
+            return this.db
+              .update(homeworkRef, {
+                [`corrections.${correctionId}`]: {
+                  delete: true,
+                  by: {
+                    id: this.auth.user.id,
+                    name: this.auth.user.name,
+                    roles: this.auth.user.roles
+                  }
+                }
+              })
+              .then(() => {
+                this.snackBar.open(
+                  'Vorige Korrekturvorschläge entfernt und Löschungsvorschlag hinzugefügt',
+                  null,
+                  { duration: 4000 }
+                );
+              });
+          } else {
+            let correctionId = this.generateId();
+            while (this.data.corrections && this.data.corrections[correctionId])
+              correctionId = this.generateId();
+
+            let homeworkRef = `years/${this.getYearOfCourse(
+              this.data.course.id
+            )}/courses/${this.data.course.id}/homework/${this.data.id}`;
+
+            return this.db
+              .update(homeworkRef, {
+                [`corrections.${correctionId}`]: {
+                  delete: true,
+                  by: {
+                    id: this.auth.user.id,
+                    name: this.auth.user.name,
+                    roles: this.auth.user.roles
+                  }
+                }
+              })
+              .then(() => {
+                this.snackBar.open(
+                  'Löschungsvorschlag zur Hausaufgabe hinzugefügt',
+                  null,
+                  { duration: 4000 }
+                );
+              });
+          }
+        }
+      });
   }
 
   onChangeDone(event) {
@@ -66,6 +189,16 @@ export class HomeworkDetailsComponent implements OnInit {
   }
 
   /* ##### HELPER ##### */
+
+  isAdmin(): boolean {
+    let user = this.auth.user;
+    return (
+      user.roles.guard ||
+      (user.roles.admin &&
+        this.getClass(this.data.course.id) ==
+          this.auth.user.class.toLocaleLowerCase())
+    );
+  }
 
   navigateBack() {
     this.router.navigate(['/homework']);
@@ -107,5 +240,40 @@ export class HomeworkDetailsComponent implements OnInit {
     if (!color) return undefined;
     var code = color.split(' ');
     return constant.colorsContrast[code[0]][code[1]];
+  }
+
+  getClass(course: string): string {
+    let clazz = course.match(/(\w\w)\-[\w]+/)[0];
+    if (!clazz || !clazz.length) return;
+    if (!this.isClass(clazz)) return;
+    return clazz.toLowerCase();
+  }
+
+  isClass(clazz?: string): boolean {
+    if (!clazz) clazz = this.auth.user.class as string;
+    return !!clazz.match(/^\d/);
+  }
+
+  getYear(clazz?: string): string {
+    if (!clazz) clazz = this.auth.user.class as string;
+    if (this.isClass(clazz)) return clazz.charAt(0);
+    else return clazz;
+  }
+
+  getYearOfCourse(course: string): string {
+    let clazz = course.match(/(\w+)\-[\w]+/)[0];
+    if (!clazz) return;
+    return this.isClass(clazz) ? this.getYear(clazz) : clazz;
+  }
+
+  generateId() {
+    let result = '';
+    let characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let charactersLength = characters.length;
+    for (var i = 0; i < 4; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
   }
 }

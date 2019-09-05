@@ -52,7 +52,7 @@ export class HomeworkFormComponent implements OnInit {
     private db: FirestoreService,
     private fb: FormBuilder,
     private auth: AuthService,
-    private snackbar: MatSnackBar,
+    private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private location: Location,
     private router: Router,
@@ -143,7 +143,7 @@ export class HomeworkFormComponent implements OnInit {
   }
 
   showSnackbar(message: string) {
-    return this.snackbar.open(message, null, { duration: 4000 });
+    return this.snackBar.open(message, null, { duration: 4000 });
   }
 
   getLesson(d: Date): number {

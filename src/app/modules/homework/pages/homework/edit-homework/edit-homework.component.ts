@@ -42,7 +42,7 @@ export class EditHomeworkComponent {
 
   constructor(
     private fb: FormBuilder,
-    private snackbar: MatSnackBar,
+    private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private db: FirestoreService,
     private auth: AuthService,
@@ -84,7 +84,7 @@ export class EditHomeworkComponent {
         if (route.url.length) {
           this.loadHomeworkData(route);
         } else {
-          this.snackbar.open('Diese Hausaufgabe wurde nicht gefunden', null, {
+          this.snackBar.open('Diese Hausaufgabe wurde nicht gefunden', null, {
             duration: 4000
           });
           this.navigateBack();
@@ -125,7 +125,7 @@ export class EditHomeworkComponent {
     this.db.docWithId$(homeworkRef).subscribe((homework: Homework) => {
       if (!homework) {
         this.navigateBack();
-        return this.snackbar.open(
+        return this.snackBar.open(
           'Diese Hausaufgabe wurde nicht gefunden',
           null,
           { duration: 4000 }
@@ -133,7 +133,7 @@ export class EditHomeworkComponent {
       }
       let courseDetails = JSON.parse(localStorage.getItem(timetableKey));
       if (!courseDetails) {
-        return this.snackbar
+        return this.snackBar
           .open('Ein Fehler ist aufgetreten', 'Erneut versuchen', {
             duration: 4000
           })
@@ -149,7 +149,7 @@ export class EditHomeworkComponent {
       )[0] as Course;
       if (!courseDetails) {
         this.navigateBack();
-        return this.snackbar.open(
+        return this.snackBar.open(
           'Du bist kein Mitglied des Kurses der Hausaufgabe',
           null,
           { duration: 4000 }
@@ -167,12 +167,12 @@ export class EditHomeworkComponent {
       if (correctedHomework && correctedHomework.length) {
         let corrData = homework.corrections[correctedHomework];
         this.homeworkForm.patchValue({
-          title: corrData.title,
+          title: corrData.title || '',
           course: homework.course.id,
           share: !personal,
           until: this.getDateOf(homework.until.date),
           entered: this.getDateOf(homework.entered.date),
-          details: corrData.details
+          details: corrData.details || ''
         });
       } else {
         this.homeworkForm.patchValue({
@@ -255,7 +255,7 @@ export class EditHomeworkComponent {
         homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.loadedData.id}`;
 
       return this.db.update(homeworkRef, data).then(() => {
-        this.snackbar.open('Änderungen an der Hausaufgabe gespeichert', null, {
+        this.snackBar.open('Änderungen an der Hausaufgabe gespeichert', null, {
           duration: 4000
         });
       });
@@ -290,7 +290,7 @@ export class EditHomeworkComponent {
             [`corrections.${correctionId}`]: data
           })
           .then(() => {
-            this.snackbar.open(
+            this.snackBar.open(
               'Bearbeitungsvorschlag zur Hausaufgabe bearbeitet',
               null,
               { duration: 4000 }
@@ -323,7 +323,7 @@ export class EditHomeworkComponent {
             [`corrections.${correctionId}`]: data
           })
           .then(() => {
-            this.snackbar.open(
+            this.snackBar.open(
               'Bearbeitungsvorschlag zur Hausaufgabe hinzugefügt',
               null,
               { duration: 4000 }
@@ -356,7 +356,7 @@ export class EditHomeworkComponent {
       })
       .catch(error => {
         this.isLoading = false;
-        this.snackbar.open(
+        this.snackBar.open(
           `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
           null,
           {
