@@ -33,6 +33,7 @@
           <ng-template #itemList let-item="item" let-type="type">
             <a
               class="item"
+              [class.corrected]="isCorrected(item)"
               *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
                 item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
@@ -129,6 +130,7 @@
             <ng-container *ngFor="let item of items">
               <a
                 class="item"
+                [class.corrected]="isCorrected(item)"
                 *ngIf="
                   (isHandset$ | async) ||
                   (!details && !detailsAnimating) ||
@@ -226,6 +228,7 @@
           <ng-template #itemList let-item="item" let-type="type">
             <a
               class="item"
+              [class.corrected]="isCorrected(item)"
               *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
                 item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
@@ -350,6 +353,7 @@
             <ng-container *ngFor="let item of items">
               <a
                 class="item"
+                [class.corrected]="isCorrected(item)"
                 *ngIf="
                   (isHandset$ | async) ||
                   (!details && !detailsAnimating) ||

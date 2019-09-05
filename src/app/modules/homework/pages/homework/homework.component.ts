@@ -64,6 +64,34 @@ export interface Homework {
     | Course;
   personal?: boolean;
   done?: boolean;
+  by?: {
+    id: string;
+    name?: {
+      first_name: string;
+      last_name: string;
+    };
+    roles?: {
+      [role: string]: boolean;
+    };
+  };
+  corrections?: {
+    [id: string]: {
+      title?: string;
+      details?: string;
+      delete?: true;
+      by: {
+        id: string;
+        name?: {
+          first_name: string;
+          last_name: string;
+        };
+        roles?: {
+          [role: string]: boolean;
+        };
+      };
+    };
+  };
+  corrected?: boolean;
 }
 
 @Component({
@@ -141,6 +169,7 @@ export class HomeworkComponent implements OnInit {
   homework: object;
   done: object;
   doneClosed: object = {};
+  correction: object;
 
   week = new Date();
   loadedWeeks: string[] = [];
@@ -368,6 +397,9 @@ export class HomeworkComponent implements OnInit {
         JSON.parse(localStorage.getItem(this.storageKey)).homework
       );
       this.done = JSON.parse(localStorage.getItem(this.storageKey)).done;
+      this.correction = JSON.parse(
+        localStorage.getItem(this.storageKey)
+      ).correction;
       this.isLoading = false;
       this.updateHomework();
     }
@@ -391,12 +423,13 @@ export class HomeworkComponent implements OnInit {
               let courseDetails = JSON.parse(
                 localStorage.getItem(this.timetableKey)
               ).courses.filter(c => c.id == homework.course)[0] as Course;
-              homework.course = {
-                id: courseDetails.id,
-                subject: courseDetails.subject,
-                short: courseDetails.short,
-                color: courseDetails.color
-              };
+              if (courseDetails.id)
+                homework.course = {
+                  id: courseDetails.id,
+                  subject: courseDetails.subject,
+                  short: courseDetails.short,
+                  color: courseDetails.color
+                };
               homework.personal = true;
               homeworkList.push(homework);
             });
@@ -478,11 +511,14 @@ export class HomeworkComponent implements OnInit {
                       let courseDetails = JSON.parse(
                         localStorage.getItem(this.timetableKey)
                       ).courses.filter(c => c.id == courseName)[0] as Course;
+
                       let newHomework = JSON.parse(
                         localStorage.getItem(this.storageKey)
                       ).homework.filter(
-                        (h: Homework) => h.course['id'] !== courseName
+                        (h: Homework) =>
+                          h.course.id !== courseName || h.personal
                       );
+
                       index.homework.forEach(homework => {
                         newHomework.push({
                           ...homework,
@@ -559,21 +595,32 @@ export class HomeworkComponent implements OnInit {
     });
     this.db
       .doc$(`users/${this.auth.user.id}/singles/homework`)
-      .subscribe((homework: { done: { [key: string]: boolean } }) => {
-        if (!homework || !homework.done)
-          return this.db.upsert(`users/${this.auth.user.id}/singles/homework`, {
-            done: {}
-          });
+      .subscribe(
+        (homework: {
+          done: { [key: string]: boolean };
+          correction: { [key: string]: object };
+        }) => {
+          if (!homework || (!homework.done && !homework.correction))
+            return this.db.upsert(
+              `users/${this.auth.user.id}/singles/homework`,
+              {
+                done: {},
+                correction: {}
+              }
+            );
 
-        this.done = homework.done;
-        localStorage.setItem(
-          this.storageKey,
-          JSON.stringify({
-            ...JSON.parse(localStorage.getItem(this.storageKey)),
-            done: homework.done
-          })
-        );
-      });
+          this.done = homework.done;
+          this.correction = homework.correction;
+          localStorage.setItem(
+            this.storageKey,
+            JSON.stringify({
+              ...JSON.parse(localStorage.getItem(this.storageKey)),
+              done: homework.done,
+              correction: homework.correction
+            })
+          );
+        }
+      );
   }
 
   loadWeeksHomework() {
@@ -1076,6 +1123,14 @@ export class HomeworkComponent implements OnInit {
     if (!code) return undefined;
     var color = code.split(' ');
     return constant.colors[color[0]][color[1]];
+  }
+
+  isCorrected(homework: Homework): boolean {
+    return (
+      (homework.corrected ||
+        (homework.corrections && Object.keys(homework.corrections).length)) &&
+      (!this.correction || !this.correction[homework.id])
+    );
   }
 
   getContrastColor(code: string): string {

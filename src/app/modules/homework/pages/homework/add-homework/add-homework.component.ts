@@ -21,69 +21,34 @@ import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { Homework } from '../homework.component';
+import { HomeworkFormComponent } from '../../../components/homework-form/homework-form.component';
 
 @Component({
   selector: 'app-add-homework',
   templateUrl: './add-homework.component.html',
   styleUrls: ['./add-homework.component.sass']
 })
-export class AddHomeworkComponent implements OnInit {
-  isNewTab = isPlatformBrowser(this.platformId)
-    ? window.history.length <= 2
-    : true;
-
-  homeworkForm: FormGroup;
-  courses: Course[] = [];
-
-  isLoading: boolean = false;
-
-  @ViewChild('titleInput', { static: true }) titleInput: MatInput;
-
-  @ViewChild('autosize', { static: false }) autosize: CdkTextareaAutosize;
-  triggerResize() {
-    this._ngZone.onStable
-      .pipe(take(1))
-      .subscribe(() => this.autosize.resizeToFitContent(true));
-  }
+export class AddHomeworkComponent {
+  @ViewChild(HomeworkFormComponent, { static: false })
+  homeworkFormComponent: HomeworkFormComponent;
 
   constructor(
-    private db: FirestoreService,
     private fb: FormBuilder,
-    private auth: AuthService,
     private snackbar: MatSnackBar,
     private dialog: MatDialog,
-    private location: Location,
+    private db: FirestoreService,
+    private auth: AuthService,
     private router: Router,
-    private _ngZone: NgZone,
-    private breakpointObserver: BreakpointObserver,
+    private location: Location,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
 
-  isHandset$: Observable<boolean> = this.breakpointObserver
-    .observe(Breakpoints.Handset)
-    .pipe(map(result => result.matches));
+  ngAfterViewInit() {
+    this.homeworkFormComponent.onSubmit = () => this.onSubmit();
+  }
 
-  ngOnInit() {
-    this.triggerResize();
-    this.homeworkForm = this.fb.group({
-      title: ['', [Validators.required]],
-      course: [null, [Validators.required]],
-      share: [false, [Validators.required]],
-      until: [undefined, [Validators.required]],
-      entered: [undefined, [Validators.required]],
-      details: ['']
-    });
-    this.db
-      .colWithIds(`years/${this.getYear()}/courses`, ref =>
-        ref.where('class', 'array-contains', this.auth.user.class)
-      )
-      .subscribe((result: Course[]) => {
-        if (!result) return;
-        this.courses = result.filter(
-          c => !c.multi || this.auth.user.courses.includes(c.id)
-        );
-      });
-    this.titleInput.focus();
+  get homeworkForm(): FormGroup {
+    return this.homeworkFormComponent.homeworkForm;
   }
 
   @HostListener('window:beforeunload')
@@ -98,24 +63,6 @@ export class AddHomeworkComponent implements OnInit {
       : true;
   }
 
-  /* ##### FILTER ##### */
-
-  lessonFilter = (d: Date): boolean => {
-    if (!this.homeworkForm.get('course').value) {
-      const day = d.getDay();
-      return day !== 0 && day !== 6;
-    } else {
-      let course = this.homeworkForm.get('course').value as Course;
-      let allowedDays = Object.keys(course.lessons).filter(
-        day => !!course.lessons[day]
-      );
-      const day = d.getDay() || 7;
-      return allowedDays.includes(day.toString());
-    }
-  };
-
-  /* ##### TRIGGERS ##### */
-
   navigateBack() {
     if (!isPlatformBrowser(this.platformId)) return;
     if (document.referrer.match(/\/homework(\/\w*)*$/)) this.location.back();
@@ -125,7 +72,9 @@ export class AddHomeworkComponent implements OnInit {
   onSubmit() {
     if (this.homeworkForm.invalid) return;
 
-    let course = this.homeworkForm.get('course').value as Course;
+    let course = this.homeworkFormComponent.getCourse(
+      this.homeworkForm.get('course').value
+    ) as Course;
     let title = this.homeworkForm.get('title').value as string;
     let until = this.homeworkForm.get('until').value as Date;
     let entered = this.homeworkForm.get('entered').value as Date;
@@ -190,7 +139,7 @@ export class AddHomeworkComponent implements OnInit {
     let getExistingUntilShared = this.db
       .colWithIds$(
         `years/${this.getYear()}/courses/${
-          this.homeworkForm.get('course').value.id
+          this.homeworkForm.get('course').value
         }/homework`,
         ref =>
           ref
@@ -206,7 +155,7 @@ export class AddHomeworkComponent implements OnInit {
     let getExistingEnteredShared = this.db
       .colWithIds$(
         `years/${this.getYear()}/courses/${
-          this.homeworkForm.get('course').value.id
+          this.homeworkForm.get('course').value
         }/homework`,
         ref =>
           ref
@@ -255,7 +204,7 @@ export class AddHomeworkComponent implements OnInit {
         ];
       });
 
-    this.isLoading = true;
+    this.homeworkFormComponent.isLoading = true;
     Promise.all([
       getExistingUntilShared,
       getExistingEnteredShared,
@@ -285,7 +234,7 @@ export class AddHomeworkComponent implements OnInit {
         if (share) {
           operation = this.db.add(
             `years/${this.getYear()}/courses/${
-              this.homeworkForm.get('course').value.id
+              this.homeworkForm.get('course').value
             }/homework`,
             data
           );
@@ -300,11 +249,11 @@ export class AddHomeworkComponent implements OnInit {
         operation
           .then(() => {
             this.homeworkForm.markAsPristine();
-            this.isLoading = false;
+            this.homeworkFormComponent.isLoading = false;
             this.navigateBack();
           })
           .catch(error => {
-            this.isLoading = false;
+            this.homeworkFormComponent.isLoading = false;
             this.snackbar.open(
               `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
               null,
@@ -416,7 +365,7 @@ export class AddHomeworkComponent implements OnInit {
         });
       }
       if (dialogContent.length) {
-        this.isLoading = false;
+        this.homeworkFormComponent.isLoading = false;
         let bothPersonal = existing.until.personal.filter(
           value =>
             existing.entered.personal.filter(value2 => value.id == value2.id)
@@ -461,34 +410,17 @@ export class AddHomeworkComponent implements OnInit {
     });
   }
 
-  onCourseChange(event) {
-    if (!event.value) return;
-    let course = event.value as Course;
-    this.setRelativeDate('until', 1);
-    this.setRelativeDate('entered', -1);
-  }
-
-  /* ##### HELPER ##### */
-
-  getCourseName(course: Course): string {
-    if (!course) return;
-    if (this.courses.filter(c => c.short == course.short).length > 1) {
-      if (course.multi) {
-        let courseNum = course.id.match(/\d+\-[\D]+(\d+)/)[1];
-        return `${course.subject} ${courseNum}`;
-      }
-    }
-    return course.subject;
-  }
-
-  showSnackbar(message: string) {
-    return this.snackbar.open(message, null, { duration: 4000 });
-  }
-
   getLesson(d: Date): number {
-    if (!this.homeworkForm.get('course').value) return;
+    if (
+      !this.homeworkFormComponent.getCourse(
+        this.homeworkForm.get('course').value
+      )
+    )
+      return;
     if (!d || !(d instanceof Date)) return;
-    let course = this.homeworkForm.get('course').value as Course;
+    let course = this.homeworkFormComponent.getCourse(
+      this.homeworkForm.get('course').value
+    );
     const day = d.getDay() || 7;
     if (!course.lessons || !course.lessons[day]) return;
     const lesson = parseInt(
@@ -497,105 +429,6 @@ export class AddHomeworkComponent implements OnInit {
       )[0]
     );
     return lesson;
-  }
-
-  getDisplayLesson(d: Date): string {
-    let lesson = this.getLesson(d);
-    if (!lesson) return;
-    return `${lesson}. Stunde`;
-  }
-
-  getRelativeDate(add: number): Date {
-    let course = this.homeworkForm.get('course').value as Course;
-    const today = new Date().getDay() || 7;
-    let lessons = course
-      ? Object.keys(course.lessons).filter(day => !!course.lessons[day])
-      : [];
-
-    if (add == 0) return new Date();
-
-    let output = new Date();
-    let futureLessons = lessons
-      .filter(day => (add > 0 ? parseInt(day) > today : parseInt(day) <= today))
-      .sort();
-    let weeksLessons = lessons.sort();
-
-    if (futureLessons.length < add * (add > 0 ? 1 : -1)) {
-      let addWeeks = Math.ceil(
-        ((add > 0 ? 1 : -1) * add - futureLessons.length) / weeksLessons.length
-      );
-      let lessonDay = parseInt(
-        weeksLessons[
-          ((add > 0 ? add - 1 : weeksLessons.length + add) -
-            futureLessons.length) %
-            weeksLessons.length
-        ]
-      );
-      output.setDate(
-        output.getDate() +
-          (lessonDay - today) +
-          7 * addWeeks * (add > 0 ? 1 : -1)
-      );
-    } else {
-      output.setDate(
-        output.getDate() +
-          (parseInt(
-            futureLessons[add > 0 ? add - 1 : futureLessons.length + add]
-          ) -
-            today)
-      );
-    }
-    return output;
-  }
-
-  setRelativeDate(path: string, add: number) {
-    let formControl = this.homeworkForm.get(path);
-    return formControl.setValue(this.getRelativeDate(add));
-  }
-
-  isRelativeDate(path: string, add: number): boolean {
-    let formControl = this.homeworkForm.get(path);
-    if (!formControl.value) return false;
-    let current = formControl.value as Date;
-
-    if (add == 0) {
-      let today = new Date();
-      if (
-        today.getDate() == current.getDate() &&
-        today.getMonth() == current.getMonth() &&
-        today.getFullYear() == current.getFullYear()
-      )
-        return true;
-    }
-    let relativeDate = this.getRelativeDate(add);
-    if (
-      relativeDate.getDate() == current.getDate() &&
-      relativeDate.getMonth() == current.getMonth() &&
-      relativeDate.getFullYear() == current.getFullYear()
-    )
-      return true;
-
-    return false;
-  }
-
-  isLessonToday(): boolean {
-    if (!this.homeworkForm.get('course').value) return true;
-    let course = this.homeworkForm.get('course').value as Course;
-    const today = new Date().getDay() || 7;
-    if (!course.lessons || !course.lessons[today]) return false;
-    return true;
-  }
-
-  getColor(color: string): string {
-    if (!color) return;
-    var code = color.split(' ');
-    return constant.colors[code[0]][code[1]];
-  }
-
-  getContrastColor(color: string): string {
-    if (!color) return undefined;
-    var code = color.split(' ');
-    return constant.colorsContrast[code[0]][code[1]];
   }
 
   isClass(clazz?: string): boolean {

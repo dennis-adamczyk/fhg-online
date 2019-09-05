@@ -35,7 +35,6 @@ export class HomeworkDetailsComponent implements OnInit {
 
   ngOnInit() {
     if (this.done !== undefined) this.data.done = this.done;
-    console.log(this.data);
   }
 
   /* ##### TRIGGERS ##### */
@@ -49,7 +48,11 @@ export class HomeworkDetailsComponent implements OnInit {
   }
 
   onEdit() {
-    // TODO:
+    if (this.data.personal)
+      return this.router.navigate([`/homework/edit/p/${this.data.id}`]);
+    return this.router.navigate([
+      `/homework/edit/${this.data.course.id}/${this.data.id}`
+    ]);
   }
 
   onDelete() {

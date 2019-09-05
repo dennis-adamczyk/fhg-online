@@ -38,7 +38,6 @@ export class NavigationComponent {
     public location: Location,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // this.activeMenuItem$.subscribe(x => console.log(x));
     router.events
       .pipe(
         withLatestFrom(this.isHandset$),

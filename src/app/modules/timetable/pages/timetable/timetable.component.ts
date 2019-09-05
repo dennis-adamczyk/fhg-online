@@ -242,10 +242,25 @@ export class TimetableComponent implements OnInit {
         }) => {
           if (!year.updated) return;
           let localyUpdated = this.getTimetableLocalStorage().updated;
+
+          for (const courseName in year.updated) {
+            if (year.updated.hasOwnProperty(courseName)) {
+              if (
+                this.isClass(this.auth.user.id) &&
+                courseName.match(`^${this.auth.user.class}-`) &&
+                !(JSON.parse(localStorage.getItem(this.courseNamesKey))
+                  .names as string[]).includes(courseName)
+              )
+                return this.downloadTimetable();
+            }
+          }
+
           JSON.parse(localStorage.getItem(this.courseNamesKey)).names.forEach(
             courseName => {
-              if (!year.updated[courseName]) return;
-              if (year.updated[courseName].toMillis() > localyUpdated) {
+              if (
+                year.updated[courseName].toMillis() > localyUpdated ||
+                year.updated[courseName] == null
+              ) {
                 this.db
                   .docWithId$(
                     `years/${this.getYear(this.auth.user
@@ -254,9 +269,9 @@ export class TimetableComponent implements OnInit {
                   .pipe(take(1))
                   .subscribe((course: Course) => {
                     let newCourses = this.getTimetableLocalStorage().courses.filter(
-                      course => course.id !== courseName
+                      c => c.id !== courseName
                     );
-                    newCourses.push(course);
+                    if (course) newCourses.push(course);
                     localStorage.setItem(
                       timetableKey,
                       JSON.stringify({

@@ -1,0 +1,208 @@
+<form [formGroup]="homeworkForm" class="homework-form">
+  <mat-toolbar>
+    <div class="navigation">
+      <button
+        type="button"
+        class="close"
+        aria-label="Close"
+        mat-icon-button
+        (click)="navigateBack()"
+        [disableRipple]="isHandset$ | async"
+      >
+        <mat-icon aria-label="Close help icon">close</mat-icon>
+      </button>
+      <button
+        class="done"
+        aria-label="Fertig"
+        mat-icon-button
+        color="primary"
+        (click)="onSubmit()"
+        [disabled]="homeworkForm.invalid"
+      >
+        <mat-icon>
+          done
+        </mat-icon>
+      </button>
+    </div>
+    <div class="title-bar">
+      <mat-form-field floatLabel="never">
+        <mat-label>Aufgabe eingeben</mat-label>
+        <textarea
+          matInput
+          [readonly]="isLoading"
+          cdkTextareaAutosize
+          #autosize="cdkTextareaAutosize"
+          cdkAutosizeMinRows="1"
+          cdkAutosizeMaxRows="3"
+          formControlName="title"
+          trim="blur"
+          #titleInput="matInput"
+        ></textarea>
+      </mat-form-field>
+    </div>
+  </mat-toolbar>
+  <div class="container">
+    <div class="loading" *ngIf="isLoading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <div class="field">
+      <mat-form-field floatLabel="never">
+        <mat-icon matPrefix *ngIf="!getCourse(homeworkForm.get('course').value)"
+          >widgets</mat-icon
+        >
+        <div
+          matPrefix
+          class="icon"
+          [style.background-color]="
+            getColor(getCourse(homeworkForm.get('course').value)?.color)
+          "
+          *ngIf="getCourse(homeworkForm.get('course').value)"
+        >
+          <p
+            class="short"
+            [style.color]="
+              getContrastColor(
+                getCourse(homeworkForm.get('course').value)?.color
+              )
+            "
+          >
+            {{ getCourse(homeworkForm.get('course').value)?.short }}
+          </p>
+        </div>
+        <mat-label>Fach</mat-label>
+        <mat-select
+          formControlName="course"
+          panelClass="courseSelect"
+          (selectionChange)="onCourseChange($event)"
+        >
+          <mat-select-trigger>{{
+            getCourseName(homeworkForm.get('course').value)
+          }}</mat-select-trigger>
+          <mat-option *ngFor="let course of courses" [value]="course.id">
+            <div class="icon" [style.background-color]="getColor(course.color)">
+              <p class="short" [style.color]="getContrastColor(course.color)">
+                {{ course.short }}
+              </p>
+            </div>
+            {{ getCourseName(course.id) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="field">
+      <mat-slide-toggle
+        color="primary"
+        formControlName="share"
+        labelPosition="before"
+        #share
+      >
+        <mat-icon class="prefix">
+          share
+        </mat-icon>
+        <p class="label">
+          Hausaufgabe teilen
+        </p>
+      </mat-slide-toggle>
+    </div>
+    <div class="field multi-line">
+      <div
+        class="line datepicker"
+        (click)="
+          !getCourse(homeworkForm.get('course').value)
+            ? showSnackbar('Wähle erst ein Fach aus')
+            : untilPicker.open()
+        "
+      >
+        <mat-form-field floatLabel="never">
+          <mat-icon matPrefix>event_available</mat-icon>
+          <mat-label>Fälligkeitsdatum</mat-label>
+          <input
+            matInput
+            readonly
+            formControlName="until"
+            [matDatepicker]="untilPicker"
+            [matDatepickerFilter]="lessonFilter"
+          />
+          <mat-datepicker
+            [touchUi]="isHandset$ | async"
+            #untilPicker
+          ></mat-datepicker>
+          <p matSuffix>
+            {{ getDisplayLesson(homeworkForm.get('until').value) }}
+          </p>
+          <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
+        </mat-form-field>
+      </div>
+
+      <mat-chip-list
+        class="suggestions"
+        [class.disabled]="homeworkForm.get('until').disabled"
+      >
+        <mat-chip
+          (click)="setRelativeDate('until', 1)"
+          [disableRipple]="homeworkForm.get('until').disabled"
+          [selected]="isRelativeDate('until', 1)"
+          *ngIf="homeworkForm.get('course').value"
+          >Nächste Stunde</mat-chip
+        >
+        <mat-chip
+          (click)="setRelativeDate('until', 2)"
+          [disableRipple]="homeworkForm.get('until').disabled"
+          [selected]="isRelativeDate('until', 2)"
+          *ngIf="homeworkForm.get('course').value"
+          >In 2 Stunden</mat-chip
+        >
+        <mat-chip
+          (click)="setRelativeDate('until', 0)"
+          [disableRipple]="homeworkForm.get('until').disabled"
+          [selected]="isRelativeDate('until', 0)"
+          *ngIf="isLessonToday()"
+          >Heute</mat-chip
+        >
+      </mat-chip-list>
+    </div>
+    <div
+      class="field datepicker"
+      (click)="
+        !homeworkForm.get('course').value
+          ? showSnackbar('Wähle erst ein Fach aus')
+          : enteredPicker.open()
+      "
+    >
+      <mat-form-field floatLabel="never">
+        <mat-icon matPrefix>event</mat-icon>
+        <mat-label>Aufgabedatum</mat-label>
+        <input
+          matInput
+          readonly
+          formControlName="entered"
+          [matDatepicker]="enteredPicker"
+          [matDatepickerFilter]="lessonFilter"
+        />
+        <mat-datepicker
+          [touchUi]="isHandset$ | async"
+          #enteredPicker
+        ></mat-datepicker>
+        <p matSuffix>
+          {{ getDisplayLesson(homeworkForm.get('entered').value) }}
+        </p>
+        <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
+      </mat-form-field>
+    </div>
+    <div class="field">
+      <mat-form-field floatLabel="never">
+        <mat-icon matPrefix>subject</mat-icon>
+        <mat-label>Details</mat-label>
+        <textarea
+          matInput
+          cdkTextareaAutosize
+          #autosize="cdkTextareaAutosize"
+          cdkAutosizeMinRows="1"
+          cdkAutosizeMaxRows="5"
+          formControlName="details"
+          trim="blur"
+        ></textarea>
+      </mat-form-field>
+    </div>
+  </div>
+</form>

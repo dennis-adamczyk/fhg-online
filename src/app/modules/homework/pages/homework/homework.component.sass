@@ -1,4 +1,5 @@
 @import ../../../../../var
+$correction: #FF9800
 
 .fab
     position: fixed 
@@ -133,6 +134,28 @@
                         cursor: pointer
                         text-decoration: initial
                         color: initial
+
+                        &.corrected
+                            .subject
+                                position: relative
+                                overflow: visible
+
+                                &::after
+                                    content: '!'
+                                    display: block
+                                    width: 16px
+                                    height: 16px
+                                    position: absolute
+                                    top: -2px
+                                    right: -2px
+                                    color: mat-color($foreground-dark, text)
+                                    font-size: 12px
+                                    font-weight: 500
+                                    line-height: 16px
+                                    text-align: center
+                                    background-color: $correction
+                                    border-radius: 50%
+                                    +mat-elevation(2)
 
                         .subject
                             margin: 0

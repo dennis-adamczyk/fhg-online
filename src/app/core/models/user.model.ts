@@ -5,7 +5,7 @@ export interface User {
     first_name: string;
     last_name: string;
   };
-  class?: string | Array<string>;
+  class?: string;
   courses: Array<string>;
   roles: {
     admin: boolean;
