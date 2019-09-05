@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { Homework } from '../homework.component';
@@ -16,9 +16,12 @@ import {
   query,
   group
 } from '@angular/animations';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog, MatSnackBar, MatBottomSheet } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { take } from 'rxjs/operators';
+import { ShareSheet } from 'src/app/core/bottomsheets/share/share.component';
+import { Title } from '@angular/platform-browser';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-homework-details',
@@ -35,7 +38,10 @@ export class HomeworkDetailsComponent implements OnInit {
     private db: FirestoreService,
     private auth: AuthService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private title: Title,
+    private bottomSheet: MatBottomSheet,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
@@ -45,7 +51,20 @@ export class HomeworkDetailsComponent implements OnInit {
   /* ##### TRIGGERS ##### */
 
   onShare() {
-    // TODO:
+    if (!isPlatformBrowser(this.platformId)) return;
+    let title = this.title.getTitle();
+    let url = window.location.href;
+    if (navigator['share']) {
+      navigator['share']({
+        title: title,
+        url: url
+      });
+    } else {
+      this.bottomSheet.open(ShareSheet, {
+        data: { url: url },
+        panelClass: 'fullWithSheet'
+      });
+    }
   }
 
   onReport() {

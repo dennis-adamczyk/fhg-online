@@ -23,6 +23,7 @@ import { SanctionDialog } from './dialogs/sanction/sanction.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from '../app-routing.module';
+import { ShareSheet } from './bottomsheets/share/share.component';
 
 // TODO: Add Angular Fire Performance
 
@@ -44,7 +45,8 @@ if (
     AcceptCancelDialog,
     EditLessonsDialog,
     ColorPickerDialog,
-    SanctionDialog
+    SanctionDialog,
+    ShareSheet
   ],
   imports: [
     ServiceWorkerModule.register('ngsw-worker.js', {
@@ -63,7 +65,8 @@ if (
     AcceptCancelDialog,
     EditLessonsDialog,
     ColorPickerDialog,
-    SanctionDialog
+    SanctionDialog,
+    ShareSheet
   ],
   exports: [NavigationComponent],
   providers: [...providerscoll]

@@ -16,6 +16,7 @@
         mat-icon-button
         (click)="onShare()"
         matTooltip="Teilen"
+        *ngIf="!data.personal"
       >
         <mat-icon>share</mat-icon>
       </button>
