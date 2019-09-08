@@ -91,7 +91,8 @@ export interface Homework {
       };
     };
   };
-  corrected?: boolean;
+  corrected?: string[];
+  selectedCorrection?: object;
 }
 
 @Component({
@@ -182,6 +183,7 @@ export class HomeworkComponent implements OnInit {
   detailsCourseName: string;
   detailsData: Homework;
   detailsAnimating: boolean;
+  detailsChanges: Subscription[] = [];
 
   constructor(
     private db: FirestoreService,
@@ -211,6 +213,8 @@ export class HomeworkComponent implements OnInit {
         if (route.url.length) {
           this.loadHomeworkDetails(route);
         } else {
+          if (this.detailsChanges.length)
+            this.detailsChanges.forEach(sub => sub.unsubscribe());
           this.details = false;
           this.detailsData = undefined;
         }
@@ -232,89 +236,111 @@ export class HomeworkComponent implements OnInit {
         .class as string)}/courses/${this.detailsCourseName}/homework/${
         this.detailsId
       }`;
-    this.db.docWithId$(homeworkRef).subscribe((homework: Homework) => {
-      this.isLoading = false;
-      if (!homework) {
-        this.router.navigate(['/homework'], { replaceUrl: true });
-        return this.snackBar.open(
-          'Diese Hausaufgabe wurde nicht gefunden',
-          null,
-          { duration: 4000 }
-        );
-      }
-      let courseDetails = JSON.parse(localStorage.getItem(timetableKey));
-      if (!courseDetails) {
-        return this.snackBar
-          .open('Ein Fehler ist aufgetreten', 'Erneut versuchen', {
-            duration: 4000
-          })
-          .onAction()
-          .pipe(take(1))
-          .subscribe(() => {
-            if (!isPlatformBrowser(this.platformId)) return;
-            location.reload();
-          });
-      }
-      courseDetails = courseDetails.courses.filter(
-        c =>
-          c.id ==
-          (this.detailsPersonal ? homework.course : this.detailsCourseName)
-      )[0] as Course;
-      if (!courseDetails) {
-        this.router.navigate(['/homework'], { replaceUrl: true });
-        return this.snackBar.open(
-          'Du bist kein Mitglied des Kurses der Hausaufgabe',
-          null,
-          { duration: 4000 }
-        );
-      }
-      if (this.detailsPersonal) homework.personal = true;
-      homework.course = courseDetails;
-      homework.done = this.done && this.done[this.detailsId] === true;
-      if (homework.done == undefined) {
-        return this.db
-          .doc$(`users/${this.auth.user.id}/singles/homework`)
-          .subscribe((singleHomework: { done: { [key: string]: boolean } }) => {
-            if (!singleHomework || !singleHomework.done)
-              this.db.upsert(`users/${this.auth.user.id}/singles/homework`, {
-                done: {}
-              });
+    this.detailsChanges.push(
+      this.db.docWithId$(homeworkRef).subscribe((homework: Homework) => {
+        this.isLoading = false;
+        if (!homework) {
+          this.router.navigate(['/homework'], { replaceUrl: true });
+          return this.snackBar.open(
+            'Diese Hausaufgabe wurde nicht gefunden',
+            null,
+            { duration: 4000 }
+          );
+        }
+        let courseDetails = JSON.parse(localStorage.getItem(timetableKey));
+        if (!courseDetails) {
+          return this.snackBar
+            .open('Ein Fehler ist aufgetreten', 'Erneut versuchen', {
+              duration: 4000
+            })
+            .onAction()
+            .pipe(take(1))
+            .subscribe(() => {
+              if (!isPlatformBrowser(this.platformId)) return;
+              location.reload();
+            });
+        }
+        courseDetails = courseDetails.courses.filter(
+          c =>
+            c.id ==
+            (this.detailsPersonal ? homework.course : this.detailsCourseName)
+        )[0] as Course;
+        if (!courseDetails) {
+          this.router.navigate(['/homework'], { replaceUrl: true });
+          return this.snackBar.open(
+            'Du bist kein Mitglied des Kurses der Hausaufgabe',
+            null,
+            { duration: 4000 }
+          );
+        }
+        if (this.detailsPersonal) homework.personal = true;
+        homework.course = courseDetails;
+        homework.done = this.done && this.done[this.detailsId] === true;
+        homework['selectedCorrection'] =
+          this.correction && this.correction[this.detailsId];
 
-            this.done = singleHomework.done;
-            localStorage.setItem(
-              this.storageKey,
-              JSON.stringify({
-                ...JSON.parse(localStorage.getItem(this.storageKey)),
-                done: singleHomework.done
-              })
-            );
-            homework.done = this.done && this.done[this.detailsId] === true;
-            this.detailsData = homework;
-            this.details = true;
-          });
-      }
-      this.detailsData = homework;
-      this.details = true;
-      if (this.sort_by == 'entered') {
-        this.week = this.getDateOf(homework.entered.date);
-        this.loadWeeksHomework();
-        setTimeout(() =>
-          !document.querySelector('mat-sidenav-content').scrollTop
-            ? (document.querySelector('mat-sidenav-content').scrollTop =
-                this.elem.nativeElement.querySelector('app-homework-details')
-                  .offsetTop || undefined)
-            : null
+        this.detailsChanges.push(
+          this.db
+            .doc$(`users/${this.auth.user.id}/singles/homework`)
+            .subscribe(
+              (singleHomework: {
+                done: { [key: string]: boolean };
+                correction: { [key: string]: { id: string } };
+              }) => {
+                if (!singleHomework || !singleHomework.done)
+                  this.db.upsert(
+                    `users/${this.auth.user.id}/singles/homework`,
+                    {
+                      done: {},
+                      correction: {}
+                    }
+                  );
+
+                this.done = singleHomework.done;
+                this.correction = singleHomework.correction;
+                localStorage.setItem(
+                  this.storageKey,
+                  JSON.stringify({
+                    ...JSON.parse(localStorage.getItem(this.storageKey)),
+                    done: singleHomework.done,
+                    correction: singleHomework.correction
+                  })
+                );
+                homework.done = this.done && this.done[this.detailsId] === true;
+                homework.selectedCorrection =
+                  this.correction && this.correction[this.detailsId];
+                this.detailsData = homework;
+                this.details = true;
+                if (this.sort_by == 'entered') {
+                  this.week = this.getDateOf(homework.entered.date);
+                  this.loadWeeksHomework();
+                  setTimeout(() =>
+                    !document.querySelector('mat-sidenav-content').scrollTop
+                      ? (document.querySelector(
+                          'mat-sidenav-content'
+                        ).scrollTop =
+                          this.elem.nativeElement.querySelector(
+                            'app-homework-details'
+                          ).offsetTop || undefined)
+                      : null
+                  );
+                } else if (this.detailsOutsideSorting('after')) {
+                  setTimeout(() =>
+                    !document.querySelector('mat-sidenav-content').scrollTop
+                      ? (document.querySelector(
+                          'mat-sidenav-content'
+                        ).scrollTop =
+                          this.elem.nativeElement.querySelector(
+                            'app-homework-details'
+                          ).offsetTop || undefined)
+                      : null
+                  );
+                }
+              }
+            )
         );
-      } else if (this.detailsOutsideSorting('after')) {
-        setTimeout(() =>
-          !document.querySelector('mat-sidenav-content').scrollTop
-            ? (document.querySelector('mat-sidenav-content').scrollTop =
-                this.elem.nativeElement.querySelector('app-homework-details')
-                  .offsetTop || undefined)
-            : null
-        );
-      }
-    });
+      })
+    );
   }
 
   /* ##### TOOLBAR EXTENTION ##### */
@@ -788,24 +814,30 @@ export class HomeworkComponent implements OnInit {
             }
           });
       }
-      if (!this.auth.user.courses.length) multis = true;
-      if (!this.auth.user.courses.length && !this.isClass(clazz))
+      if (!this.auth.user.courses || !this.auth.user.courses.length)
+        multis = true;
+      if (
+        (!this.auth.user.courses || !this.auth.user.courses.length) &&
+        !this.isClass(clazz)
+      )
         setCourseNames();
-      this.auth.user.courses.forEach((courseName, index) => {
-        this.db
-          .docWithId$(`years/${this.getYear(clazz)}/courses/${courseName}`)
-          .pipe(take(1))
-          .toPromise()
-          .then((course: Course) => {
-            multiCourses.push(course);
-            if (index == this.auth.user.courses.length - 1) {
-              multis = true;
-              if ((this.isClass(clazz) && singles) || !this.isClass(clazz)) {
-                setCourseNames();
+
+      this.auth.user.courses ||
+        [].forEach((courseName, index) => {
+          this.db
+            .docWithId$(`years/${this.getYear(clazz)}/courses/${courseName}`)
+            .pipe(take(1))
+            .toPromise()
+            .then((course: Course) => {
+              multiCourses.push(course);
+              if (index == this.auth.user.courses.length - 1) {
+                multis = true;
+                if ((this.isClass(clazz) && singles) || !this.isClass(clazz)) {
+                  setCourseNames();
+                }
               }
-            }
-          });
-      });
+            });
+        });
     };
 
     if (
@@ -815,6 +847,8 @@ export class HomeworkComponent implements OnInit {
       return new Promise(updateCourseNames);
     } else {
       if (
+        this.auth.user.courses &&
+        this.auth.user.courses.length &&
         JSON.stringify(
           JSON.parse(localStorage.getItem(this.courseNamesKey))
             .names.filter(course =>
@@ -1010,10 +1044,11 @@ export class HomeworkComponent implements OnInit {
   ): Homework[] {
     if (!homework) return;
     let output = [];
+    let newHomework = Object.assign({}, homework);
     let keys = Object.keys(homework).sort();
     for (const lesson of keys) {
       if (homework.hasOwnProperty(lesson)) {
-        const assignment = homework[lesson];
+        const assignment = newHomework[lesson];
         if (Array.isArray(assignment)) {
           assignment.forEach(subAssignment => {
             if (
@@ -1038,6 +1073,102 @@ export class HomeworkComponent implements OnInit {
     }
     if (!output.length) return;
     return output;
+  }
+
+  // correctionModified(items: Homework[]): Homework[] {
+  //   let output = items.map(h => {
+  //     if (
+  //       this.correction &&
+  //       this.correction[h.id] &&
+  //       this.correction[h.id].id
+  //     ) {
+  //       if (this.correction[h.id].title) h.title = this.correction[h.id].title;
+  //       if (this.correction[h.id].details)
+  //         h.details = this.correction[h.id].details;
+  //       if (this.correction[h.id].delete)
+  //         h['delete'] = this.correction[h.id].delete;
+  //     }
+  //     return h;
+  //   });
+  //   return output;
+  // }
+
+  getDisplayCorrTitle(item: Homework): string {
+    if (
+      this.correction &&
+      this.correction[item.id] &&
+      this.correction[item.id].id
+    ) {
+      // if (!item.corrected.includes(this.correction[item.id].id)) {
+      //   this.db.update(`users/${this.auth.user.id}/singles/homework`, {
+      //     [`correction.${item.id}`]: null
+      //   });
+      //   this.correction[item.id] = null;
+      //   return item.title;
+      // }
+      if (this.correction[item.id].title) return this.correction[item.id].title;
+    }
+    return item.title;
+  }
+
+  isDisplayCorrDeleted(item): boolean {
+    if (
+      this.correction &&
+      this.correction[item.id] &&
+      this.correction[item.id].id
+    ) {
+      // if (!item.corrected.includes(this.correction[item.id].id)) {
+      //   this.db.update(`users/${this.auth.user.id}/singles/homework`, {
+      //     [`correction.${item.id}`]: null
+      //   });
+      //   this.correction[item.id] = null;
+      //   return false;
+      // }
+      if (this.correction[item.id].delete) return true;
+    }
+    return false;
+  }
+
+  isCorrected(homework: Homework): boolean {
+    if (
+      (homework.corrected.length ||
+        (homework.corrections && Object.keys(homework.corrections).length)) &&
+      (!this.correction || !this.correction[homework.id])
+    ) {
+      return true;
+    } else {
+      if (
+        this.correction &&
+        this.correction[homework.id] &&
+        this.correction[homework.id].id &&
+        !homework.corrected.includes(this.correction[homework.id].id)
+      ) {
+        let corr = this.correction[homework.id];
+        this.db
+          .docWithId$(
+            `years/${this.getYear(this.getClass(homework.course.id))}/courses/${
+              homework.course.id
+            }/homework/${homework.id}`
+          )
+          .pipe(take(1))
+          .subscribe((h: Homework) => {
+            if (!h.corrections || !h.corrections[corr.id]) {
+              this.db.update(`users/${this.auth.user.id}/singles/homework`, {
+                [`correction.${homework.id}`]: null
+              });
+            }
+          });
+        this.correction[homework.id] = null;
+      }
+      return false;
+    }
+  }
+
+  getClass(course: string): string {
+    let clazz = course.match(/(\w\w)\-[\w]+/)[0];
+    if (!clazz || !clazz.length) return;
+    if (!this.isClass(clazz)) return;
+    return clazz.toLowerCase();
   }
 
   getDateOf(date: Date | firebase.firestore.Timestamp): Date {
@@ -1123,14 +1254,6 @@ export class HomeworkComponent implements OnInit {
     if (!code) return undefined;
     var color = code.split(' ');
     return constant.colors[color[0]][color[1]];
-  }
-
-  isCorrected(homework: Homework): boolean {
-    return (
-      (homework.corrected ||
-        (homework.corrections && Object.keys(homework.corrections).length)) &&
-      (!this.correction || !this.correction[homework.id])
-    );
   }
 
   getContrastColor(code: string): string {

@@ -38,7 +38,7 @@ interface Homework {
       };
     };
   };
-  corrected?: boolean;
+  corrected?: string[];
 }
 
 export const onChangeHomework = functions.firestore
@@ -65,10 +65,21 @@ export const onChangeHomework = functions.firestore
       return newDate;
     };
 
-    let isCorrected = (): boolean => {
-      if (!newValue.corrections) return false;
-      if (!(typeof newValue.corrections == 'object')) return false;
-      return !!Object.keys(newValue.corrections).length;
+    let getCorrected = (): string[] => {
+      if (!newValue.corrections) return [];
+      if (!(typeof newValue.corrections == 'object')) return [];
+      let output = [];
+      for (const key in newValue.corrections) {
+        if (newValue.corrections.hasOwnProperty(key)) {
+          const element = newValue.corrections[key];
+          if (
+            element.title !== newValue.title ||
+            element.details !== newValue.details
+          )
+            output.push(key);
+        }
+      }
+      return output;
     };
 
     let min = new Date();
@@ -117,7 +128,7 @@ export const onChangeHomework = functions.firestore
                 title: newValue.title,
                 entered: newValue.entered,
                 until: newValue.until,
-                corrected: isCorrected()
+                corrected: getCorrected()
               });
             return admin
               .firestore()
@@ -142,7 +153,7 @@ export const onChangeHomework = functions.firestore
                     title: newValue.title,
                     entered: newValue.entered,
                     until: newValue.until,
-                    corrected: isCorrected()
+                    corrected: getCorrected()
                   }
                 ],
                 index: true
@@ -183,12 +194,6 @@ export const onChangePersonalHomework = functions.firestore
       newDate.setSeconds(0);
       newDate.setMilliseconds(0);
       return newDate;
-    };
-
-    let isCorrected = (): boolean => {
-      if (!newValue.corrections) return false;
-      if (!(typeof newValue.corrections == 'object')) return false;
-      return !!Object.keys(newValue.corrections).length;
     };
 
     let min = new Date();
@@ -237,8 +242,7 @@ export const onChangePersonalHomework = functions.firestore
                 title: newValue.title,
                 entered: newValue.entered,
                 until: newValue.until,
-                course: newValue.course,
-                corrected: isCorrected()
+                course: newValue.course
               });
             return admin
               .firestore()
@@ -263,8 +267,7 @@ export const onChangePersonalHomework = functions.firestore
                     title: newValue.title,
                     entered: newValue.entered,
                     until: newValue.until,
-                    course: newValue.course,
-                    corrected: isCorrected()
+                    course: newValue.course
                   }
                 ],
                 index: true

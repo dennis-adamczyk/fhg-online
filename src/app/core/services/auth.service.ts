@@ -62,12 +62,19 @@ export class AuthService {
       })
     );
     this.user$.subscribe(user => {
+      if (!user) {
+        if (isPlatformBrowser(this.platformId)) localStorage.clear();
+        this.user = user;
+        return;
+      }
+
       if (
         this.user &&
         this.user.class !== user.class &&
         isPlatformBrowser(this.platformId)
       )
         localStorage.clear();
+
       if (isPlatformBrowser(this.platformId))
         localStorage.setItem('user', JSON.stringify(user));
       this.user = user;

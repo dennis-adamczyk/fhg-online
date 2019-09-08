@@ -269,7 +269,14 @@ export class EditHomeworkComponent {
         );
 
       if (correctedHomework && correctedHomework.length) {
-        let correctionId = correctedHomework[0];
+        let oldId = correctedHomework[0];
+
+        let correctionId = this.generateId();
+        while (
+          this.loadedData.corrections &&
+          this.loadedData.corrections[correctionId]
+        )
+          correctionId = this.generateId();
 
         let data = {
           title: title,
@@ -285,16 +292,32 @@ export class EditHomeworkComponent {
           this.loadedData.course.id
         )}/courses/${this.loadedData.course.id}/homework/${this.loadedData.id}`;
 
+        delete this.loadedData.corrections[oldId];
+        this.loadedData.corrections[correctionId] = data;
+
         return this.db
           .update(homeworkRef, {
-            [`corrections.${correctionId}`]: data
+            corrections: this.loadedData.corrections
           })
           .then(() => {
-            this.snackBar.open(
-              'Bearbeitungsvorschlag zur Hausaufgabe bearbeitet',
-              null,
-              { duration: 4000 }
-            );
+            let corrData = {
+              id: correctionId
+            };
+            if (data.title || data.details) {
+              corrData['title'] = data.title;
+              corrData['details'] = data.details;
+            }
+            this.db
+              .update(`users/${this.auth.user.id}/singles/homework`, {
+                [`correction.${this.loadedData.id}`]: corrData
+              })
+              .then(() => {
+                this.snackBar.open(
+                  'Bearbeitungsvorschlag zur Hausaufgabe bearbeitet',
+                  null,
+                  { duration: 4000 }
+                );
+              });
           });
       } else {
         let correctionId = this.generateId();
@@ -323,11 +346,25 @@ export class EditHomeworkComponent {
             [`corrections.${correctionId}`]: data
           })
           .then(() => {
-            this.snackBar.open(
-              'Bearbeitungsvorschlag zur Hausaufgabe hinzugefügt',
-              null,
-              { duration: 4000 }
-            );
+            let corrData = {
+              id: correctionId
+            };
+            if (data.title || data.details) {
+              corrData['title'] = data.title;
+              corrData['details'] = data.details;
+            }
+            this.db
+              .update(`users/${this.auth.user.id}/singles/homework`, {
+                [`correction.${this.loadedData.id}`]: corrData
+              })
+              .then(() => {
+                console.log(corrData);
+                this.snackBar.open(
+                  'Bearbeitungsvorschlag zur Hausaufgabe hinzugefügt',
+                  null,
+                  { duration: 4000 }
+                );
+              });
           });
       }
     };
@@ -338,7 +375,7 @@ export class EditHomeworkComponent {
     if (
       this.loadedData.personal ||
       this.loadedData.by.id == this.auth.user.id ||
-      // this.auth.user.roles.guard ||
+      this.auth.user.roles.guard ||
       (this.auth.user.roles.admin &&
         this.getClass(this.loadedData.course.id) ==
           this.auth.user.class.toLocaleLowerCase())

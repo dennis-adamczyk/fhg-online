@@ -131,6 +131,7 @@
               <a
                 class="item"
                 [class.corrected]="isCorrected(item)"
+                [class.deleted]="isDisplayCorrDeleted(item)"
                 *ngIf="
                   (isHandset$ | async) ||
                   (!details && !detailsAnimating) ||
@@ -150,7 +151,7 @@
                     {{ item.course.short }}
                   </p>
                 </div>
-                <p class="title">{{ item.title }}</p>
+                <p class="title">{{ getDisplayCorrTitle(item) }}</p>
                 <mat-checkbox
                   [checked]="type == 'done'"
                   (change)="onChangeItemCheck($event, item.id)"
@@ -354,6 +355,7 @@
               <a
                 class="item"
                 [class.corrected]="isCorrected(item)"
+                [class.deleted]="isDisplayCorrDeleted(item)"
                 *ngIf="
                   (isHandset$ | async) ||
                   (!details && !detailsAnimating) ||
@@ -373,7 +375,7 @@
                     {{ item.course.short }}
                   </p>
                 </div>
-                <p class="title">{{ item.title }}</p>
+                <p class="title">{{ getDisplayCorrTitle(item) }}</p>
                 <mat-checkbox
                   [checked]="type == 'done'"
                   (change)="onChangeItemCheck($event, item.id)"

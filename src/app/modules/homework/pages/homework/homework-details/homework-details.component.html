@@ -122,5 +122,76 @@
         </p>
       </div>
     </div>
+    <div class="corrections" *ngIf="correctionsOf(data.corrections).length">
+      <h3>Korrekturen</h3>
+      <div
+        class="correction"
+        [class.selected]="isSelectedCorrection(corr.id)"
+        *ngFor="let corr of correctionsOf(data.corrections)"
+      >
+        <div class="changes" *ngIf="corr.title || corr.details">
+          <div class="content">
+            <p class="title" *ngIf="corr.title">{{ corr.title }}</p>
+            <p class="details" *ngIf="corr.details">{{ corr.details }}</p>
+          </div>
+          <a
+            class="by"
+            *ngIf="isAdmin()"
+            [routerLink]="'/admin/users/' + corr.by.id"
+            >{{ corr.by.name.first_name + ' ' + corr.by.name.last_name }}</a
+          >
+        </div>
+        <div class="changes delete" *ngIf="corr.delete">
+          <div class="content">
+            <mat-icon>
+              delete
+            </mat-icon>
+            <p class="delete">Löschung</p>
+          </div>
+          <a
+            class="by"
+            *ngIf="isAdmin()"
+            [routerLink]="'/admin/users/' + corr.by.id"
+            >{{ corr.by.name.first_name + ' ' + corr.by.name.last_name }}</a
+          >
+        </div>
+        <button
+          mat-icon-button
+          class="delete"
+          matTooltip="Korrektur löschen"
+          (click)="deleteCorrection(corr.id)"
+          *ngIf="corr.by.id == auth.user.id || isAdmin()"
+        >
+          <mat-icon>
+            clear
+          </mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          class="edit"
+          matTooltip="Korrektur bearbeiten"
+          [routerLink]="'/homework/edit/' + data.course.id + '/' + data.id"
+          *ngIf="corr.by.id == auth.user.id && !corr.delete"
+        >
+          <mat-icon>
+            edit
+          </mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          class="select"
+          [matTooltip]="
+            isSelectedCorrection(corr.id)
+              ? 'Als korrekt markiert'
+              : 'Als korrekt markieren'
+          "
+          (click)="selectCorrection(corr.id)"
+        >
+          <mat-icon>
+            done
+          </mat-icon>
+        </button>
+      </div>
+    </div>
   </div>
 </div>

@@ -198,29 +198,36 @@ export class TimetableComponent implements OnInit {
           }
         });
     }
-    if (!this.auth.user.courses.length) multis = true;
-    if (!this.auth.user.courses.length && !this.isClass(clazz)) setTimetable();
-    this.auth.user.courses.forEach((courseName, index) => {
-      this.db
-        .docWithId$(`years/${this.getYear(clazz)}/courses/${courseName}`)
-        .pipe(take(1))
-        .subscribe((course: Course) => {
-          if (!this.isLoading) {
-            multiCourses = multiCourses.filter(c => c.id != course.id);
-          }
-          multiCourses.push(course);
-          if (index == this.auth.user.courses.length - 1) {
-            multis = true;
-            if ((this.isClass(clazz) && singles) || !this.isClass(clazz)) {
-              setTimetable();
+    if (!this.auth.user.courses || !this.auth.user.courses.length)
+      multis = true;
+    if (
+      !this.auth.user.courses ||
+      (!this.auth.user.courses.length && !this.isClass(clazz))
+    )
+      setTimetable();
+    if (this.auth.user.courses && this.auth.user.courses.length)
+      this.auth.user.courses.forEach((courseName, index) => {
+        this.db
+          .docWithId$(`years/${this.getYear(clazz)}/courses/${courseName}`)
+          .pipe(take(1))
+          .subscribe((course: Course) => {
+            if (!this.isLoading) {
+              multiCourses = multiCourses.filter(c => c.id != course.id);
             }
-          }
-        });
-    });
+            multiCourses.push(course);
+            if (index == this.auth.user.courses.length - 1) {
+              multis = true;
+              if ((this.isClass(clazz) && singles) || !this.isClass(clazz)) {
+                setTimetable();
+              }
+            }
+          });
+      });
   }
 
   updateTimetable() {
     if (
+      this.auth.user.courses &&
       JSON.stringify(
         JSON.parse(localStorage.getItem(this.courseNamesKey))
           .names.filter(course =>

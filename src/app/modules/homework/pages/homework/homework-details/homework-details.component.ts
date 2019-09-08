@@ -46,6 +46,15 @@ export class HomeworkDetailsComponent implements OnInit {
 
   ngOnInit() {
     if (this.done !== undefined) this.data.done = this.done;
+    if (
+      this.data.selectedCorrection &&
+      this.data.selectedCorrection['id'] &&
+      this.data.corrections &&
+      !this.data.corrections[this.data.selectedCorrection['id']]
+    )
+      this.db.update(`users/${this.auth.user.id}/singles/homework`, {
+        [`correction.${this.data.id}`]: null
+      });
   }
 
   /* ##### TRIGGERS ##### */
@@ -149,25 +158,40 @@ export class HomeworkDetailsComponent implements OnInit {
           )}/courses/${this.data.course.id}/homework/${this.data.id}`;
 
           if (existingCorrection.length) {
-            let correctionId = existingCorrection[0];
+            let oldId = existingCorrection[0];
+
+            let correctionId = this.generateId();
+            while (this.data.corrections && this.data.corrections[correctionId])
+              correctionId = this.generateId();
+
+            delete this.data.corrections[oldId];
+            this.data.corrections[correctionId] = {
+              delete: true,
+              by: {
+                id: this.auth.user.id,
+                name: this.auth.user.name,
+                roles: this.auth.user.roles
+              }
+            };
 
             return this.db
               .update(homeworkRef, {
-                [`corrections.${correctionId}`]: {
-                  delete: true,
-                  by: {
-                    id: this.auth.user.id,
-                    name: this.auth.user.name,
-                    roles: this.auth.user.roles
-                  }
-                }
+                corrections: this.data.corrections
               })
               .then(() => {
-                this.snackBar.open(
-                  'Vorige Korrekturvorschläge entfernt und Löschungsvorschlag hinzugefügt',
-                  null,
-                  { duration: 4000 }
-                );
+                this.db
+                  .update(`users/${this.auth.user.id}/singles/homework`, {
+                    [`correction.${this.data.id}`]: this.data.corrections[
+                      correctionId
+                    ]
+                  })
+                  .then(() => {
+                    this.snackBar.open(
+                      'Vorige Korrekturvorschläge entfernt und Löschungsvorschlag hinzugefügt',
+                      null,
+                      { duration: 4000 }
+                    );
+                  });
               });
           } else {
             let correctionId = this.generateId();
@@ -190,11 +214,19 @@ export class HomeworkDetailsComponent implements OnInit {
                 }
               })
               .then(() => {
-                this.snackBar.open(
-                  'Löschungsvorschlag zur Hausaufgabe hinzugefügt',
-                  null,
-                  { duration: 4000 }
-                );
+                this.db
+                  .update(`users/${this.auth.user.id}/singles/homework`, {
+                    [`correction.${this.data.id}`]: this.data.corrections[
+                      correctionId
+                    ]
+                  })
+                  .then(() => {
+                    this.snackBar.open(
+                      'Löschungsvorschlag zur Hausaufgabe hinzugefügt',
+                      null,
+                      { duration: 4000 }
+                    );
+                  });
               });
           }
         }
@@ -207,6 +239,126 @@ export class HomeworkDetailsComponent implements OnInit {
     });
   }
 
+  deleteCorrection(id: string) {
+    if (
+      this.data.corrections[id].by.id !== this.auth.user.id &&
+      !this.isAdmin()
+    )
+      return;
+    if (this.data.personal) return;
+    this.dialog
+      .open(AcceptCancelDialog, {
+        data: {
+          title: 'Korrektur löschen',
+          content: `Sicher, dass du die Korrektur #${id} unwiederruflich löschen möchtest?`,
+          defaultCancel: true,
+          accept: 'Unwiederruflich löschen'
+        }
+      })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(accept => {
+        if (!accept) return;
+        delete this.data.corrections[id];
+        this.db
+          .update(
+            `years/${this.getYearOfCourse(this.data.course.id)}/courses/${
+              this.data.course.id
+            }/homework/${this.data.id}`,
+            {
+              corrections: this.data.corrections
+            }
+          )
+          .then(() => {
+            if (
+              this.data.selectedCorrection &&
+              this.data.selectedCorrection['id'] == id
+            ) {
+              this.db.update(`users/${this.auth.user.id}/singles/homework`, {
+                [`correction.${this.data.id}`]: null
+              });
+            }
+            this.snackBar.open('Korrektur gelöscht', null, { duration: 4000 });
+          });
+      });
+  }
+
+  selectCorrection(id: string) {
+    if (
+      !this.data.selectedCorrection ||
+      this.data.selectedCorrection['id'] !== id
+    ) {
+      let addPersomalSelect = () => {
+        let data = {
+          id: id
+        };
+        if (this.data.corrections[id].delete === true) data['delete'] = true;
+        if (
+          this.data.corrections[id].title ||
+          this.data.corrections[id].details
+        ) {
+          data['title'] = this.data.corrections[id].title;
+          data['details'] = this.data.corrections[id].details;
+        }
+        this.db.update(`users/${this.auth.user.id}/singles/homework`, {
+          [`correction.${this.data.id}`]: data
+        });
+      };
+      if (this.isAdmin()) {
+        this.dialog
+          .open(AcceptCancelDialog, {
+            data: {
+              title: 'Hausaufgabe überschreiben?',
+              content:
+                'Soll die Hausaufgabe entsprechend der Korrektur für alle bearbeitet werden?',
+              accept: 'Ja'
+            }
+          })
+          .afterClosed()
+          .pipe(take(1))
+          .subscribe(accept => {
+            if (!accept) return addPersomalSelect();
+
+            if (this.data.corrections[id].delete === true) {
+              return this.onDelete();
+            }
+
+            let data = {};
+            if (
+              this.data.corrections[id].title ||
+              this.data.corrections[id].details
+            ) {
+              data['title'] = this.data.corrections[id].title;
+              data['details'] = this.data.corrections[id].details;
+            }
+            this.db
+              .update(
+                `years/${this.getYear(
+                  this.getClass(this.data.course.id)
+                )}/courses/${this.data.course.id}/homework/${this.data.id}`,
+                data
+              )
+              .then(() => {
+                this.snackBar.open(
+                  'Hausaufgabe entsprechend der Korrektur bearbeitet',
+                  null,
+                  { duration: 4000 }
+                );
+              });
+          });
+      } else {
+        addPersomalSelect();
+      }
+    } else if (
+      this.data.selectedCorrection &&
+      this.data.selectedCorrection['id'] == id
+    ) {
+      this.db.update(`users/${this.auth.user.id}/singles/homework`, {
+        [`correction.${this.data.id}`]: null
+      });
+    }
+  }
+
   /* ##### HELPER ##### */
 
   isAdmin(): boolean {
@@ -216,6 +368,12 @@ export class HomeworkDetailsComponent implements OnInit {
       (user.roles.admin &&
         this.getClass(this.data.course.id) ==
           this.auth.user.class.toLocaleLowerCase())
+    );
+  }
+
+  isSelectedCorrection(id: string): boolean {
+    return (
+      this.data.selectedCorrection && this.data.selectedCorrection['id'] == id
     );
   }
 
@@ -294,5 +452,29 @@ export class HomeworkDetailsComponent implements OnInit {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+  }
+
+  notEmptyObj(obj: object): boolean {
+    return !!obj && !!Object.keys(obj).length;
+  }
+
+  correctionsOf(obj: object): object[] {
+    let output = [];
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const element = obj[key];
+        element.id = key;
+        if (element.title || element.details) {
+          if (
+            element.title == this.data.title &&
+            element.details == this.data.details
+          )
+            continue;
+        }
+        if (element.delete === false) continue;
+        output.push(element);
+      }
+    }
+    return output;
   }
 }

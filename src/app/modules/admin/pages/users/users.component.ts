@@ -183,7 +183,7 @@ export class UsersComponent implements OnInit {
         }
       })
       .catch(error => {
-        console.error(error);
+        // console.error(error);
       });
   }
 
