@@ -39,16 +39,18 @@ interface Homework {
     };
   };
   corrected?: string[];
+  reporter?: string[];
+  blocked?: boolean;
 }
 
 export const onChangeHomework = functions.firestore
   .document('years/{year}/courses/{courseId}/homework/{homeworkId}')
-  .onWrite((change, context) => {
+  .onWrite(async (change, context) => {
     const newValue = change.after.data()! as Homework;
     const previousValue = change.before.data()! as Homework;
     const year = context.params.year;
-    const courseId = context.params.courseId;
-    const homeworkId = context.params.homeworkId;
+    const courseId = context.params.courseId as string;
+    const homeworkId = context.params.homeworkId as string;
 
     if (newValue) {
       if (!newValue.title) return false;
@@ -82,6 +84,38 @@ export const onChangeHomework = functions.firestore
       return output;
     };
 
+    let isBlocked = async (): Promise<boolean> => {
+      if (!newValue.reporter || !newValue.reporter.length) return false;
+      let amount = newValue.reporter.length;
+      const ratio = 0.25;
+
+      let clazz = courseId.match(/^(\d[^\-])/)[0];
+      if (clazz) {
+        return admin
+          .firestore()
+          .collection(`users`)
+          .where('class', '==', clazz)
+          .get()
+          .then(members => {
+            return amount >= members.docs.length * ratio;
+          });
+      } else {
+        return admin
+          .firestore()
+          .collection(`users`)
+          .where('course', 'array-contains', courseId)
+          .get()
+          .then(members => {
+            return amount >= members.docs.length * ratio;
+          });
+      }
+    };
+    const blocked = await isBlocked();
+
+    change.after.ref.update({
+      blocked: blocked
+    });
+
     let min = new Date();
     min.setDate(min.getDate() - 14);
     min.setHours(0);
@@ -89,85 +123,77 @@ export const onChangeHomework = functions.firestore
     min.setSeconds(0);
     min.setMilliseconds(0);
 
-    let max = new Date();
-    max.setDate(min.getDate() + 14);
-    max.setHours(0);
-    max.setMinutes(0);
-    max.setSeconds(0);
-    max.setMilliseconds(0);
-
     if (
-      (newValue &&
-        getDate(newValue.entered.date).getTime() >= min.getTime() &&
-        getDate(newValue.until.date).getDate() <= max.getTime()) ||
+      (newValue && getDate(newValue.entered.date).getTime() >= min.getTime()) ||
       (previousValue &&
-        getDate(previousValue.entered.date).getTime() >= min.getTime() &&
-        getDate(previousValue.until.date).getDate() <= max.getTime())
+        getDate(previousValue.entered.date).getTime() >= min.getTime())
     ) {
       let addCurrent =
         newValue &&
         newValue.entered &&
-        getDate(newValue.entered.date).getTime() >= min.getTime() &&
-        getDate(newValue.until.date).getDate() <= max.getTime();
+        getDate(newValue.entered.date).getTime() >= min.getTime();
       return admin
         .firestore()
         .doc(`years/${year}/courses/${courseId}/homework/--index--`)
         .get()
-        .then((indexSnap): any => {
-          if (indexSnap.exists) {
-            let index = indexSnap.data() as { homework: Homework[] };
-            index.homework = index.homework.filter(
-              h =>
-                getDate(h.entered.date).getTime() >= min.getTime() &&
-                getDate(h.until.date).getDate() <= max.getTime() &&
-                h.id !== homeworkId
-            );
-            if (addCurrent)
-              index.homework.push({
-                id: homeworkId,
-                title: newValue.title,
-                entered: newValue.entered,
-                until: newValue.until,
-                corrected: getCorrected()
-              });
-            return admin
-              .firestore()
-              .doc(indexSnap.ref.path)
-              .update(index)
-              .then(() => {
-                return admin
-                  .firestore()
-                  .doc(`years/${year}`)
-                  .update({
-                    [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
-                  });
-              });
-          } else if (addCurrent) {
-            return admin
-              .firestore()
-              .doc(indexSnap.ref.path)
-              .set({
-                homework: [
-                  {
-                    id: homeworkId,
-                    title: newValue.title,
-                    entered: newValue.entered,
-                    until: newValue.until,
-                    corrected: getCorrected()
-                  }
-                ],
-                index: true
-              })
-              .then(() => {
-                return admin
-                  .firestore()
-                  .doc(`years/${year}`)
-                  .update({
-                    [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
-                  });
-              });
+        .then(
+          async (indexSnap): Promise<any> => {
+            if (indexSnap.exists) {
+              let index = indexSnap.data() as { homework: Homework[] };
+              index.homework = index.homework.filter(
+                h =>
+                  getDate(h.entered.date).getTime() >= min.getTime() &&
+                  h.id !== homeworkId
+              );
+              if (addCurrent)
+                index.homework.push({
+                  id: homeworkId,
+                  title: newValue.title,
+                  entered: newValue.entered,
+                  until: newValue.until,
+                  corrected: getCorrected(),
+                  blocked: blocked
+                });
+              return admin
+                .firestore()
+                .doc(indexSnap.ref.path)
+                .update(index)
+                .then(() => {
+                  return admin
+                    .firestore()
+                    .doc(`years/${year}`)
+                    .update({
+                      [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+            } else if (addCurrent) {
+              return admin
+                .firestore()
+                .doc(indexSnap.ref.path)
+                .set({
+                  homework: [
+                    {
+                      id: homeworkId,
+                      title: newValue.title,
+                      entered: newValue.entered,
+                      until: newValue.until,
+                      corrected: getCorrected(),
+                      blocked: blocked
+                    }
+                  ],
+                  index: true
+                })
+                .then(() => {
+                  return admin
+                    .firestore()
+                    .doc(`years/${year}`)
+                    .update({
+                      [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+            }
           }
-        });
+        );
     }
     return false;
   });
@@ -203,26 +229,15 @@ export const onChangePersonalHomework = functions.firestore
     min.setSeconds(0);
     min.setMilliseconds(0);
 
-    let max = new Date();
-    max.setDate(min.getDate() + 14);
-    max.setHours(0);
-    max.setMinutes(0);
-    max.setSeconds(0);
-    max.setMilliseconds(0);
-
     if (
-      (newValue &&
-        getDate(newValue.entered.date).getTime() >= min.getTime() &&
-        getDate(newValue.until.date).getDate() <= max.getTime()) ||
+      (newValue && getDate(newValue.entered.date).getTime() >= min.getTime()) ||
       (previousValue &&
-        getDate(previousValue.entered.date).getTime() >= min.getTime() &&
-        getDate(previousValue.until.date).getDate() <= max.getTime())
+        getDate(previousValue.entered.date).getTime() >= min.getTime())
     ) {
       let addCurrent =
         newValue &&
         newValue.entered &&
-        getDate(newValue.entered.date).getTime() >= min.getTime() &&
-        getDate(newValue.until.date).getDate() <= max.getTime();
+        getDate(newValue.entered.date).getTime() >= min.getTime();
       return admin
         .firestore()
         .doc(`users/${userId}/personalHomework/--index--`)
@@ -233,7 +248,6 @@ export const onChangePersonalHomework = functions.firestore
             index.homework = index.homework.filter(
               h =>
                 getDate(h.entered.date).getTime() >= min.getTime() &&
-                getDate(h.until.date).getDate() <= max.getTime() &&
                 h.id !== homeworkId
             );
             if (addCurrent)

@@ -26,6 +26,7 @@
         mat-icon-button
         (click)="onReport()"
         matTooltip="Melden"
+        *ngIf="!data.personal && data.by.id !== auth.user.id"
       >
         <mat-icon>report</mat-icon>
       </button>

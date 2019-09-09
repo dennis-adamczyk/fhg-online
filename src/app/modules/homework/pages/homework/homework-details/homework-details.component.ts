@@ -77,7 +77,53 @@ export class HomeworkDetailsComponent implements OnInit {
   }
 
   onReport() {
-    // TODO:
+    if (this.data.personal) return;
+    this.dialog
+      .open(AcceptCancelDialog, {
+        data: {
+          title: 'Hausaufgabe melden?',
+          content: `Möchtest du diese Hausaufgabe aufgrund eines Verstoßes gegen die <a href="/info#terms">Nutzungsbedingungen</a> melden?
+          Das falsche Melden von Hausaufgaben wird kann ebenfalls sanktioniert werden.<br/>
+          Bitte reiche einen Korrekturvorschlag ein, wenn die Hausaufgabe lediglich fehlerhaft ist, indem du auf das Bearbeiten- oder Löschen-Symbol klickst.`,
+          defaultCancel: true,
+          accept: 'Melden'
+        }
+      })
+      .afterClosed()
+      .subscribe(accept => {
+        if (!accept) return;
+        let homeworkRef = `years/${this.getYearOfCourse(
+          this.data.course.id
+        )}/courses/${this.data.course.id}/homework/${this.data.id}`;
+        let success: boolean;
+        this.db
+          .runTransaction(homeworkRef, value => {
+            let reporter = (value.data() as Homework).reporter;
+            if (!reporter || !reporter.length) reporter = [];
+            if (reporter.includes(this.auth.user.id)) {
+              success = false;
+              this.snackBar.open(
+                'Du hast diese Hausaufgabe bereits gemeldet',
+                null,
+                { duration: 4000 }
+              );
+              return;
+            }
+
+            reporter.push(this.auth.user.id);
+            success = true;
+            return {
+              reporter: reporter
+            };
+          })
+          .then(() =>
+            success
+              ? this.snackBar.open('Hausaufgabe erfolgreich gemeldet', null, {
+                  duration: 4000
+                })
+              : null
+          );
+      });
   }
 
   onEdit() {

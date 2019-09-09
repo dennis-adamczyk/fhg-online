@@ -151,6 +151,23 @@ export class FirestoreService {
     });
   }
 
+  public runTransaction<T>(
+    ref: DocPredicate<T>,
+    onfulfilled: (
+      value: firebase.firestore.DocumentSnapshot
+    ) => firebase.firestore.UpdateData
+  ) {
+    const docRef = this.doc(ref).ref;
+    return this.db.firestore.runTransaction(transaction =>
+      transaction.get(docRef).then(value => {
+        let newData = onfulfilled(value);
+        if (typeof newData == 'object' && newData)
+          return transaction.update(docRef, newData);
+        else return transaction.update(docRef, {});
+      })
+    );
+  }
+
   // Inspect Data
 
   public inspectDoc(ref: DocPredicate<any>): void {

@@ -93,6 +93,8 @@ export interface Homework {
   };
   corrected?: string[];
   selectedCorrection?: object;
+  reporter?: string[];
+  blocked?: boolean;
 }
 
 @Component({
@@ -239,13 +241,19 @@ export class HomeworkComponent implements OnInit {
     this.detailsChanges.push(
       this.db.docWithId$(homeworkRef).subscribe((homework: Homework) => {
         this.isLoading = false;
-        if (!homework) {
+        if (!homework || Object.keys(homework).length <= 1) {
           this.router.navigate(['/homework'], { replaceUrl: true });
           return this.snackBar.open(
             'Diese Hausaufgabe wurde nicht gefunden',
             null,
             { duration: 4000 }
           );
+        }
+        if (homework.blocked) {
+          this.router.navigate(['/homework'], { replaceUrl: true });
+          return this.snackBar.open('Diese Hausaufgabe wurde entfernt', null, {
+            duration: 4000
+          });
         }
         let courseDetails = JSON.parse(localStorage.getItem(timetableKey));
         if (!courseDetails) {
@@ -314,16 +322,21 @@ export class HomeworkComponent implements OnInit {
                 if (this.sort_by == 'entered') {
                   this.week = this.getDateOf(homework.entered.date);
                   this.loadWeeksHomework();
-                  setTimeout(() =>
-                    !document.querySelector('mat-sidenav-content').scrollTop
-                      ? (document.querySelector(
-                          'mat-sidenav-content'
-                        ).scrollTop =
-                          this.elem.nativeElement.querySelector(
+                  try {
+                    setTimeout(() =>
+                      !document.querySelector('mat-sidenav-content').scrollTop
+                        ? (document.querySelector(
+                            'mat-sidenav-content'
+                          ).scrollTop = this.elem.nativeElement.querySelector(
                             'app-homework-details'
-                          ).offsetTop || undefined)
-                      : null
-                  );
+                          )
+                            ? this.elem.nativeElement.querySelector(
+                                'app-homework-details'
+                              ) || undefined
+                            : undefined)
+                        : null
+                    );
+                  } catch (error) {}
                 } else if (this.detailsOutsideSorting('after')) {
                   setTimeout(() =>
                     !document.querySelector('mat-sidenav-content').scrollTop
@@ -700,6 +713,9 @@ export class HomeworkComponent implements OnInit {
             color: courseDetails.color
           };
           homework.personal = true;
+          newHomework = newHomework.filter(
+            h => h.id !== homework.id || !h.personal
+          );
           newHomework.push(homework);
         });
         this.homework = this.convertToDateList(newHomework);
@@ -738,6 +754,9 @@ export class HomeworkComponent implements OnInit {
               ).courses.filter(c => c.id == courseName)[0] as Course;
 
               homeworkList.forEach(homework => {
+                newHomework = newHomework.filter(
+                  h => h.id !== homework.id || h.personal
+                );
                 newHomework.push({
                   ...homework,
                   course: {
@@ -1012,7 +1031,12 @@ export class HomeworkComponent implements OnInit {
   }
 
   detailsOutsideSorting(where: 'before' | 'after') {
-    if (!this.details || !this.detailsData) return;
+    if (
+      !this.details ||
+      !this.detailsData ||
+      !Object.keys(this.detailsData).length
+    )
+      return;
     if (this.sort_by !== 'due_day') return;
 
     let until = this.getDateOf(this.detailsData.until.date);
@@ -1051,6 +1075,7 @@ export class HomeworkComponent implements OnInit {
         const assignment = newHomework[lesson];
         if (Array.isArray(assignment)) {
           assignment.forEach(subAssignment => {
+            if (subAssignment.blocked) return;
             if (
               type == 'done' &&
               this.done &&
@@ -1064,6 +1089,7 @@ export class HomeworkComponent implements OnInit {
               output.push(subAssignment);
           });
         } else {
+          if (assignment.blocked) return;
           if (type == 'done' && this.done && this.done[assignment.id] === true)
             output.push(assignment);
           if (type == 'pending' && (!this.done || !this.done[assignment.id]))
@@ -1131,7 +1157,7 @@ export class HomeworkComponent implements OnInit {
 
   isCorrected(homework: Homework): boolean {
     if (
-      (homework.corrected.length ||
+      ((homework.corrected && homework.corrected.length) ||
         (homework.corrections && Object.keys(homework.corrections).length)) &&
       (!this.correction || !this.correction[homework.id])
     ) {
