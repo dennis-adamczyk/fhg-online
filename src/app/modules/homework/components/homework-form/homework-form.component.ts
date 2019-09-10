@@ -16,14 +16,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { take, map } from 'rxjs/operators';
-import { Course } from 'src/app/modules/timetable/pages/timetable/timetable.component';
-import { constant } from 'src/configs/constants';
 import { MatSnackBar, MatDialog, MatInput } from '@angular/material';
-import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { Homework } from '../../pages/homework/homework.component';
+import { HelperService } from 'src/app/core/services/helper.service';
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
 
 @Component({
   selector: 'app-homework-form',
@@ -49,6 +47,7 @@ export class HomeworkFormComponent implements OnInit {
   }
 
   constructor(
+    private helper: HelperService,
     private db: FirestoreService,
     private fb: FormBuilder,
     private auth: AuthService,
@@ -78,7 +77,7 @@ export class HomeworkFormComponent implements OnInit {
       });
     }
     this.db
-      .colWithIds(`years/${this.getYear()}/courses`, ref =>
+      .colWithIds(`years/${this.helper.getYear()}/courses`, ref =>
         ref.where('class', 'array-contains', this.auth.user.class)
       )
       .subscribe((result: Course[]) => {
@@ -248,28 +247,5 @@ export class HomeworkFormComponent implements OnInit {
     const today = new Date().getDay() || 7;
     if (!course.lessons || !course.lessons[today]) return false;
     return true;
-  }
-
-  getColor(color: string): string {
-    if (!color) return;
-    var code = color.split(' ');
-    return constant.colors[code[0]][code[1]];
-  }
-
-  getContrastColor(color: string): string {
-    if (!color) return undefined;
-    var code = color.split(' ');
-    return constant.colorsContrast[code[0]][code[1]];
-  }
-
-  isClass(clazz?: string): boolean {
-    if (!clazz) clazz = this.auth.user.class as string;
-    return !!clazz.match(/^\d/);
-  }
-
-  getYear(clazz?: string): string {
-    if (!clazz) clazz = this.auth.user.class as string;
-    if (this.isClass(clazz)) return clazz.charAt(0);
-    else return clazz;
   }
 }

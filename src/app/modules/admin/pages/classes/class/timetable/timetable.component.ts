@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { constant } from 'src/configs/constants';
 import { SettingsService } from 'src/app/core/services/settings.service';
-import { Course } from '../../course/course.component';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { take } from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
 import { LessonDetailsDialog } from './dialogs/lesson-details/lesson-details.component';
 import { AddLessonDialog } from './dialogs/add-lesson/add-lesson.component';
 import * as firebase from 'firebase/app';
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
 
 @Component({
   selector: 'app-timetable',

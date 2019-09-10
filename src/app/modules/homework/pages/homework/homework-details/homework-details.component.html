@@ -57,8 +57,14 @@
   </mat-toolbar>
   <div class="container">
     <div class="title">
-      <div class="icon" [style.background-color]="getColor(data.course.color)">
-        <p class="subject" [style.color]="getContrastColor(data.course.color)">
+      <div
+        class="icon"
+        [style.background-color]="helper.getColor(data.course.color)"
+      >
+        <p
+          class="subject"
+          [style.color]="helper.getContrastColor(data.course.color)"
+        >
           {{ data.course.short }}
         </p>
       </div>

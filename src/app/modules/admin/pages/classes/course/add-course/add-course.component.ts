@@ -14,9 +14,9 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { EditLessonsDialog } from 'src/app/core/dialogs/edit-lessons/edit-lessons.component';
 import { take } from 'rxjs/operators';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
-import { Course } from '../course.component';
 import { Router } from '@angular/router';
 import { ColorPickerDialog } from 'src/app/core/dialogs/color-picker/color-picker.component';
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
 
 @Component({
   selector: 'app-add-course',
@@ -303,9 +303,7 @@ export class AddCourseComponent implements OnInit {
             .catch(error => {
               this.isLoading = false;
               this.snackBar.open(
-                `Fehler aufgetreten (${error.code}: ${
-                  error.message
-                }). Bitte versuche es später erneut`,
+                `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
                 null,
                 {
                   duration: 4000
@@ -328,11 +326,7 @@ export class AddCourseComponent implements OnInit {
             this.dialog.open(AcceptCancelDialog, {
               data: {
                 title: 'Kurs bereits vorhanden',
-                content: `Es ist bereits ein ${
-                  val.subject
-                }-Kurs mit dem Namen "${result[0]['id']}" für die Klasse ${
-                  val.class[0]
-                } vorhanden.`,
+                content: `Es ist bereits ein ${val.subject}-Kurs mit dem Namen "${result[0]['id']}" für die Klasse ${val.class[0]} vorhanden.`,
                 accept: 'Klasse ändern',
                 defaultCancel: false
               }
@@ -351,9 +345,7 @@ export class AddCourseComponent implements OnInit {
               .catch(error => {
                 this.isLoading = false;
                 this.snackBar.open(
-                  `Fehler aufgetreten (${error.code}: ${
-                    error.message
-                  }). Bitte versuche es später erneut`,
+                  `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
                   null,
                   {
                     duration: 4000

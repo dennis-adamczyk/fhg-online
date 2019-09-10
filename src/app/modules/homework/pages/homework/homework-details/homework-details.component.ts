@@ -1,27 +1,17 @@
 import { Component, OnInit, Input, Inject, PLATFORM_ID } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
-import { Homework } from '../homework.component';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { timetableKey } from 'src/app/modules/timetable/pages/timetable/timetable.component';
-import { Course } from 'src/app/modules/admin/pages/classes/course/course.component';
 import { constant } from 'src/configs/constants';
 import { Observable } from 'rxjs';
-import {
-  state,
-  trigger,
-  style,
-  transition,
-  animate,
-  query,
-  group
-} from '@angular/animations';
 import { MatDialog, MatSnackBar, MatBottomSheet } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { take } from 'rxjs/operators';
 import { ShareSheet } from 'src/app/core/bottomsheets/share/share.component';
 import { Title } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
+import { HelperService } from 'src/app/core/services/helper.service';
+import { Homework } from '../../../models/homework.model';
 
 @Component({
   selector: 'app-homework-details',
@@ -34,9 +24,10 @@ export class HomeworkDetailsComponent implements OnInit {
   @Input() done?: boolean;
 
   constructor(
+    public helper: HelperService,
     private router: Router,
     private db: FirestoreService,
-    private auth: AuthService,
+    public auth: AuthService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private title: Title,
@@ -83,7 +74,7 @@ export class HomeworkDetailsComponent implements OnInit {
         data: {
           title: 'Hausaufgabe melden?',
           content: `Möchtest du diese Hausaufgabe aufgrund eines Verstoßes gegen die <a href="/info#terms">Nutzungsbedingungen</a> melden?
-          Das falsche Melden von Hausaufgaben wird kann ebenfalls sanktioniert werden.<br/>
+          Das falsche Melden von Hausaufgaben kann ebenfalls sanktioniert werden.<br/>
           Bitte reiche einen Korrekturvorschlag ein, wenn die Hausaufgabe lediglich fehlerhaft ist, indem du auf das Bearbeiten- oder Löschen-Symbol klickst.`,
           defaultCancel: true,
           accept: 'Melden'
@@ -92,7 +83,7 @@ export class HomeworkDetailsComponent implements OnInit {
       .afterClosed()
       .subscribe(accept => {
         if (!accept) return;
-        let homeworkRef = `years/${this.getYearOfCourse(
+        let homeworkRef = `years/${this.helper.getYearOfCourse(
           this.data.course.id
         )}/courses/${this.data.course.id}/homework/${this.data.id}`;
         let success: boolean;
@@ -141,7 +132,7 @@ export class HomeworkDetailsComponent implements OnInit {
       this.data.by.id == this.auth.user.id ||
       this.auth.user.roles.guard ||
       (this.auth.user.roles.admin &&
-        this.getClass(this.data.course.id) ==
+        this.helper.getClass(this.data.course.id) ==
           this.auth.user.class.toLocaleLowerCase());
 
     let existingCorrection: string[] = this.data.corrections
@@ -187,7 +178,7 @@ export class HomeworkDetailsComponent implements OnInit {
         if (canModify) {
           let homeworkRef = '';
           if (!this.data.personal)
-            homeworkRef = `years/${this.getYearOfCourse(
+            homeworkRef = `years/${this.helper.getYearOfCourse(
               this.data.course.id
             )}/courses/${this.data.course.id}/homework/${this.data.id}`;
           else
@@ -199,16 +190,16 @@ export class HomeworkDetailsComponent implements OnInit {
             });
           });
         } else {
-          let homeworkRef = `years/${this.getYearOfCourse(
+          let homeworkRef = `years/${this.helper.getYearOfCourse(
             this.data.course.id
           )}/courses/${this.data.course.id}/homework/${this.data.id}`;
 
           if (existingCorrection.length) {
             let oldId = existingCorrection[0];
 
-            let correctionId = this.generateId();
+            let correctionId = this.helper.generateId();
             while (this.data.corrections && this.data.corrections[correctionId])
-              correctionId = this.generateId();
+              correctionId = this.helper.generateId();
 
             delete this.data.corrections[oldId];
             this.data.corrections[correctionId] = {
@@ -240,11 +231,11 @@ export class HomeworkDetailsComponent implements OnInit {
                   });
               });
           } else {
-            let correctionId = this.generateId();
+            let correctionId = this.helper.generateId();
             while (this.data.corrections && this.data.corrections[correctionId])
-              correctionId = this.generateId();
+              correctionId = this.helper.generateId();
 
-            let homeworkRef = `years/${this.getYearOfCourse(
+            let homeworkRef = `years/${this.helper.getYearOfCourse(
               this.data.course.id
             )}/courses/${this.data.course.id}/homework/${this.data.id}`;
 
@@ -308,9 +299,9 @@ export class HomeworkDetailsComponent implements OnInit {
         delete this.data.corrections[id];
         this.db
           .update(
-            `years/${this.getYearOfCourse(this.data.course.id)}/courses/${
+            `years/${this.helper.getYearOfCourse(
               this.data.course.id
-            }/homework/${this.data.id}`,
+            )}/courses/${this.data.course.id}/homework/${this.data.id}`,
             {
               corrections: this.data.corrections
             }
@@ -379,8 +370,8 @@ export class HomeworkDetailsComponent implements OnInit {
             }
             this.db
               .update(
-                `years/${this.getYear(
-                  this.getClass(this.data.course.id)
+                `years/${this.helper.getYear(
+                  this.helper.getClass(this.data.course.id)
                 )}/courses/${this.data.course.id}/homework/${this.data.id}`,
                 data
               )
@@ -412,7 +403,7 @@ export class HomeworkDetailsComponent implements OnInit {
     return (
       user.roles.guard ||
       (user.roles.admin &&
-        this.getClass(this.data.course.id) ==
+        this.helper.getClass(this.data.course.id) ==
           this.auth.user.class.toLocaleLowerCase())
     );
   }
@@ -451,57 +442,6 @@ export class HomeworkDetailsComponent implements OnInit {
     );
     let period = `${lesson.lesson}. Stunde (${constant.times[lesson.lesson].start} - ${constant.times[lesson.lesson].end})`;
     return date + '\n' + period;
-  }
-
-  getColor(color: string): string {
-    if (!color) return;
-    var code = color.split(' ');
-    return constant.colors[code[0]][code[1]];
-  }
-
-  getContrastColor(color: string): string {
-    if (!color) return undefined;
-    var code = color.split(' ');
-    return constant.colorsContrast[code[0]][code[1]];
-  }
-
-  getClass(course: string): string {
-    let clazz = course.match(/(\w\w)\-[\w]+/)[0];
-    if (!clazz || !clazz.length) return;
-    if (!this.isClass(clazz)) return;
-    return clazz.toLowerCase();
-  }
-
-  isClass(clazz?: string): boolean {
-    if (!clazz) clazz = this.auth.user.class as string;
-    return !!clazz.match(/^\d/);
-  }
-
-  getYear(clazz?: string): string {
-    if (!clazz) clazz = this.auth.user.class as string;
-    if (this.isClass(clazz)) return clazz.charAt(0);
-    else return clazz;
-  }
-
-  getYearOfCourse(course: string): string {
-    let clazz = course.match(/(\w+)\-[\w]+/)[0];
-    if (!clazz) return;
-    return this.isClass(clazz) ? this.getYear(clazz) : clazz;
-  }
-
-  generateId() {
-    let result = '';
-    let characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let charactersLength = characters.length;
-    for (var i = 0; i < 4; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  }
-
-  notEmptyObj(obj: object): boolean {
-    return !!obj && !!Object.keys(obj).length;
   }
 
   correctionsOf(obj: object): object[] {

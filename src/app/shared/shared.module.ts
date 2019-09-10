@@ -11,6 +11,7 @@ import {
   MAT_DATE_FORMATS
 } from '@angular/material';
 import { AppDateAdapter, APP_DATE_FORMATS } from './adapters/app-date-adapters';
+import { HomeworkService } from '../modules/homework/services/homework.service';
 
 @NgModule({
   declarations: [DocPipe, ColPipe],

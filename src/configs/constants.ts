@@ -1,3 +1,9 @@
+/* STORAGE NAMES */
+export const homeworkKey = 'homework';
+export const timetableKey = 'timetable';
+export const courseNamesKey = 'course_names';
+
+/* CONSTANTS */
 export const constant = {
   emailSuffix: '@franz-haniel-gymnasium.eu',
   displayedEmailSuffix: '@franz-haniel-gym….eu',

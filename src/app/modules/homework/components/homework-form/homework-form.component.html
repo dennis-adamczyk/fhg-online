@@ -54,14 +54,14 @@
           matPrefix
           class="icon"
           [style.background-color]="
-            getColor(getCourse(homeworkForm.get('course').value)?.color)
+            helper.getColor(getCourse(homeworkForm.get('course').value)?.color)
           "
           *ngIf="getCourse(homeworkForm.get('course').value)"
         >
           <p
             class="short"
             [style.color]="
-              getContrastColor(
+              helper.getContrastColor(
                 getCourse(homeworkForm.get('course').value)?.color
               )
             "
@@ -79,8 +79,14 @@
             getCourseName(homeworkForm.get('course').value)
           }}</mat-select-trigger>
           <mat-option *ngFor="let course of courses" [value]="course.id">
-            <div class="icon" [style.background-color]="getColor(course.color)">
-              <p class="short" [style.color]="getContrastColor(course.color)">
+            <div
+              class="icon"
+              [style.background-color]="helper.getColor(course.color)"
+            >
+              <p
+                class="short"
+                [style.color]="helper.getContrastColor(course.color)"
+              >
                 {{ course.short }}
               </p>
             </div>

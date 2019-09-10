@@ -16,22 +16,7 @@ import { take } from 'rxjs/operators';
 import { constant } from 'src/configs/constants';
 import { EditLessonsDialog } from 'src/app/core/dialogs/edit-lessons/edit-lessons.component';
 import { ColorPickerDialog } from 'src/app/core/dialogs/color-picker/color-picker.component';
-
-export interface Course {
-  class: string[];
-  lessons: object;
-  multi: boolean;
-  short: string;
-  subject: string;
-  room: string;
-  teacher: {
-    last_name: string;
-    title: string;
-    short: string;
-  };
-  color: string;
-  id?: string;
-}
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
 
 @Component({
   selector: 'app-course',
@@ -257,9 +242,7 @@ export class CourseComponent implements OnInit {
       .open(AcceptCancelDialog, {
         data: {
           title: 'Kurs löschen?',
-          content: `Der Kurs <b>${
-            this.course
-          }</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
+          content: `Der Kurs <b>${this.course}</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
           accept: 'Unwiederruflich löschen',
           defaultCancel: true
         }

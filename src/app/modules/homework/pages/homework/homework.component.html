@@ -29,11 +29,11 @@
           </div>
           <h4>{{ getDisplayWeekDay(detail.until.date) }}</h4>
         </div>
-        <div class="content" *ngIf="homework">
+        <div class="content" *ngIf="homework.data">
           <ng-template #itemList let-item="item" let-type="type">
             <a
               class="item"
-              [class.corrected]="isCorrected(item)"
+              [class.corrected]="homework.isCorrected(item)"
               *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
                 item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
@@ -41,9 +41,9 @@
             >
               <div
                 class="subject"
-                [style.background-color]="getColor(item.course.color)"
+                [style.background-color]="helper.getColor(item.course.color)"
               >
-                <p [style.color]="getContrastColor(item.course.color)">
+                <p [style.color]="helper.getContrastColor(item.course.color)">
                   {{ item.course.short }}
                 </p>
               </div>
@@ -64,7 +64,7 @@
               *ngIf="!(isHandset$ | async) && details"
             ></app-homework-details>
           </ng-template>
-          <div class="pending" *ngIf="!done[detail.id]">
+          <div class="pending" *ngIf="!homework.done[detail.id]">
             <ng-container
               *ngTemplateOutlet="
                 itemList;
@@ -72,7 +72,7 @@
               "
             ></ng-container>
           </div>
-          <div class="done" *ngIf="done[detail.id]">
+          <div class="done" *ngIf="homework.done[detail.id]">
             <div
               class="expander opened"
               (click)="doneClosed[date] = !doneClosed[date]"
@@ -111,12 +111,12 @@
           </div>
           <h4>{{ getDisplayWeekDay(date) }}</h4>
         </div>
-        <div class="content" *ngIf="homework">
+        <div class="content" *ngIf="homework.data">
           <div
             class="no-homework"
             *ngIf="
-              !getHomeworkContent('pending', homework[date]) &&
-              !getHomeworkContent('done', homework[date])
+              !getHomeworkFilteredByType('pending', homework.data[date]) &&
+              !getHomeworkFilteredByType('done', homework.data[date])
             "
           >
             <div class="icon">
@@ -130,7 +130,7 @@
             <ng-container *ngFor="let item of items">
               <a
                 class="item"
-                [class.corrected]="isCorrected(item)"
+                [class.corrected]="homework.isCorrected(item)"
                 [class.deleted]="isDisplayCorrDeleted(item)"
                 *ngIf="
                   (isHandset$ | async) ||
@@ -145,9 +145,9 @@
               >
                 <div
                   class="subject"
-                  [style.background-color]="getColor(item.course.color)"
+                  [style.background-color]="helper.getColor(item.course.color)"
                 >
-                  <p [style.color]="getContrastColor(item.course.color)">
+                  <p [style.color]="helper.getContrastColor(item.course.color)">
                     {{ item.course.short }}
                   </p>
                 </div>
@@ -171,7 +171,9 @@
           </ng-template>
           <div
             class="pending"
-            *ngIf="getHomeworkContent('pending', homework[date]) as items"
+            *ngIf="
+              getHomeworkFilteredByType('pending', homework.data[date]) as items
+            "
           >
             <ng-container
               *ngTemplateOutlet="
@@ -182,7 +184,9 @@
           </div>
           <div
             class="done"
-            *ngIf="getHomeworkContent('done', homework[date]) as items"
+            *ngIf="
+              getHomeworkFilteredByType('done', homework.data[date]) as items
+            "
           >
             <div
               class="expander opened"
@@ -225,11 +229,11 @@
           </div>
           <h4>{{ getDisplayWeekDay(detail.until.date) }}</h4>
         </div>
-        <div class="content" *ngIf="homework">
+        <div class="content" *ngIf="homework.data">
           <ng-template #itemList let-item="item" let-type="type">
             <a
               class="item"
-              [class.corrected]="isCorrected(item)"
+              [class.corrected]="homework.isCorrected(item)"
               *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
                 item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
@@ -237,9 +241,9 @@
             >
               <div
                 class="subject"
-                [style.background-color]="getColor(item.course.color)"
+                [style.background-color]="helper.getColor(item.course.color)"
               >
-                <p [style.color]="getContrastColor(item.course.color)">
+                <p [style.color]="helper.getContrastColor(item.course.color)">
                   {{ item.course.short }}
                 </p>
               </div>
@@ -260,7 +264,7 @@
               *ngIf="!(isHandset$ | async) && details"
             ></app-homework-details>
           </ng-template>
-          <div class="pending" *ngIf="!done[detail.id]">
+          <div class="pending" *ngIf="!helper.done[detail.id]">
             <ng-container
               *ngTemplateOutlet="
                 itemList;
@@ -268,7 +272,7 @@
               "
             ></ng-container>
           </div>
-          <div class="done" *ngIf="done[detail.id]">
+          <div class="done" *ngIf="helper.done[detail.id]">
             <div
               class="expander opened"
               (click)="doneClosed[date] = !doneClosed[date]"
@@ -309,13 +313,13 @@
         </mat-icon>
       </button>
       <h2>
-        Woche {{ getWeekNumber(week) }}
+        Woche {{ homework.getWeekNumber(week) }}
         {{ getOptionalYear(week) ? '– ' + getOptionalYear(week) : '' }}
       </h2>
       <button
         mat-icon-button
         (click)="onChangeWeek(1)"
-        [disabled]="isThisWeek()"
+        [disabled]="homework.isThisWeek(week)"
       >
         <mat-icon>
           chevron_right
@@ -327,20 +331,20 @@
         <mat-spinner diameter="32"></mat-spinner>
       </div>
       <article class="day" *ngFor="let date of getDisplayDates()">
-        <div class="heading" [class.future]="isInFuture(date)">
+        <div class="heading" [class.future]="homework.isInFuture(date)">
           <div class="date">
             <p class="day">{{ getDisplayDay(date) }}</p>
             <p class="month">{{ getDisplayMonth(date) }}</p>
           </div>
           <h4>{{ getDisplayWeekDay(date) }}</h4>
         </div>
-        <div class="content" *ngIf="homework">
+        <div class="content" *ngIf="homework.data">
           <div
             class="no-homework"
-            [class.future]="isInFuture(date)"
+            [class.future]="homework.isInFuture(date)"
             *ngIf="
-              !getHomeworkContent('pending', homework[date]) &&
-              !getHomeworkContent('done', homework[date])
+              !getHomeworkFilteredByType('pending', homework.data[date]) &&
+              !getHomeworkFilteredByType('done', homework.data[date])
             "
           >
             <div class="icon">
@@ -354,7 +358,7 @@
             <ng-container *ngFor="let item of items">
               <a
                 class="item"
-                [class.corrected]="isCorrected(item)"
+                [class.corrected]="homework.isCorrected(item)"
                 [class.deleted]="isDisplayCorrDeleted(item)"
                 *ngIf="
                   (isHandset$ | async) ||
@@ -369,9 +373,9 @@
               >
                 <div
                   class="subject"
-                  [style.background-color]="getColor(item.course.color)"
+                  [style.background-color]="helper.getColor(item.course.color)"
                 >
-                  <p [style.color]="getContrastColor(item.course.color)">
+                  <p [style.color]="helper.getContrastColor(item.course.color)">
                     {{ item.course.short }}
                   </p>
                 </div>
@@ -395,7 +399,9 @@
           </ng-template>
           <div
             class="pending"
-            *ngIf="getHomeworkContent('pending', homework[date]) as items"
+            *ngIf="
+              getHomeworkFilteredByType('pending', homework.data[date]) as items
+            "
           >
             <ng-container
               *ngTemplateOutlet="
@@ -406,7 +412,9 @@
           </div>
           <div
             class="done"
-            *ngIf="getHomeworkContent('done', homework[date]) as items"
+            *ngIf="
+              getHomeworkFilteredByType('done', homework.data[date]) as items
+            "
           >
             <div
               class="expander opened"

@@ -8,11 +8,8 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 import { take, filter, map, startWith } from 'rxjs/operators';
-import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
-import { Homework } from '../homework.component';
-import { Course } from 'src/app/modules/admin/pages/classes/course/course.component';
 import { MatSnackBar, MatDialog } from '@angular/material';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { Observable, Subscription } from 'rxjs';
@@ -23,9 +20,11 @@ import {
   ActivatedRouteSnapshot
 } from '@angular/router';
 import { isPlatformBrowser, Location } from '@angular/common';
-import { timetableKey } from 'src/app/modules/timetable/pages/timetable/timetable.component';
-import * as firebase from 'firebase/app';
 import { HomeworkFormComponent } from '../../../components/homework-form/homework-form.component';
+import { HelperService } from 'src/app/core/services/helper.service';
+import { Homework } from '../../../models/homework.model';
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
+import { timetableKey } from 'src/configs/constants';
 
 @Component({
   selector: 'app-edit-homework',
@@ -41,6 +40,7 @@ export class EditHomeworkComponent {
   startRoute: ActivatedRouteSnapshot;
 
   constructor(
+    private helper: HelperService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
@@ -120,7 +120,7 @@ export class EditHomeworkComponent {
     if (personal)
       homeworkRef = `users/${this.auth.user.id}/personalHomework/${id}`;
     else
-      homeworkRef = `years/${this.getYear(this.auth.user
+      homeworkRef = `years/${this.helper.getYear(this.auth.user
         .class as string)}/courses/${courseName}/homework/${id}`;
     this.db.docWithId$(homeworkRef).subscribe((homework: Homework) => {
       if (!homework) {
@@ -170,8 +170,8 @@ export class EditHomeworkComponent {
           title: corrData.title || '',
           course: homework.course.id,
           share: !personal,
-          until: this.getDateOf(homework.until.date),
-          entered: this.getDateOf(homework.entered.date),
+          until: this.helper.getDateOf(homework.until.date),
+          entered: this.helper.getDateOf(homework.entered.date),
           details: corrData.details || ''
         });
       } else {
@@ -179,8 +179,8 @@ export class EditHomeworkComponent {
           title: homework.title,
           course: homework.course.id,
           share: !personal,
-          until: this.getDateOf(homework.until.date),
-          entered: this.getDateOf(homework.entered.date),
+          until: this.helper.getDateOf(homework.until.date),
+          entered: this.helper.getDateOf(homework.entered.date),
           details: homework.details
         });
       }
@@ -220,11 +220,6 @@ export class EditHomeworkComponent {
       );
   }
 
-  getDateOf(date: Date | firebase.firestore.Timestamp): Date {
-    if (date instanceof firebase.firestore.Timestamp) return date.toDate();
-    return date;
-  }
-
   onSubmit() {
     if (this.homeworkForm.invalid) return;
 
@@ -248,7 +243,7 @@ export class EditHomeworkComponent {
 
       let homeworkRef = '';
       if (!this.loadedData.personal)
-        homeworkRef = `years/${this.getYearOfCourse(
+        homeworkRef = `years/${this.helper.getYearOfCourse(
           this.loadedData.course.id
         )}/courses/${this.loadedData.course.id}/homework/${this.loadedData.id}`;
       else
@@ -271,12 +266,12 @@ export class EditHomeworkComponent {
       if (correctedHomework && correctedHomework.length) {
         let oldId = correctedHomework[0];
 
-        let correctionId = this.generateId();
+        let correctionId = this.helper.generateId();
         while (
           this.loadedData.corrections &&
           this.loadedData.corrections[correctionId]
         )
-          correctionId = this.generateId();
+          correctionId = this.helper.generateId();
 
         let data = {
           title: title,
@@ -288,7 +283,7 @@ export class EditHomeworkComponent {
           }
         };
 
-        let homeworkRef = `years/${this.getYearOfCourse(
+        let homeworkRef = `years/${this.helper.getYearOfCourse(
           this.loadedData.course.id
         )}/courses/${this.loadedData.course.id}/homework/${this.loadedData.id}`;
 
@@ -320,12 +315,12 @@ export class EditHomeworkComponent {
               });
           });
       } else {
-        let correctionId = this.generateId();
+        let correctionId = this.helper.generateId();
         while (
           this.loadedData.corrections &&
           this.loadedData.corrections[correctionId]
         )
-          correctionId = this.generateId();
+          correctionId = this.helper.generateId();
 
         let data = {
           title: title,
@@ -337,7 +332,7 @@ export class EditHomeworkComponent {
           }
         };
 
-        let homeworkRef = `years/${this.getYearOfCourse(
+        let homeworkRef = `years/${this.helper.getYearOfCourse(
           this.loadedData.course.id
         )}/courses/${this.loadedData.course.id}/homework/${this.loadedData.id}`;
 
@@ -377,7 +372,7 @@ export class EditHomeworkComponent {
       this.loadedData.by.id == this.auth.user.id ||
       this.auth.user.roles.guard ||
       (this.auth.user.roles.admin &&
-        this.getClass(this.loadedData.course.id) ==
+        this.helper.getClass(this.loadedData.course.id) ==
           this.auth.user.class.toLocaleLowerCase())
     ) {
       operation = updateHomework();
@@ -401,40 +396,5 @@ export class EditHomeworkComponent {
           }
         );
       });
-  }
-
-  generateId() {
-    let result = '';
-    let characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let charactersLength = characters.length;
-    for (var i = 0; i < 4; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  }
-
-  getClass(course: string): string {
-    let clazz = course.match(/(\w\w)\-[\w]+/)[0];
-    if (!clazz || !clazz.length) return;
-    if (!this.isClass(clazz)) return;
-    return clazz.toLowerCase();
-  }
-
-  isClass(clazz?: string): boolean {
-    if (!clazz) clazz = this.auth.user.class as string;
-    return !!clazz.match(/^\d/);
-  }
-
-  getYear(clazz?: string): string {
-    if (!clazz) clazz = this.auth.user.class as string;
-    if (this.isClass(clazz)) return clazz.charAt(0);
-    else return clazz;
-  }
-
-  getYearOfCourse(course: string): string {
-    let clazz = course.match(/(\w+)\-[\w]+/)[0];
-    if (!clazz) return;
-    return this.isClass ? this.getYear(clazz) : clazz;
   }
 }

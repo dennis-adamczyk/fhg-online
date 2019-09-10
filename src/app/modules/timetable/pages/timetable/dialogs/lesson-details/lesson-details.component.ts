@@ -1,9 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { Course } from '../../timetable.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { constant } from 'src/configs/constants';
-import { Router, RouterEvent, NavigationStart } from '@angular/router';
-import { filter, tap, take } from 'rxjs/operators';
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
 
 @Component({
   selector: 'app-lesson-details',

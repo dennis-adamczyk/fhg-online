@@ -13,15 +13,16 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { take, map } from 'rxjs/operators';
-import { Course } from 'src/app/modules/timetable/pages/timetable/timetable.component';
 import { constant } from 'src/configs/constants';
 import { MatSnackBar, MatDialog, MatInput } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { Observable } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { Homework } from '../homework.component';
 import { HomeworkFormComponent } from '../../../components/homework-form/homework-form.component';
+import { HelperService } from 'src/app/core/services/helper.service';
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
+import { Homework } from '../../../models/homework.model';
 
 @Component({
   selector: 'app-add-homework',
@@ -33,6 +34,7 @@ export class AddHomeworkComponent {
   homeworkFormComponent: HomeworkFormComponent;
 
   constructor(
+    private helper: HelperService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
@@ -138,7 +140,7 @@ export class AddHomeworkComponent {
 
     let getExistingUntilShared = this.db
       .colWithIds$(
-        `years/${this.getYear()}/courses/${
+        `years/${this.helper.getYear()}/courses/${
           this.homeworkForm.get('course').value
         }/homework`,
         ref =>
@@ -154,7 +156,7 @@ export class AddHomeworkComponent {
       });
     let getExistingEnteredShared = this.db
       .colWithIds$(
-        `years/${this.getYear()}/courses/${
+        `years/${this.helper.getYear()}/courses/${
           this.homeworkForm.get('course').value
         }/homework`,
         ref =>
@@ -233,7 +235,7 @@ export class AddHomeworkComponent {
         let operation: Promise<any>;
         if (share) {
           operation = this.db.add(
-            `years/${this.getYear()}/courses/${
+            `years/${this.helper.getYear()}/courses/${
               this.homeworkForm.get('course').value
             }/homework`,
             data
@@ -429,16 +431,5 @@ export class AddHomeworkComponent {
       )[0]
     );
     return lesson;
-  }
-
-  isClass(clazz?: string): boolean {
-    if (!clazz) clazz = this.auth.user.class as string;
-    return !!clazz.match(/^\d/);
-  }
-
-  getYear(clazz?: string): string {
-    if (!clazz) clazz = this.auth.user.class as string;
-    if (this.isClass(clazz)) return clazz.charAt(0);
-    else return clazz;
   }
 }

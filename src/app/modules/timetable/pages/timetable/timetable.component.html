@@ -10,12 +10,12 @@
     <table *ngIf="!isLoading">
       <tr class="table-header">
         <th></th>
-        <th *ngFor="let day of keysOf(constant.weekDayShort)">
+        <th *ngFor="let day of helper.keysOf(constant.weekDayShort)">
           {{ constant.weekDayShort[day] }}
         </th>
       </tr>
 
-      <tr *ngFor="let period of arrayOf(constant.maxLessons)">
+      <tr *ngFor="let period of helper.arrayOf(constant.maxLessons)">
         <th>
           <span
             class="number"
@@ -28,42 +28,53 @@
             {{ constant.times[period].end }}
           </span>
         </th>
-        <td *ngFor="let day of keysOf(constant.weekDayShort)">
+        <td *ngFor="let day of helper.keysOf(constant.weekDayShort)">
           <div
             class="lesson"
-            *ngIf="lessonExists(day, period) && isSingleLesson(day, period)"
-            [style.background-color]="getColor(timetable[day][period].color)"
+            *ngIf="
+              timetable.lessonExists(day, period) &&
+              timetable.isSingleLesson(day, period)
+            "
+            [style.background-color]="
+              helper.getColor(timetable.data[day][period].color)
+            "
             [class.contrast]="
-              getContrastColor(timetable[day][period].color) == '#000000'
+              helper.getContrastColor(timetable.data[day][period].color) ==
+              '#000000'
             "
             (click)="onClickLesson(day, period)"
           >
             <p class="subject">
               {{
                 settings.get('timetable.subjects_abbreviation')
-                  ? timetable[day][period].short
-                  : timetable[day][period].subject
+                  ? timetable.data[day][period].short
+                  : timetable.data[day][period].subject
               }}
             </p>
             <p class="teacher" *ngIf="settings.get('timetable.show_teacher')">
               {{
                 settings.get('timetable.teacher_abbreviation')
-                  ? timetable[day][period].teacher.short
-                  : timetable[day][period].teacher.last_name
+                  ? timetable.data[day][period].teacher.short
+                  : timetable.data[day][period].teacher.last_name
               }}
             </p>
             <p class="room" *ngIf="settings.get('timetable.show_room')">
-              {{ getRoomPrefix(day, period) + timetable[day][period].room }}
+              {{
+                getRoomPrefix(day, period) + timetable.data[day][period].room
+              }}
             </p>
           </div>
           <div
             class="multi-lesson"
-            *ngIf="lessonExists(day, period) && !isSingleLesson(day, period)"
+            *ngIf="
+              timetable.lessonExists(day, period) &&
+              !timetable.isSingleLesson(day, period)
+            "
             (click)="onClickLesson(day, period)"
           >
-            <p class="count">{{ timetable[day][period].length }}</p>
+            <p class="count">{{ timetable.data[day][period].length }}</p>
           </div>
-          <div class="empty" *ngIf="!lessonExists(day, period)">
+          <div class="empty" *ngIf="!timetable.lessonExists(day, period)">
             <p>+++++</p>
           </div>
         </td>

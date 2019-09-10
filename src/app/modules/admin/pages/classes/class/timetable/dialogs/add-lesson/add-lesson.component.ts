@@ -9,7 +9,7 @@ import {
 import { constant } from 'src/configs/constants';
 import { CourseElement } from '../../../courses/courses.component';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Course } from '../../../../course/course.component';
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
 
 @Component({
   selector: 'app-add-lesson',

@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../../../core/services/auth.service';
-import { SettingsService } from 'src/app/core/services/settings.service';
 
 @Component({
   selector: 'app-home',

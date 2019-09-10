@@ -1,8 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { Course } from '../../../../course/course.component';
 import { constant } from 'src/configs/constants';
-import { FirestoreService } from 'src/app/core/services/firestore.service';
+import { Course } from 'src/app/modules/timetable/models/timetable.model';
 
 @Component({
   selector: 'app-lesson-details',
