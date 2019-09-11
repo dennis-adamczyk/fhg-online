@@ -125,13 +125,17 @@ export const onChangeHomework = functions.firestore
 
     if (
       (newValue && getDate(newValue.entered.date).getTime() >= min.getTime()) ||
-      (previousValue &&
-        getDate(previousValue.entered.date).getTime() >= min.getTime())
+      getDate(newValue.until.date).getTime() >= min.getTime() ||
+      ((previousValue &&
+        getDate(previousValue.entered.date).getTime() >= min.getTime()) ||
+        getDate(previousValue.until.date).getTime() >= min.getTime())
     ) {
       let addCurrent =
         newValue &&
         newValue.entered &&
-        getDate(newValue.entered.date).getTime() >= min.getTime();
+        newValue.until &&
+        (getDate(newValue.entered.date).getTime() >= min.getTime() ||
+          getDate(newValue.until.date).getTime() >= min.getTime());
       return admin
         .firestore()
         .doc(`years/${year}/courses/${courseId}/homework/--index--`)
@@ -231,13 +235,17 @@ export const onChangePersonalHomework = functions.firestore
 
     if (
       (newValue && getDate(newValue.entered.date).getTime() >= min.getTime()) ||
-      (previousValue &&
-        getDate(previousValue.entered.date).getTime() >= min.getTime())
+      getDate(newValue.until.date).getTime() >= min.getTime() ||
+      ((previousValue &&
+        getDate(previousValue.entered.date).getTime() >= min.getTime()) ||
+        getDate(previousValue.until.date).getTime() >= min.getTime())
     ) {
       let addCurrent =
         newValue &&
         newValue.entered &&
-        getDate(newValue.entered.date).getTime() >= min.getTime();
+        newValue.until &&
+        (getDate(newValue.entered.date).getTime() >= min.getTime() ||
+          getDate(newValue.until.date).getTime() >= min.getTime());
       return admin
         .firestore()
         .doc(`users/${userId}/personalHomework/--index--`)

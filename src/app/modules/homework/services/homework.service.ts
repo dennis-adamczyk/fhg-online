@@ -68,7 +68,8 @@ export class HomeworkService {
     }
     if (
       !localStorage.getItem(homeworkKey) ||
-      !localStorage.getItem(homeworkKey).length
+      !localStorage.getItem(homeworkKey).length ||
+      !JSON.parse(localStorage.getItem(homeworkKey)).homework
     ) {
       this.downloadHomework();
     } else {
@@ -82,6 +83,27 @@ export class HomeworkService {
       this.isLoading = false;
       this.updateHomework();
     }
+    this.settings.onChange().subscribe(() => {
+      if (this.settings.get('homework.sort_by') !== this.sort_by) {
+        this.sort_by = this.settings.get('homework.sort_by');
+        this.max_days = parseInt(this.settings.get('homework.max_days')) | 0;
+
+        if (
+          localStorage.getItem(homeworkKey) &&
+          localStorage.getItem(homeworkKey).length &&
+          JSON.parse(localStorage.getItem(homeworkKey)).homework
+        ) {
+          this.data = this.convertToDateList(
+            JSON.parse(localStorage.getItem(homeworkKey)).homework
+          );
+          this.done = JSON.parse(localStorage.getItem(homeworkKey)).done;
+          this.correction = JSON.parse(
+            localStorage.getItem(homeworkKey)
+          ).correction;
+          this.isLoading = false;
+        }
+      }
+    });
   }
 
   updateHomework() {

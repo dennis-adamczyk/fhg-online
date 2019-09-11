@@ -7,13 +7,18 @@ import {
 } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
-import { map, take } from 'rxjs/operators';
+import { map, take, filter } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { constant } from 'src/configs/constants';
 import { MatDialog } from '@angular/material';
 import { SettingsService } from 'src/app/core/services/settings.service';
 import { LessonDetailsDialog } from './dialogs/lesson-details/lesson-details.component';
-import { Router } from '@angular/router';
+import {
+  Router,
+  NavigationEnd,
+  ActivatedRoute,
+  ActivatedRouteSnapshot
+} from '@angular/router';
 import { TimetableService } from '../../services/timetable.service';
 import { HelperService } from 'src/app/core/services/helper.service';
 

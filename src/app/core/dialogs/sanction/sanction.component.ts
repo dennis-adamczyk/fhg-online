@@ -39,7 +39,7 @@ export class SanctionDialog implements OnInit {
   }
 
   getSanctionName() {
-    if (this.sanctionName == 'ban') return 'Kontosuspendierung';
+    if (this.sanctionName == 'ban') return 'Kontoschließung';
     if (this.sanctionName == 'block') return 'Kontosperre';
     if (this.sanctionName == 'interaction') return 'Interaktionssperre';
   }

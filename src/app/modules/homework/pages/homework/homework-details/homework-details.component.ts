@@ -9,7 +9,7 @@ import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-ca
 import { take } from 'rxjs/operators';
 import { ShareSheet } from 'src/app/core/bottomsheets/share/share.component';
 import { Title } from '@angular/platform-browser';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, Location } from '@angular/common';
 import { HelperService } from 'src/app/core/services/helper.service';
 import { Homework } from '../../../models/homework.model';
 
@@ -31,6 +31,7 @@ export class HomeworkDetailsComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private title: Title,
+    private location: Location,
     private bottomSheet: MatBottomSheet,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
@@ -415,7 +416,9 @@ export class HomeworkDetailsComponent implements OnInit {
   }
 
   navigateBack() {
-    this.router.navigate(['/homework']);
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (document.referrer !== '') this.location.back();
+    else this.router.navigate(['/homework'], { replaceUrl: true });
   }
 
   getDisplayClass(classes: string[]): string {

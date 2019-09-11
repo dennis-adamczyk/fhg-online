@@ -107,7 +107,7 @@ export class HelperService {
    * @memberof HelperService
    */
   getYear(clazz?: string): string {
-    if (!clazz) this.auth.user.class;
+    if (!clazz) clazz = this.auth.user.class;
     if (clazz.charAt(0).match(/\d/)) {
       return clazz.charAt(0);
     } else {
@@ -142,6 +142,18 @@ export class HelperService {
         date['seconds'] * 1000
       ).toDate();
     return date;
+  }
+
+  /**
+   * Returns the number equivalent to the week day of a date.
+   * Monday = 1 (...) Saturday = 7
+   *
+   * @param {Date} date
+   * @returns {number}
+   * @memberof HelperService
+   */
+  getWeekDay(date: Date): number {
+    return date.getDay() || 7;
   }
 
   /**

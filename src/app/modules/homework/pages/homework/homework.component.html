@@ -10,7 +10,7 @@
       add
     </mat-icon>
   </a>
-  <div class="due_day" *ngIf="sort_by == 'due_day'">
+  <div class="due_day" *ngIf="homework.sort_by == 'due_day'">
     <div class="header">
       <h2>Fällig bis...</h2>
     </div>
@@ -305,7 +305,7 @@
       </article>
     </div>
   </div>
-  <div class="entered" *ngIf="sort_by == 'entered'">
+  <div class="entered" *ngIf="homework.sort_by == 'entered'">
     <div class="header">
       <button mat-icon-button (click)="onChangeWeek(-1)">
         <mat-icon>

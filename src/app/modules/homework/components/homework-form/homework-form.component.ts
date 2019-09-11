@@ -39,7 +39,8 @@ export class HomeworkFormComponent implements OnInit {
   isLoading: boolean = false;
 
   @ViewChild('titleInput', { static: true }) titleInput: MatInput;
-  @ViewChild('autosize', { static: false }) autosize: CdkTextareaAutosize;
+
+  @ViewChild('autosize', { static: true }) autosize: CdkTextareaAutosize;
   triggerResize() {
     this._ngZone.onStable
       .pipe(take(1))
@@ -52,7 +53,6 @@ export class HomeworkFormComponent implements OnInit {
     private fb: FormBuilder,
     private auth: AuthService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog,
     private location: Location,
     private router: Router,
     private _ngZone: NgZone,

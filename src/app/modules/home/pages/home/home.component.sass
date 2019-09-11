@@ -1,0 +1,244 @@
+@import ../../../../../var
+
+.toolbar-extention
+    position: absolute
+    left: 0
+    top: 0
+    right: 0
+    height: 112px
+    background-color: mat-color($primary-light)
+    z-index: -1
+    +mat-elevation(2)
+
+.day
+    margin: 0 8px 16px 8px
+    height: auto
+    background-color: mat-color($background-light, card)
+    border-radius: 4px
+    user-select: none
+    overflow: hidden
+    +mat-elevation(4)
+
+    .header
+        display: flex
+        justify-content: space-between
+        align-items: center
+        margin: 0
+        padding: 0 16px
+        height: 56px
+        border-bottom: 1px solid mat-color($foreground-light, divider)
+
+        button
+            margin: -8px
+            color: mat-color($foreground-light, icon)
+
+        .title
+            cursor: pointer
+
+            h2
+                margin: 0
+                padding: 0
+                font-size: 16px
+                font-weight: 400
+                text-align: center
+                color: mat-color($foreground-light, text)
+
+            p
+                margin: 0
+                padding: 0
+                font-size: 14px
+                font-weight: 400
+                text-align: center
+                color: mat-color($foreground-light, secondary-text)
+
+            &.active
+                h2
+                    font-weight: 500
+
+    .body
+        position: relative
+        margin: 0
+        padding: 0
+        width: 100%
+        height: auto
+
+        .timetable
+            margin: 0
+            padding: 0 16px
+
+            .no-timetable
+                margin: 0
+                padding: 24px 0
+
+                p
+                    margin: 0
+                    padding: 0
+                    font-size: 12px
+                    font-weight: 500
+                    text-align: center
+                    color: mat-color($foreground-light, secondary-text)
+
+            .item
+                display: flex
+                justify-content: space-between
+                align-items: center
+                height: 72px
+                cursor: pointer
+
+                .icon
+                    flex-shrink: 1
+                    display: flex
+                    justify-content: center
+                    align-items: center
+                    margin: 0 16px 0 0
+                    padding: 0
+                    width: 40px
+                    height: 40px
+                    background-color: mat-color($primary-light)
+                    border-radius: 50%
+
+                    p
+                        margin: 0
+                        padding: 0
+                        font-size: 16px
+                        font-weight: 400
+                        text-align: center
+                        color: mat-color($foreground-dark, text)
+
+                .text
+                    flex-grow: 1
+                    display: grid
+                    grid-template: 1fr 1fr / 1fr 1fr
+                    align-items: end
+                    grid-auto-flow: column
+
+                    p
+                        margin: 0
+                        padding: 0
+                        text-align: left
+                        font-size: 14px
+                        font-weight: 400
+                        color: mat-color($foreground-light, secondary-text)
+
+                    .subject
+                        font-size: 16px
+                        color: mat-color($foreground-light, text)
+
+                    .time,
+                    .teacher
+                        text-align: right
+
+        mat-divider
+            margin: 8px 16px
+            border-top-color: rgba(mat-color($foreground-light, base), .26)
+
+        .homework
+            margin: 0 0 8px 0
+            padding: 0 16px
+
+            .no-homework
+                margin: 0
+                padding: 16px 0
+
+                mat-icon
+                    display: block
+                    margin: 0 auto
+                    color: mat-color($foreground-light, icon)
+
+                p
+                    margin: 12px 0 0 0
+                    padding: 0
+                    font-size: 12px
+                    font-weight: 500
+                    text-align: center
+                    color: mat-color($foreground-light, secondary-text)
+
+            .item
+                margin: 0
+                padding: 0
+                display: flex
+                justify-content: space-between
+                align-items: center
+                min-height: 48px
+                cursor: pointer
+
+                &.done
+                    .text
+                        opacity: .56
+
+                        .subject
+                            text-decoration: line-through
+
+                .text
+                    margin: 0
+                    padding: 6px 0
+                    display: grid
+                    grid-template: auto auto / 10px auto
+                    grid-template-areas: "dot subject" ". title"
+                    align-items: center
+                    grid-auto-flow: column
+
+                    p
+                        margin: 0
+                        padding: 0
+                        font-size: 14px
+                        font-weight: 400
+                        color: mat-color($foreground-light, secondary-text)
+
+                    .subject
+                        grid-area: subject
+                        color: mat-color($foreground-light, text)
+
+                    .title
+                        grid-area: title
+
+                    .dot
+                        grid-area: dot
+                        width: 6px
+                        height: 6px
+                        background-color: mat-color($primary-light)
+                        border-radius: 50%
+
+                mat-checkbox
+                    padding: 1px 4px 4px 4px
+
+                    &.mat-checkbox-checked,
+                    &:active
+                        ::ng-deep .mat-checkbox-background,
+                        ::ng-deep .mat-ripple-element
+                            background-color: #757575
+
+
+
+
+@media not all and ($mat-xsmall)
+    .toolbar-extention
+        height: 128px
+
+    .day
+        margin: 0 auto 16px auto
+        width: 576px
+
+        .header
+            padding: 0 24px
+            height: 64px
+
+        .body
+            display: flex
+            justify-content: stretch
+            align-items: stretch
+            padding: 8px 0
+
+            .timetable
+                flex-grow: 1
+                margin: 0
+                padding: 0 16px 0 24px
+                border-right: 1px solid rgba(mat-color($foreground-light, base), .26)
+
+            mat-divider
+                display: none
+
+            .homework
+                flex-grow: 1
+                margin: 0
+                padding: 0 24px 0 16px

@@ -104,9 +104,6 @@ import {
   ]
 })
 export class HomeworkComponent implements OnInit {
-  sort_by: 'due_day' | 'entered' = this.settings.get('homework.sort_by');
-  max_days = parseInt(this.settings.get('homework.max_days')) | 0;
-
   loading: boolean = false;
   get isLoading(): boolean {
     return this.loading || this.homework.isLoading;
@@ -279,7 +276,7 @@ export class HomeworkComponent implements OnInit {
                   this.homework.correction[this.detailsId];
                 this.detailsData = homework;
                 this.details = true;
-                if (this.sort_by == 'entered') {
+                if (this.homework.sort_by == 'entered') {
                   this.week = this.helper.getDateOf(homework.entered.date);
                   this.loadWeeksHomework();
                   try {
@@ -345,7 +342,7 @@ export class HomeworkComponent implements OnInit {
             'scroll',
             event => scrollHandler()
           );
-        } else if (handset && this.sort_by == 'entered') {
+        } else if (handset && this.homework.sort_by == 'entered') {
           this.renderer.setStyle(this.toolbar, 'box-shadow', 'none');
         } else {
           this.renderer.removeStyle(this.toolbar, 'box-shadow');
@@ -496,7 +493,7 @@ export class HomeworkComponent implements OnInit {
 
   getDisplayDates(): string[] {
     let output: string[] = [];
-    if (this.sort_by == 'entered') {
+    if (this.homework.sort_by == 'entered') {
       let monday = new Date(this.week);
       let day = monday.getDay() || 7;
       if (day !== 1) monday.setDate(monday.getDate() - (day - 1));
@@ -516,7 +513,7 @@ export class HomeworkComponent implements OnInit {
       maxSchoolTimeDate.setMilliseconds(0);
       let skipToday = maxSchoolTimeDate.getTime() <= Date.now();
       let current = new Date();
-      for (let index = 0; index < this.max_days; index++) {
+      for (let index = 0; index < this.homework.max_days; index++) {
         current.setDate(current.getDate() + (index ? 1 : skipToday ? 1 : 0));
         if (current.getDay() > 5 || current.getDay() == 0) {
           index--;
@@ -552,7 +549,7 @@ export class HomeworkComponent implements OnInit {
 
     const formatter = new Intl.DateTimeFormat('de', { weekday: 'long' });
     let output = formatter.format(current);
-    if (this.sort_by == 'due_day') {
+    if (this.homework.sort_by == 'due_day') {
       if (current.toDateString() == new Date().toDateString()) output = 'Heute';
       if (current.toDateString() == tomorrow.toDateString()) output = 'Morgen';
     }
@@ -599,7 +596,7 @@ export class HomeworkComponent implements OnInit {
       !Object.keys(this.detailsData).length
     )
       return;
-    if (this.sort_by !== 'due_day') return;
+    if (this.homework.sort_by !== 'due_day') return;
 
     let until = this.helper.getDateOf(this.detailsData.until.date);
 

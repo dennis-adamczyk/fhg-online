@@ -7,12 +7,15 @@ import { Router } from '@angular/router';
 import { take, tap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
 import { AcceptCancelDialog } from '../dialogs/accept-cancel/accept-cancel.component';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
   private storageKey = 'settings';
+
+  private changes = new BehaviorSubject(null);
 
   constructor(
     private auth: AuthService,
@@ -41,6 +44,10 @@ export class SettingsService {
       return;
     }
     this.sync();
+  }
+
+  onChange(): Observable<string[] | null> {
+    return this.changes.asObservable();
   }
 
   get(key: string): any {
@@ -97,6 +104,7 @@ export class SettingsService {
           .subscribe(data => {
             let settings = this.strictSettings(data);
             this.setLocalSettings(settings);
+            this.changes.next(null);
           });
       }
     });
