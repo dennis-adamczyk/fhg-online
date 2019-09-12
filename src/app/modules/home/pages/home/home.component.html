@@ -24,27 +24,25 @@
       >
         <p>Für diesen Tag ist noch kein Stundenplan vorhanden</p>
       </div>
-      <ng-container *ngIf="getTimetable() as courses">
-        <div class="item" *ngFor="let course of courses">
-          <div class="icon">
-            <p>{{ course.lesson }}</p>
-          </div>
-          <div class="text">
-            <p class="subject">{{ course.subject }}</p>
-            <p class="room">
-              {{ (hasRoomPrefix(course.room) ? 'Raum ' : '') + course.room }}
-            </p>
-            <p class="time">
-              {{ getTime('start', course.lesson) }}
-              –
-              {{ getTime('end', course.lesson) }}
-            </p>
-            <p class="teacher">
-              {{ course.teacher.title + ' ' + course.teacher.last_name }}
-            </p>
-          </div>
+      <div class="item" *ngFor="let course of getTimetable()">
+        <div class="icon" [class.hasHomework]="hasCourseHomework(course.id)">
+          <p>{{ course.lesson }}</p>
         </div>
-      </ng-container>
+        <div class="text">
+          <p class="subject">{{ course.subject }}</p>
+          <p class="room">
+            {{ (hasRoomPrefix(course.room) ? 'Raum ' : '') + course.room }}
+          </p>
+          <p class="time">
+            {{ getTime('start', course.lesson) }}
+            –
+            {{ getTime('end', course.lesson) }}
+          </p>
+          <p class="teacher">
+            {{ course.teacher.title + ' ' + course.teacher.last_name }}
+          </p>
+        </div>
+      </div>
     </div>
     <mat-divider></mat-divider>
     <div class="homework">
@@ -56,25 +54,23 @@
         <mat-icon>mood</mat-icon>
         <p>Keine Hausaufgaben für diesen Tag</p>
       </div>
-      <ng-container *ngIf="getHomework() as assignments">
-        <div
-          class="item"
-          [class.done]="homework.done[assignment.id]"
-          [routerLink]="getHomeworkDetailsURL(assignment)"
-          *ngFor="let assignment of assignments"
-        >
-          <div class="text">
-            <div class="dot"></div>
-            <p class="subject">{{ assignment.course.subject }}</p>
-            <p class="title">{{ getDisplayCorrTitle(assignment) }}</p>
-          </div>
-          <mat-checkbox
-            (click)="$event.stopPropagation()"
-            [checked]="homework.done[assignment.id]"
-            (change)="onChangeDone($event, assignment.id)"
-          ></mat-checkbox>
+      <div
+        class="item"
+        [class.done]="homework.done[assignment.id]"
+        [routerLink]="getHomeworkDetailsURL(assignment)"
+        *ngFor="let assignment of getHomework()"
+      >
+        <div class="text">
+          <div class="dot"></div>
+          <p class="subject">{{ assignment.course.subject }}</p>
+          <p class="title">{{ getDisplayCorrTitle(assignment) }}</p>
         </div>
-      </ng-container>
+        <mat-checkbox
+          (click)="$event.stopPropagation()"
+          [checked]="homework.done[assignment.id]"
+          (change)="onChangeDone($event, assignment.id)"
+        ></mat-checkbox>
+      </div>
     </div>
   </div>
 </div>

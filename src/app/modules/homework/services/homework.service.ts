@@ -118,7 +118,8 @@ export class HomeworkService {
           }) => {
             if (!year.homework_updated) return;
             let localyUpdated = JSON.parse(localStorage.getItem(homeworkKey))
-              .updated;
+              ? JSON.parse(localStorage.getItem(homeworkKey)).updated
+              : 0;
             JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
               courseName => {
                 if (!year.homework_updated[courseName]) return;
@@ -153,6 +154,19 @@ export class HomeworkService {
                             color: courseDetails.color
                           }
                         });
+                        if (
+                          this.correction &&
+                          this.correction[homework.id] &&
+                          !homework.corrected.includes(
+                            this.correction[homework.id].id
+                          )
+                        )
+                          this.db.update(
+                            `users/${this.auth.user.id}/singles/homework`,
+                            {
+                              [`correction.${homework.id}`]: null
+                            }
+                          );
                       });
                       localStorage.setItem(
                         homeworkKey,

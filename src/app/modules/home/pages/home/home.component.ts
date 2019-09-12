@@ -4,7 +4,9 @@ import {
   Inject,
   PLATFORM_ID,
   Renderer2,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  SimpleChanges,
+  OnChanges
 } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
@@ -162,7 +164,7 @@ export class HomeComponent implements OnInit {
                   1
               ) {
                 // this.homeworkLoading = false;
-                this.loadedDays.push(this.homework.getKeyDateFormat(this.day));
+                // this.loadedDays.push(this.homework.getKeyDateFormat(this.day));
               }
 
               if (!homeworkList.length) return;
@@ -184,6 +186,20 @@ export class HomeComponent implements OnInit {
                     color: courseDetails.color
                   }
                 });
+                if (
+                  this.homework.correction &&
+                  this.homework.correction[homework.id] &&
+                  homework.corrections &&
+                  !homework.corrections[
+                    this.homework.correction[homework.id].id
+                  ]
+                )
+                  this.db.update(
+                    `users/${this.auth.user.id}/singles/homework`,
+                    {
+                      [`correction.${homework.id}`]: null
+                    }
+                  );
               });
               this.homework.data = this.homework.convertToDateList(newHomework);
             });
@@ -243,7 +259,9 @@ export class HomeComponent implements OnInit {
     this.loadDayHomework();
   }
 
-  getTimetable() {
+  private timetableData: Course[];
+
+  getTimetable(): Course[] {
     let weekDay = this.day.getDay() || 7;
     if (!this.timetable.data) return;
     let timetable = this.timetable.data[weekDay];
@@ -270,7 +288,14 @@ export class HomeComponent implements OnInit {
         else addCourse(course);
       }
     }
-    return output;
+    if (JSON.stringify(output) !== JSON.stringify(this.timetableData)) {
+      this.timetableData = output;
+      return output;
+    } else return this.timetableData;
+  }
+
+  getJSON(str: string) {
+    return JSON.parse(str);
   }
 
   hasRoomPrefix(room: string): boolean {
@@ -308,8 +333,11 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  getHomework() {
+  private homeworkData;
+
+  getHomework(): Homework[] {
     if (!this.homework.data) return;
+    let output = [];
     if (this.homework.sort_by == 'due_day') {
       let homework = this.homework.data[
         this.homework.getKeyDateFormat(this.day)
@@ -322,7 +350,6 @@ export class HomeComponent implements OnInit {
         .map(l => (sorted[l] = homework[l]));
       homework = sorted;
 
-      let output = [];
       for (const lesson in homework) {
         if (homework.hasOwnProperty(lesson)) {
           const assignment = Object.assign({}, homework[lesson]);
@@ -346,10 +373,8 @@ export class HomeComponent implements OnInit {
           } else addHomework(assignment);
         }
       }
-      return output;
     } else {
       let homework = this.homework.data;
-      let output = [];
       for (const date in homework) {
         if (homework.hasOwnProperty(date)) {
           let day = homework[date];
@@ -397,8 +422,16 @@ export class HomeComponent implements OnInit {
           }
         }
       }
-      return output;
     }
+    if (JSON.stringify(output) !== JSON.stringify(this.homeworkData)) {
+      this.homeworkData = output;
+      return output;
+    } else return this.homeworkData;
+  }
+
+  getHomeworkArray() {
+    if (!this.homeworkData || !Array.isArray(this.homeworkData)) return;
+    return this.helper.arrayOf(this.homeworkData.length - 1, 0);
   }
 
   getDisplayCorrTitle(item: Homework): string {
@@ -431,5 +464,12 @@ export class HomeComponent implements OnInit {
     output += (homework.personal ? 'p' : homework.course.id) + '/';
     output += homework.id;
     return output;
+  }
+
+  hasCourseHomework(courseId: string): boolean {
+    if (!this.getHomework() || !Array.isArray(this.getHomework())) return;
+    return !!this.getHomework().filter(
+      h => h.course.id == courseId && !this.homework.done[h.id]
+    ).length;
   }
 }

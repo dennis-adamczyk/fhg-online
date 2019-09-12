@@ -97,6 +97,21 @@
                     background-color: mat-color($primary-light)
                     border-radius: 50%
 
+                    &.hasHomework
+                        position: relative
+
+                        &::after
+                            content: ''
+                            display: block
+                            width: 10px
+                            height: 10px
+                            position: absolute
+                            top: -1px
+                            right: -1px
+                            background-color: mat-color($primary-light)
+                            border-radius: 50%
+                            +mat-elevation(4)
+
                     p
                         margin: 0
                         padding: 0

@@ -174,9 +174,10 @@ export class HelperService {
    * @returns {number[]}
    * @memberof HelperService
    */
-  arrayOf(max: number): number[] {
+  arrayOf(max: number, min: number = 1): number[] {
+    max = max - (min - 1);
     return Array.apply(null, Array(max)).map(function(x, i) {
-      return i + 1;
+      return i + min;
     });
   }
 }
