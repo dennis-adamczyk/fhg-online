@@ -109,7 +109,8 @@ export class HomeworkFormComponent implements OnInit {
 
   navigateBack() {
     if (!isPlatformBrowser(this.platformId)) return;
-    if (document.referrer.match(/\/homework(\/\w*)*$/)) this.location.back();
+    if (document.referrer.indexOf(window.location.host) !== -1)
+      this.location.back();
     else this.router.navigate(['/homework'], { replaceUrl: true });
   }
 

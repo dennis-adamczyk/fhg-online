@@ -12,17 +12,19 @@ import {
 } from '@angular/material';
 import { AppDateAdapter, APP_DATE_FORMATS } from './adapters/app-date-adapters';
 import { HomeworkService } from '../modules/homework/services/homework.service';
+import { SpeedDialFabComponent } from './components/speed-dial-fab/speed-dial-fab.component';
 
 @NgModule({
-  declarations: [DocPipe, ColPipe],
-  imports: [CommonModule],
+  declarations: [DocPipe, ColPipe, SpeedDialFabComponent],
+  imports: [CommonModule, MaterialModule],
   exports: [
     CommonModule,
     MaterialModule,
     DocPipe,
     ColPipe,
     ReactiveFormsModule,
-    NgxTrimDirectiveModule
+    NgxTrimDirectiveModule,
+    SpeedDialFabComponent
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },

@@ -10,6 +10,12 @@
     z-index: -1
     +mat-elevation(2)
 
+app-speed-dial-fab
+    position: fixed 
+    bottom: 16px
+    right: 16px
+    z-index: 6
+
 .day
     margin: 0 8px 16px 8px
     height: auto
@@ -229,6 +235,10 @@
 @media not all and ($mat-xsmall)
     .toolbar-extention
         height: 128px
+
+    app-speed-dial-fab
+        bottom: 24px
+        right: 24px
 
     .day
         margin: 0 auto 16px auto

@@ -37,7 +37,13 @@ import { Course } from 'src/app/modules/timetable/models/timetable.model';
 export class HomeComponent implements OnInit {
   day: Date = new Date();
 
-  loadedDays: string[] = [];
+  fabButtons = [
+    {
+      label: 'Hausaufgabe',
+      icon: 'list',
+      click: () => this.router.navigate(['/homework/add'])
+    }
+  ];
 
   constructor(
     public homework: HomeworkService,
@@ -309,6 +315,8 @@ export class HomeComponent implements OnInit {
   isNextDay(): boolean {
     let tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
+    let weekDay = tomorrow.getDay() || 7;
+    if (weekDay >= 6) tomorrow.setDate(tomorrow.getDate() + 8 - weekDay);
     if (this.homework.isInFuture(new Date())) return this.isToday(this.day);
     else
       return (
@@ -321,6 +329,8 @@ export class HomeComponent implements OnInit {
   setNextDay() {
     let tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
+    let weekDay = tomorrow.getDay() || 7;
+    if (weekDay >= 6) tomorrow.setDate(tomorrow.getDate() + 8 - weekDay);
     if (!this.homework.isInFuture(new Date())) this.day = tomorrow;
   }
 
