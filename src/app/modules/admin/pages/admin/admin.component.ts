@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 @Component({
   selector: 'app-admin',
@@ -6,10 +8,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./admin.component.sass']
 })
 export class AdminComponent implements OnInit {
+  constructor(public helper: HelperService, public auth: AuthService) {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

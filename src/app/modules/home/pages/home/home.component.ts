@@ -479,7 +479,9 @@ export class HomeComponent implements OnInit {
   hasCourseHomework(courseId: string): boolean {
     if (!this.getHomework() || !Array.isArray(this.getHomework())) return;
     return !!this.getHomework().filter(
-      h => h.course.id == courseId && !this.homework.done[h.id]
+      h =>
+        h.course.id == courseId &&
+        (!this.homework || !this.homework.done || !this.homework.done[h.id])
     ).length;
   }
 }

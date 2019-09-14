@@ -19,10 +19,10 @@
         *ngFor="let class of classlist"
       >
         <mat-icon matListIcon>{{
-          isClass(class) ? 'class' : 'bookmark'
+          helper.isClass(class) ? 'class' : 'bookmark'
         }}</mat-icon>
         <p mat-line>
-          {{ isClass(class) ? 'Klasse ' + class : 'Stufe ' + class }}
+          {{ helper.isClass(class) ? 'Klasse ' + class : 'Stufe ' + class }}
         </p>
         <mat-icon matSuffix>chevron_right</mat-icon>
       </button>

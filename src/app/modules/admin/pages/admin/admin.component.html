@@ -1,5 +1,5 @@
 <div class="admin">
-  <mat-action-list class="list">
+  <mat-action-list class="list" *ngIf="auth.user.roles.guard; else adminList">
     <button mat-list-item routerLink="/admin/users">
       <mat-icon matListIcon>person</mat-icon>
       <h4 mat-line>Benutzer</h4>
@@ -8,9 +8,29 @@
       <mat-icon matListIcon>class</mat-icon>
       <h4 mat-line>Klassen</h4>
     </button>
-    <button mat-list-item routerLink="/admin/calendar">
+    <button mat-list-item routerLink="/admin/calendar" *ngIf="false">
       <mat-icon matListIcon>event</mat-icon>
       <h4 mat-line>Kalender</h4>
     </button>
   </mat-action-list>
+  <ng-template #adminList>
+    <mat-action-list class="list">
+      <button mat-list-item [routerLink]="'/admin/classes/' + auth.user.class">
+        <mat-icon matListIcon>{{
+          helper.isClass(auth.user.class) ? 'class' : 'bookmark'
+        }}</mat-icon>
+        <h4 mat-line>
+          {{
+            helper.isClass(auth.user.class)
+              ? 'Klasse ' + auth.user.class
+              : 'Stufe ' + auth.user.class
+          }}
+        </h4>
+      </button>
+      <button mat-list-item routerLink="/admin/calendar" *ngIf="false">
+        <mat-icon matListIcon>event</mat-icon>
+        <h4 mat-line>Kalender</h4>
+      </button>
+    </mat-action-list>
+  </ng-template>
 </div>

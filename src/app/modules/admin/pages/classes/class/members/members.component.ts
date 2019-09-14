@@ -84,21 +84,16 @@ export class MembersComponent implements OnInit {
   }
 
   getData(callback: () => any) {
-    let students$ = this.db.colWithIds('users', ref =>
-      ref.where('class', '==', this.class)
-    );
-    let teachers$ = this.db.colWithIds('users', ref =>
-      ref.where('class', 'array-contains', this.class)
-    );
-
-    merge(students$, teachers$).subscribe((res: any[]) => {
-      this.isLoading = false;
-      if (res.length == 0) return;
-      res.forEach(res => {
-        if (!this.members.includes(res)) this.members.push(res);
+    this.db
+      .colWithIds('users', ref => ref.where('class', '==', this.class))
+      .subscribe((res: any[]) => {
+        this.isLoading = false;
+        if (res.length == 0) return;
+        res.forEach(res => {
+          if (!this.members.includes(res)) this.members.push(res);
+        });
+        callback();
       });
-      callback();
-    });
   }
 
   getCreatedFormat(created_at: any) {

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, of } from 'rxjs';
-import { map, withLatestFrom, filter, tap } from 'rxjs/operators';
+import { map, withLatestFrom, filter, tap, startWith } from 'rxjs/operators';
 import { AppToolbarService, MenuItem } from '../services/app-toolbar.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -25,7 +25,14 @@ export class NavigationComponent {
   @ViewChild('drawer', { static: false }) drawer: MatSidenav;
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
-    .pipe(map(result => result.matches));
+    .pipe(
+      map(result => result.matches),
+      startWith(
+        isPlatformBrowser(this.platformId)
+          ? window.matchMedia('(max-width: 599px)').matches
+          : true
+      )
+    );
   activeMenuItem$: Observable<MenuItem> = this.toolbarService.activeMenuItem$;
   extended: boolean = false;
 

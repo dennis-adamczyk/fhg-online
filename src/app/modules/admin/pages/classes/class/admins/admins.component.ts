@@ -85,21 +85,13 @@ export class AdminsComponent implements OnInit {
 
   getData(callback: () => any) {
     let admins$ = this.db.colWithIds('users', ref =>
-      ref
-        .where('roles.admin', '==', true)
-        .where('class', 'array-contains', this.class)
+      ref.where('roles.admin', '==', true).where('class', '==', this.class)
     );
-    let guardsStudent$ = this.db.colWithIds('users', ref =>
+    let guards$ = this.db.colWithIds('users', ref =>
       ref.where('roles.guard', '==', true).where('class', '==', this.class)
     );
 
-    let guardsTeacher$ = this.db.colWithIds('users', ref =>
-      ref
-        .where('roles.guard', '==', true)
-        .where('class', 'array-contains', this.class)
-    );
-
-    merge(admins$, guardsStudent$, guardsTeacher$).subscribe((res: any[]) => {
+    merge(admins$, guards$).subscribe((res: any[]) => {
       this.isLoading = false;
       if (res.length == 0) return;
       res.forEach(res => {

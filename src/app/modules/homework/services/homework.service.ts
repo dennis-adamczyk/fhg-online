@@ -116,7 +116,7 @@ export class HomeworkService {
             classes: string[];
             homework_updated: { [key: string]: firebase.firestore.Timestamp };
           }) => {
-            if (!year.homework_updated) return;
+            if (!year || !year.homework_updated) return;
             let localyUpdated = JSON.parse(localStorage.getItem(homeworkKey))
               ? JSON.parse(localStorage.getItem(homeworkKey)).updated
               : 0;

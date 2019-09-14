@@ -33,7 +33,7 @@ export const speedDialFabAnimations = [
         ':enter',
         stagger('40ms', [
           animate(
-            '120ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+            '180ms cubic-bezier(0.4, 0.0, 0.2, 1)',
             keyframes([style({ opacity: 0 }), style({ opacity: 1 })])
           )
         ]),

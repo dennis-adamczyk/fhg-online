@@ -17,6 +17,7 @@ import { TimetableComponent } from './timetable/timetable.component';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import * as firebase from 'firebase/app';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 @Component({
   selector: 'app-class',
@@ -43,6 +44,7 @@ export class ClassComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
+    public helper: HelperService,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
@@ -102,12 +104,12 @@ export class ClassComponent implements OnInit {
 
       if (params.class.charAt(0).match(/\d/)) {
         this.db
-          .doc$(`years/${this.getYear()}`)
+          .doc$(`years/${this.helper.getYear()}`)
           .pipe(take(1))
           .subscribe((result: { classes: string[] }) => {
             if (!result || !result.classes.includes(this.class)) {
               this.snackBar.open(
-                `Die ${this.isClass() ? 'Klasse' : 'Stufe'} ${
+                `Die ${this.helper.isClass() ? 'Klasse' : 'Stufe'} ${
                   this.class
                 } existiert nicht`,
                 null,
@@ -124,7 +126,7 @@ export class ClassComponent implements OnInit {
           .subscribe(docSnapshot => {
             if (!docSnapshot.exists) {
               this.snackBar.open(
-                `Die ${this.isClass() ? 'Klasse' : 'Stufe'} ${
+                `Die ${this.helper.isClass() ? 'Klasse' : 'Stufe'} ${
                   this.class
                 } existiert nicht`,
                 null,
@@ -137,36 +139,25 @@ export class ClassComponent implements OnInit {
 
       if (this.sub) return;
 
-      let students$ = this.db.colWithIds('users', ref =>
+      let members$ = this.db.colWithIds('users', ref =>
         ref.where('class', '==', this.class)
-      );
-      let teachers$ = this.db.colWithIds('users', ref =>
-        ref.where('class', 'array-contains', this.class)
       );
 
       let admins$ = this.db.colWithIds('users', ref =>
-        ref
-          .where('roles.admin', '==', true)
-          .where('class', 'array-contains', this.class)
+        ref.where('roles.admin', '==', true).where('class', '==', this.class)
       );
-      let guardsStudent$ = this.db.colWithIds('users', ref =>
+      let guards$ = this.db.colWithIds('users', ref =>
         ref.where('roles.guard', '==', true).where('class', '==', this.class)
       );
 
-      let guardsTeacher$ = this.db.colWithIds('users', ref =>
-        ref
-          .where('roles.guard', '==', true)
-          .where('class', 'array-contains', this.class)
-      );
-
-      merge(students$, teachers$).subscribe((res: any[]) => {
+      members$.subscribe((res: any[]) => {
         this.isLoading = false;
         if (res.length == 0) return;
         res.forEach(res => {
           if (!this.members.includes(res)) this.members.push(res);
         });
       });
-      merge(admins$, guardsStudent$, guardsTeacher$).subscribe((res: any[]) => {
+      merge(admins$, guards$).subscribe((res: any[]) => {
         this.isLoading = false;
         if (res.length == 0) return;
         res.forEach(res => {
@@ -174,15 +165,6 @@ export class ClassComponent implements OnInit {
         });
       });
     });
-  }
-
-  isClass(): boolean {
-    return !!this.class.charAt(0).match(/\d/);
-  }
-
-  getYear(): string {
-    if (this.isClass()) return this.class.charAt(0);
-    else return this.class;
   }
 
   private flatten(array: any[]): any[] {
@@ -194,23 +176,23 @@ export class ClassComponent implements OnInit {
       componentReference.members = this.members;
       componentReference.class = this.class;
       componentReference.title =
-        (this.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
+        (this.helper.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
     }
     if (componentReference instanceof AdminsComponent) {
       componentReference.admins = this.admins;
       componentReference.class = this.class;
       componentReference.title =
-        (this.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
+        (this.helper.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
     }
     if (componentReference instanceof CoursesComponent) {
       componentReference.class = this.class;
       componentReference.title =
-        (this.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
+        (this.helper.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
     }
     if (componentReference instanceof TimetableComponent) {
       componentReference.class = this.class;
       componentReference.title =
-        (this.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
+        (this.helper.isClass() ? 'Klasse ' : 'Stufe ') + this.class;
     }
   }
 
@@ -220,11 +202,11 @@ export class ClassComponent implements OnInit {
     this.dialog
       .open(AcceptCancelDialog, {
         data: {
-          title: `${this.isClass() ? 'Klasse' : 'Stufe'} ${
+          title: `${this.helper.isClass() ? 'Klasse' : 'Stufe'} ${
             this.class
           } löschen?`,
           content: `Die ${
-            this.isClass() ? 'Klasse' : 'Stufe'
+            this.helper.isClass() ? 'Klasse' : 'Stufe'
           } wird mitsamt allen Mitgliedern, Administratoren und Kursen unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können. Wirklich sicher, dass diese Aktion ausgeführt werden soll?`,
           defaultCancel: true,
           accept: 'Unwiederruflich löschen'
@@ -251,23 +233,25 @@ export class ClassComponent implements OnInit {
             classes: [...index.classes].filter(clazz => clazz !== this.class)
           })
           .then(() => {
-            if (!this.isClass()) {
-              this.db.delete(`years/${this.getYear()}`);
+            if (!this.helper.isClass()) {
+              this.db.delete(`years/${this.helper.getYear()}`);
             } else {
               this.db
-                .doc$(`years/${this.getYear()}`)
+                .doc$(`years/${this.helper.getYear()}`)
                 .pipe(take(1))
                 .subscribe((year: { classes: string[] }) => {
                   this.db
-                    .update(`years/${this.getYear()}`, {
+                    .update(`years/${this.helper.getYear()}`, {
                       classes: [...year.classes].filter(
                         clazz => clazz !== this.class
                       )
                     })
                     .then(() => {
                       this.db
-                        .colWithIds$(`years/${this.getYear()}/courses`, ref =>
-                          ref.where('class', 'array-contains', this.class)
+                        .colWithIds$(
+                          `years/${this.helper.getYear()}/courses`,
+                          ref =>
+                            ref.where('class', 'array-contains', this.class)
                         )
                         .pipe(take(1))
                         .subscribe((courses: { id: string }[]) => {
@@ -277,7 +261,9 @@ export class ClassComponent implements OnInit {
                               firebase
                                 .firestore()
                                 .doc(
-                                  `years/${this.getYear()}/courses/${course.id}`
+                                  `years/${this.helper.getYear()}/courses/${
+                                    course.id
+                                  }`
                                 )
                             );
                           });
@@ -315,7 +301,7 @@ export class ClassComponent implements OnInit {
               });
 
             this.snackBar.open(
-              `Die ${this.isClass() ? 'Klasse' : 'Stufe'} ${
+              `Die ${this.helper.isClass() ? 'Klasse' : 'Stufe'} ${
                 this.class
               } wurde unwiederruflich gelöscht`,
               null,

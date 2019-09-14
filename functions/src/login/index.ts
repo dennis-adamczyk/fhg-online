@@ -112,20 +112,29 @@ export const registerUser = functions.https.onCall((data, context) => {
     })
     .catch();
 
-  admin
-    .firestore()
-    .collection('users')
-    .where('index', '==', true)
-    .where('teachers', 'array-contains', email)
-    .get()
-    .then(data => {
-      if (role == 'teacher' && data.size == 0) {
-        throw new HttpsError(
-          'failed-precondition',
-          'Die E-Mail gehört keinem Leherer.'
-        );
-      }
-    });
+  if (
+    context.auth.uid &&
+    !admin
+      .auth()
+      .getUser(context.auth.uid)
+      .then(userRecord => {
+        return (userRecord.customClaims as { guard: boolean })!.guard == true;
+      })
+  )
+    admin
+      .firestore()
+      .collection('users')
+      .where('index', '==', true)
+      .where('teachers', 'array-contains', email)
+      .get()
+      .then(data => {
+        if (role == 'teacher' && data.size == 0) {
+          throw new HttpsError(
+            'failed-precondition',
+            'Die E-Mail gehört keinem Leherer.'
+          );
+        }
+      });
 
   // Registration
 
@@ -150,10 +159,10 @@ export const registerUser = functions.https.onCall((data, context) => {
           roles: {
             guard: false,
             admin: false,
-            student: role == 'student' ? true : false,
-            teacher: role == 'teacher' ? true : false
+            student: role == 'student',
+            teacher: role == 'teacher'
           },
-          class: clazz ? clazz : undefined,
+          class: clazz || null,
           courses: [],
           status: skipVerification ? 1 : 0,
           settings_changed: null,
@@ -165,8 +174,8 @@ export const registerUser = functions.https.onCall((data, context) => {
         .setCustomUserClaims(userRecord.uid, {
           guard: false,
           admin: false,
-          student: role == 'student' ? true : false,
-          teacher: role == 'teacher' ? true : false
+          student: role == 'student',
+          teacher: role == 'teacher'
         })
         .then(() => {
           return admin

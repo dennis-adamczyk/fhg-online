@@ -163,6 +163,12 @@ export class UserComponent {
         courses: result.courses,
         status: result.status
       });
+      if (!this.auth.user.roles.guard) {
+        this.userForm.get('name').disable();
+        this.userForm.get('email').disable();
+        this.userForm.get('roles').disable();
+        this.userForm.get('status').disable();
+      }
       this.edited = false;
       if (result.sanctions) {
         if (result.sanctions.interaction) {

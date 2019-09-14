@@ -153,6 +153,7 @@ export const deleteUsers = functions.https.onCall((data, context) => {
       'Fehler beim Ausführen der Funktion im unauthentifizierten Zustand.'
     );
   }
+
   if (
     !admin
       .auth()

@@ -10,6 +10,7 @@ import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { map, switchMap, tap, take } from 'rxjs/operators';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { AddClassDialog } from './dialogs/add-class/add-class.component';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 @Component({
   selector: 'app-classes',
@@ -23,6 +24,7 @@ export class ClassesComponent implements OnInit {
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private db: FirestoreService,
+    public helper: HelperService,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
@@ -82,7 +84,7 @@ export class ClassesComponent implements OnInit {
           if (this.classlist.includes(result)) {
             this.snackBar.open(
               `Die ${
-                this.isClass(result) ? 'Klasse' : 'Stufe'
+                this.helper.isClass(result) ? 'Klasse' : 'Stufe'
               } ${result} existiert bereits`,
               null,
               { duration: 4000 }
@@ -96,23 +98,23 @@ export class ClassesComponent implements OnInit {
             })
             .then(() => {
               this.db
-                .doc(`years/${this.getYear(result)}`)
+                .doc(`years/${this.helper.getYear(result)}`)
                 .get()
                 .toPromise()
                 .then(docSnapshot => {
-                  if (this.isClass(result)) {
-                    this.db.upsert(`years/${this.getYear(result)}`, {
+                  if (this.helper.isClass(result)) {
+                    this.db.upsert(`years/${this.helper.getYear(result)}`, {
                       classes:
                         docSnapshot.data() && docSnapshot.data().classes
                           ? [...docSnapshot.data().classes, result].sort()
                           : [result]
                     });
                   } else if (!docSnapshot.exists) {
-                    this.db.set(`years/${this.getYear(result)}`, {});
+                    this.db.set(`years/${this.helper.getYear(result)}`, {});
                   }
                   this.snackBar.open(
                     `${
-                      this.isClass(result) ? 'Klasse' : 'Stufe'
+                      this.helper.isClass(result) ? 'Klasse' : 'Stufe'
                     } ${result} erfolgreich erstellt`,
                     null,
                     { duration: 4000 }
@@ -121,16 +123,5 @@ export class ClassesComponent implements OnInit {
             });
         }
       });
-  }
-
-  /* ##### HELPER ##### */
-
-  isClass(clazz: string): boolean {
-    return !!clazz.match(/^\d/);
-  }
-
-  getYear(clazz: string): string {
-    if (this.isClass(clazz)) return clazz.charAt(0);
-    else return clazz;
   }
 }

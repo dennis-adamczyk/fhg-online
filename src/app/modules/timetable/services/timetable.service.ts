@@ -167,7 +167,7 @@ export class TimetableService {
           classes: string[];
           updated: { [key: string]: firebase.firestore.Timestamp };
         }) => {
-          if (!year.updated) return;
+          if (!year || !year.updated) return;
           let localyUpdated = this.getTimetableLocalStorage().updated;
 
           for (const courseName in year.updated) {

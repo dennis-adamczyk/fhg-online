@@ -81,7 +81,9 @@ export class HelperService {
    * @returns {boolean}
    * @memberof HelperService
    */
-  isClass(clazz: string): boolean {
+  isClass(clazz?: string): boolean {
+    if (!clazz) clazz = this.auth.user.class;
+    if (!clazz) return;
     return !!clazz.charAt(0).match(/\d/);
   }
 
@@ -93,6 +95,7 @@ export class HelperService {
    * @memberof HelperService
    */
   getClass(course: string): string {
+    if (!course) return;
     let clazz = course.match(/(\w\w)\-[\w]+/)[0];
     if (!clazz || !clazz.length) return;
     if (!this.isClass(clazz)) return;
@@ -108,6 +111,7 @@ export class HelperService {
    */
   getYear(clazz?: string): string {
     if (!clazz) clazz = this.auth.user.class;
+    if (!clazz) return;
     if (clazz.charAt(0).match(/\d/)) {
       return clazz.charAt(0);
     } else {
@@ -123,6 +127,7 @@ export class HelperService {
    * @memberof HelperService
    */
   getYearOfCourse(course: string): string {
+    if (!course) return;
     let clazz = course.match(/(\w+)\-[\w]+/)[0];
     if (!clazz) return;
     return this.isClass(clazz) ? this.getYear(clazz) : clazz;

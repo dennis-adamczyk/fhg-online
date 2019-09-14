@@ -212,10 +212,7 @@ export class UsersComponent implements OnInit {
             deleteUsers({ uids: uids }).then(() => {
               let newData = this.data.data;
               selected.forEach(selected => {
-                const index = this.data.data.findIndex(
-                  d => d.uid == selected.uid
-                );
-                newData.splice(index, 1);
+                newData = newData.filter(d => d.uid !== selected.uid);
               });
               this.isLoadingResults = false;
               this.data = new MatTableDataSource<UserElement>(newData);
