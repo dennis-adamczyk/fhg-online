@@ -49,7 +49,7 @@ export class UserComponent {
     private fb: FormBuilder,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private auth: AuthService,
+    public auth: AuthService,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
 

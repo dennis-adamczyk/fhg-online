@@ -1,0 +1,339 @@
+@import ../../../../var
+
+.intro
+    display: flex
+    flex-flow: column
+    align-items: stretch
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    z-index: 999
+    background-color: mat-color($primary-light)
+    color: mat-color($foreground-dark, text)
+    transition: background 350ms $ease-in-out-curve-function
+
+    .view
+        flex-grow: 1
+        overflow-y: visible
+        overflow-x: hidden
+        display: flex
+        justify-content: space-between
+
+        section
+            display: flex
+            flex-flow: column
+            align-items: center
+            width: 100%
+            min-width: 100%
+            max-height: calc(100% - 56px)
+            overflow-y: hidden
+
+            &.circular
+                .img
+                    flex-grow: 1
+                    padding: 64px 0 24px 0
+                    width: 80%
+                    max-width: 256px
+                    height: auto
+                    max-height: 50%
+                    display: flex
+                    justify-content: center
+                    align-items: center
+                    overflow: hidden
+
+                    & > *
+                        width: 100%
+                        max-height: 100%
+
+                .text
+                    flex-grow: 1
+
+                    .title
+                        margin: 0 0 16px 0
+                        padding: 0
+                        font-size: 24px
+                        font-weight: 500
+                        text-align: center
+
+                        p
+                            font-size: 14px
+                            font-weight: 400
+
+                        h2 
+                            font-size: 24px
+                            font-weight: 500
+
+                        p, h2
+                            margin: 0
+                            padding: 0
+
+                    .description
+                        margin: 0
+                        padding: 0 16px
+                        font-size: 16px
+                        font-weight: 400
+                        text-align: center
+                        color: mat-color($foreground-dark, secondary-text)
+
+            &[data-index="1"]
+                .text
+                    .title
+                        h2
+                            font-size: 28px
+
+            &[data-index="2"]
+                .text
+                    margin: 10% 0 24px 0
+                    padding: 0 16px
+
+                    .title
+                        margin: 0 0 16px 0
+                        padding: 0
+                        font-size: 24px
+                        font-weight: 500
+                        text-align: center
+
+                    .description
+                        margin: 0
+                        padding: 0 16px
+                        font-size: 16px
+                        font-weight: 400
+                        text-align: center
+                        color: mat-color($foreground-dark, secondary-text)
+
+                .courses
+                    margin: 0
+                    padding: 0 16px
+                    overflow: auto
+                    width: calc(100% - 32px)
+                    display: flex
+                    flex-flow: column
+                    justify-content: stretch
+                    align-items: stretch
+                    user-select: none
+
+                    .no-course
+                        margin: 0
+                        padding: 32px 0
+
+                        mat-icon
+                            display: block
+                            margin: 0 auto
+                            color: mat-color($foreground-dark, icon)
+
+                        p
+                            margin: 12px 0 0 0
+                            padding: 0
+                            font-size: 12px
+                            font-weight: 500
+                            text-align: center
+                            color: mat-color($foreground-dark, secondary-text)
+
+                    .courseGroup
+                        padding: 0 0 8px 0
+                        margin: 0 0 8px 0
+                        display: flex
+                        flex-flow: column
+                        border-bottom: 1px solid mat-color($foreground-light, divider)
+
+                        &:last-child
+                            border-bottom: none
+
+                        .course
+                            margin: 0
+                            padding: 0 16px
+                            display: flex
+                            justify-content: space-between
+                            align-items: center
+                            height: 72px
+                            cursor: pointer
+
+                            .icon
+                                flex-shrink: 1
+                                display: flex
+                                justify-content: center
+                                align-items: center
+                                margin: 0 16px 0 0
+                                padding: 0
+                                width: 40px
+                                min-width: 40px
+                                height: 40px
+                                background-color: mat-color($primary-light)
+                                border-radius: 50%
+
+                                p
+                                    margin: 0
+                                    padding: 0
+                                    font-size: 16px
+                                    font-weight: 400
+                                    text-align: center
+                                    color: mat-color($foreground-dark, text)
+
+                            .text
+                                margin: 0
+                                padding: 0
+                                flex-grow: 1
+                                display: grid
+                                grid-template: auto auto / auto auto
+                                align-items: end
+                                grid-auto-flow: column
+
+                                p
+                                    margin: 0
+                                    padding: 0
+                                    text-align: left
+                                    font-size: 14px
+                                    font-weight: 400
+                                    color: mat-color($foreground-dark, secondary-text)
+
+                                .subject
+                                    font-size: 16px
+                                    color: mat-color($foreground-dark, text)
+
+                                .room,
+                                .teacher
+                                    text-align: right
+
+            &[data-index="3"]
+                .text
+                    margin: 10% 0 24px 0
+                    padding: 0 16px
+
+                    .title
+                        margin: 0 0 16px 0
+                        padding: 0
+                        font-size: 24px
+                        font-weight: 500
+                        text-align: center
+
+                    .description
+                        margin: 0
+                        padding: 0 16px
+                        font-size: 16px
+                        font-weight: 400
+                        text-align: center
+                        color: mat-color($foreground-dark, secondary-text)
+
+                .setting
+                    margin: 5% 0
+
+                    p
+                        margin: 8px 0
+                        padding: 0
+                        font-size: 16px
+                        font-weight: 400
+                        text-align: center
+
+                    mat-radio-group
+                        mat-radio-button
+                            margin: 12px 0
+                            display: block
+                            font-size: 18px
+                            font-weight: 400
+
+                            ::ng-deep
+                                .mat-radio-container
+                                    .mat-radio-outer-circle
+                                        border-color: mat-color($foreground-dark, icon)
+
+                                    .mat-radio-inner-circle,
+                                    .mat-ripple-element
+                                        background-color: mat-color($foreground-dark, icon)
+
+                .info
+                    margin: 16px 0
+                    padding: 0 32px
+                    font-size: 14px
+                    font-weight: 500
+                    text-align: center
+                    color: mat-color($foreground-dark, secondary-text)
+
+            &[data-index="4"]
+                .img
+                    .background
+                        flex: 1 0 100%
+                        width: 100%
+                        background-color: rgba(mat-color($foreground-light, base), .1)
+                        border-radius: 50%
+                        display: flex
+                        justify-content: center
+                        align-items: center
+
+                        &::before
+                            content: ""
+                            float: left
+                            padding-top: 100%
+
+                        mat-icon
+                            font-size: 128px
+                            width: 128px
+                            height: 128px
+                            color: mat-color($foreground-dark, icon)
+
+
+    .navigation
+        flex-shrink: 1
+        display: flex
+        justify-content: space-between
+        align-items: center
+        margin: 0
+        padding: 0 16px
+        height: 56px
+
+        .left, .right
+            color: mat-color($foreground-dark, icon)
+
+            button
+                text-transform: uppercase
+
+        .dots
+            margin: 0
+            padding: 0
+            position: absolute
+            left: 50%
+            transform: translateX(-50%)
+            display: flex
+            justify-content: space-between
+            align-items: center
+
+            .dot
+                width: 6px
+                height: 6px
+                margin: 6px
+                border-radius: 50%
+                background-color: mat-color($foreground-dark, icon)
+                opacity: .24
+                cursor: pointer
+                transition: opacity 180ms $ease-in-out-curve-function
+
+                &.active
+                    opacity: 1
+
+
+@media not all and ($mat-xsmall)
+    .intro
+        .view
+            max-height: calc(100% - 64px)
+
+            section
+                width: 576px
+                min-width: 576px
+                margin: 0
+                padding: 0 calc((100% - 576px) / 2)
+
+                &.circular
+                    .img
+                        width: 40%
+
+                &[data-index="2"]
+                    .courses
+                        padding: 0 24px
+                        width: calc(100% - 48px)
+
+        .navigation
+            padding: 0
+            width: 576px
+            margin: 0 auto
+            height: 64px

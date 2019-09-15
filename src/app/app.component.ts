@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { UpdateService } from './core/services/update.service';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,5 @@ import { UpdateService } from './core/services/update.service';
 export class AppComponent {
   theme: string = 'light-theme';
 
-  constructor(private updater: UpdateService) {}
+  constructor(private updater: UpdateService, public auth: AuthService) {}
 }

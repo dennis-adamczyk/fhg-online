@@ -30,7 +30,12 @@
     >
       <mat-icon>save</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Löschen" (click)="onDelete()">
+    <button
+      mat-icon-button
+      matTooltip="Löschen"
+      (click)="onDelete()"
+      *ngIf="auth.user.roles.guard"
+    >
       <mat-icon>delete</mat-icon>
     </button>
   </div>

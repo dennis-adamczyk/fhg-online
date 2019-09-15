@@ -26,8 +26,14 @@
         <p>Für diesen Tag ist noch kein Stundenplan vorhanden</p>
       </div>
       <div class="item" *ngFor="let course of getTimetable()">
-        <div class="icon" [class.hasHomework]="hasCourseHomework(course.id)">
-          <p>{{ course.lesson }}</p>
+        <div
+          class="icon"
+          [style.background-color]="helper.getColor(course.color)"
+          [class.hasHomework]="hasCourseHomework(course.id)"
+        >
+          <p [style.color]="helper.getContrastColor(course.color)">
+            {{ course.lesson }}
+          </p>
         </div>
         <div class="text">
           <p class="subject">{{ course.subject }}</p>
@@ -57,7 +63,7 @@
       </div>
       <div
         class="item"
-        [class.done]="homework.done[assignment.id]"
+        [class.done]="homework.done && homework.done[assignment.id]"
         [routerLink]="getHomeworkDetailsURL(assignment)"
         *ngFor="let assignment of getHomework()"
       >
@@ -68,7 +74,7 @@
         </div>
         <mat-checkbox
           (click)="$event.stopPropagation()"
-          [checked]="homework.done[assignment.id]"
+          [checked]="homework.done && homework.done[assignment.id]"
           (change)="onChangeDone($event, assignment.id)"
         ></mat-checkbox>
       </div>

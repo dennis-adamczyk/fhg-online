@@ -9,7 +9,7 @@ import {
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { SettingsService } from 'src/app/core/services/settings.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, Location } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
 import { map, take, filter } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -149,6 +149,7 @@ export class HomeworkComponent implements OnInit {
     private snackBar: MatSnackBar,
     private renderer: Renderer2,
     private elem: ElementRef,
+    private location: Location,
     private route: ActivatedRoute,
     private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string

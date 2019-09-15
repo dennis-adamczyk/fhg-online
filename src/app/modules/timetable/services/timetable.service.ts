@@ -13,6 +13,7 @@ import {
   timetableKey,
   courseNamesKey
 } from 'src/configs/constants';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ export class TimetableService {
   data: object;
 
   isLoading: boolean = true;
+  subs: Subscription[] = [];
 
   constructor(
     private db: FirestoreService,
@@ -74,6 +76,8 @@ export class TimetableService {
       multiCourses: Course[] = [];
     let singles = false,
       multis = false;
+
+    this.subs.forEach(sub => sub.unsubscribe());
 
     this.isLoading = true;
 
@@ -146,75 +150,83 @@ export class TimetableService {
   }
 
   updateTimetable() {
-    if (
-      this.auth.user.courses &&
-      JSON.stringify(
-        JSON.parse(localStorage.getItem(courseNamesKey))
-          .names.filter(course =>
-            this.helper.isClass(this.auth.user.class as string)
-              ? course.charAt(1).match(/\-/)
-              : course.charAt(2).match(/\-/)
-          )
-          .sort()
-      ) !== JSON.stringify(this.auth.user.courses.sort())
-    ) {
-      return this.downloadTimetable();
-    }
-    this.db
-      .doc$(`years/${this.helper.getYear(this.auth.user.class as string)}`)
-      .subscribe(
-        (year: {
-          classes: string[];
-          updated: { [key: string]: firebase.firestore.Timestamp };
-        }) => {
-          if (!year || !year.updated) return;
-          let localyUpdated = this.getTimetableLocalStorage().updated;
-
-          for (const courseName in year.updated) {
-            if (year.updated.hasOwnProperty(courseName)) {
-              if (
-                this.helper.isClass(this.auth.user.id) &&
-                courseName.match(`^${this.auth.user.class}-`) &&
-                !(JSON.parse(localStorage.getItem(courseNamesKey))
-                  .names as string[]).includes(courseName)
+    this.subs.forEach(sub => sub.unsubscribe());
+    this.subs.push(
+      this.auth.user$.subscribe(user => {
+        if (
+          user.courses &&
+          JSON.stringify(
+            JSON.parse(localStorage.getItem(courseNamesKey))
+              .names.filter(course =>
+                this.helper.isClass(user.class as string)
+                  ? course.charAt(1).match(/\-/)
+                  : course.charAt(2).match(/\-/)
               )
-                return this.downloadTimetable();
-            }
-          }
+              .sort()
+          ) !== JSON.stringify(user.courses.sort())
+        ) {
+          return this.downloadTimetable();
+        }
+      })
+    );
+    this.subs.push(
+      this.db
+        .doc$(`years/${this.helper.getYear(this.auth.user.class as string)}`)
+        .subscribe(
+          (year: {
+            classes: string[];
+            updated: { [key: string]: firebase.firestore.Timestamp };
+          }) => {
+            if (!year || !year.updated) return;
+            let localyUpdated = this.getTimetableLocalStorage().updated;
 
-          JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
-            courseName => {
-              if (
-                year.updated[courseName].toMillis() > localyUpdated ||
-                year.updated[courseName] == null
-              ) {
-                this.db
-                  .docWithId$(
-                    `years/${this.helper.getYear(this.auth.user
-                      .class as string)}/courses/${courseName}`
-                  )
-                  .pipe(take(1))
-                  .subscribe((course: Course) => {
-                    let newCourses = this.getTimetableLocalStorage().courses.filter(
-                      c => c.id !== courseName
-                    );
-                    if (course) newCourses.push(course);
-                    localStorage.setItem(
-                      timetableKey,
-                      JSON.stringify({
-                        updated: Date.now(),
-                        courses: newCourses,
-                        names: JSON.parse(localStorage.getItem(courseNamesKey))
-                          .names
-                      })
-                    );
-                    this.data = this.convertToTimetable(newCourses);
-                  });
+            for (const courseName in year.updated) {
+              if (year.updated.hasOwnProperty(courseName)) {
+                if (
+                  this.helper.isClass(this.auth.user.id) &&
+                  courseName.match(`^${this.auth.user.class}-`) &&
+                  !(JSON.parse(localStorage.getItem(courseNamesKey))
+                    .names as string[]).includes(courseName)
+                )
+                  return this.downloadTimetable();
               }
             }
-          );
-        }
-      );
+
+            JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
+              courseName => {
+                if (
+                  year.updated[courseName].toMillis() > localyUpdated ||
+                  year.updated[courseName] == null
+                ) {
+                  this.db
+                    .docWithId$(
+                      `years/${this.helper.getYear(this.auth.user
+                        .class as string)}/courses/${courseName}`
+                    )
+                    .pipe(take(1))
+                    .subscribe((course: Course) => {
+                      let newCourses = this.getTimetableLocalStorage().courses.filter(
+                        c => c.id !== courseName
+                      );
+                      if (course) newCourses.push(course);
+                      localStorage.setItem(
+                        timetableKey,
+                        JSON.stringify({
+                          updated: Date.now(),
+                          courses: newCourses,
+                          names: JSON.parse(
+                            localStorage.getItem(courseNamesKey)
+                          ).names
+                        })
+                      );
+                      this.data = this.convertToTimetable(newCourses);
+                    });
+                }
+              }
+            );
+          }
+        )
+    );
   }
 
   convertToTimetable(courses: Course[]): object {

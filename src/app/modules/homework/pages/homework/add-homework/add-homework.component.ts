@@ -67,7 +67,6 @@ export class AddHomeworkComponent {
 
   navigateBack() {
     if (!isPlatformBrowser(this.platformId)) return;
-    console.log(document.referrer);
     if (document.referrer.indexOf(window.location.host) !== -1)
       this.location.back();
     else this.router.navigate(['/homework'], { replaceUrl: true });
@@ -255,6 +254,9 @@ export class AddHomeworkComponent {
             this.homeworkForm.markAsPristine();
             this.homeworkFormComponent.isLoading = false;
             this.navigateBack();
+            this.snackBar.open('Neue Hausaufgabe erstellt', null, {
+              duration: 4000
+            });
           })
           .catch(error => {
             this.homeworkFormComponent.isLoading = false;
