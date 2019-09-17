@@ -8,6 +8,7 @@ import { take, tap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
 import { AcceptCancelDialog } from '../dialogs/accept-cancel/accept-cancel.component';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -92,9 +93,10 @@ export class SettingsService {
     }
 
     this.auth.user$.subscribe(user => {
+      if (!user) return;
       const serverChanged = user.settings_changed.toMillis();
-      const localChanged = this.getLocalSettings()
-        ? this.getLocalSettings()['changed']
+      const localChanged = this.getLocalSettings(user)
+        ? this.getLocalSettings(user)['changed']
         : 0;
 
       if (serverChanged > localChanged) {
@@ -134,10 +136,12 @@ export class SettingsService {
     return new Settings();
   }
 
-  private getLocalSettings(): Settings {
+  private getLocalSettings(user?: User): Settings {
     if (!localStorage.getItem(this.storageKey))
       this.db
-        .doc$<Settings>(`users/${this.auth.user.id}/singles/settings`)
+        .doc$<Settings>(
+          `users/${user ? user.id : this.auth.user.id}/singles/settings`
+        )
         .pipe(take(1))
         .subscribe(data => {
           let settings = this.strictSettings(data);

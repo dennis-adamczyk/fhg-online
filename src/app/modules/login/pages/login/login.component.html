@@ -1,7 +1,7 @@
 <div class="login">
   <div class="title">
     <p class="maintitle">Wilkommen bei <span>FHG Online</span></p>
-    <p class="subtitle">- Deinem Online Schulaner -</p>
+    <p class="subtitle">- Deinem Online Schulplaner -</p>
   </div>
   <form [formGroup]="loginForm">
     <mat-form-field hideRequiredMarker>
@@ -41,9 +41,9 @@
         getPasswordErrorMessage()
       }}</mat-error>
     </mat-form-field>
-    <a class="forgotPassword" routerLink="/login/forgotPassword"
-      >Passwort vergessen?</a
-    >
+    <div class="forgotPassword">
+      <a routerLink="/login/forgotPassword">Passwort vergessen?</a>
+    </div>
     <div id="recaptcha-container"></div>
     <button
       mat-raised-button

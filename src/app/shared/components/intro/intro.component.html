@@ -4,6 +4,8 @@
   [@fadeOut]="submitted"
   (@fadeOut.done)="hide = true"
   [style.display]="submitted && hide ? 'none' : undefined"
+  (swipeleft)="nextSection($event)"
+  (swiperight)="previousSection($event)"
 >
   <div
     class="view"

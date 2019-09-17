@@ -4,6 +4,8 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { ActionComponent } from './pages/action/action.component';
 import { NoAuthGuard } from 'src/app/core/guards/no-auth.guard';
+import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+import { AuthGuard } from 'src/app/core/guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -11,6 +13,12 @@ const routes: Routes = [
     component: LoginComponent,
     data: { title: 'Anmelden' },
     canActivate: [NoAuthGuard]
+  },
+  {
+    path: 'changePassword',
+    component: ChangePasswordComponent,
+    data: { title: 'Passwort ändern' },
+    canActivate: [AuthGuard]
   },
   {
     path: 'register',

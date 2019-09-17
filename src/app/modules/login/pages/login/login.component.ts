@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import {
-  ActivatedRoute,
-  RouterStateSnapshot,
-  NavigationExtras
-} from '@angular/router';
+import { ActivatedRoute, NavigationExtras } from '@angular/router';
 import { message } from '../../../../../configs/messages';
 import { constant } from '../../../../../configs/constants';
 import * as firebase from 'firebase/app';

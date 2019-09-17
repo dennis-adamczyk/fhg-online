@@ -17,7 +17,7 @@
       </mat-icon>
     </button>
   </div>
-  <div class="body">
+  <div class="body" (swipeleft)="addDay(1)" (swiperight)="addDay(-1)">
     <div class="timetable" routerLink="/timetable">
       <div
         class="no-timetable"

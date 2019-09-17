@@ -29,7 +29,7 @@ export const introAnimations = [
           '350ms cubic-bezier(0.4, 0.0, 0.2, 1)',
           keyframes([
             style({ transform: 'translateX(0)', offset: 0 }),
-            style({ transform: 'translateX(-100%)', offset: 0.99999999 }),
+            style({ transform: 'translateX(-100%)', offset: 0.99999999999 }),
             style({ transform: 'translateX(0)', offset: 1 })
           ])
         ),

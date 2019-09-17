@@ -191,6 +191,7 @@ export class HomeworkService {
     );
     this.subs.push(
       this.auth.user$.subscribe(user => {
+        if (!user) return;
         if (!user.homework_updated) return;
         this.checkCourseNames().then(go => {
           if (!go) return;

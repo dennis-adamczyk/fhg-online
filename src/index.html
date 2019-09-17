@@ -7,7 +7,7 @@
 
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, maximum-scale=1, user-scalable=no"
     />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link
@@ -24,9 +24,80 @@
     />
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#303F9F" />
+
+    <style type="text/css">
+      body,
+      html {
+        height: 100%;
+      }
+      .app-loading {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
+      .app-loading .spinner {
+        height: 64px;
+        width: 64px;
+        animation: rotate 2s linear infinite;
+        transform-origin: center center;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+      }
+      .app-loading .spinner .path {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35px;
+        animation: dash 1.5s ease-in-out infinite;
+        stroke-linecap: round;
+        stroke: #757575;
+      }
+      @keyframes rotate {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes dash {
+        0% {
+          stroke-dasharray: 89, 200;
+          stroke-dashoffset: -35px;
+        }
+        50% {
+          stroke-dasharray: 89, 200;
+          stroke-dashoffset: -124px;
+        }
+        50.0001% {
+          stroke-dasharray: 1, 200;
+          stroke-dashoffset: 0;
+        }
+        100% {
+          stroke-dasharray: 89, 200;
+          stroke-dashoffset: -35px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <app-root></app-root>
+    <app-root>
+      <div class="app-loading">
+        <svg class="spinner" viewBox="25 25 50 50">
+          <circle
+            class="path"
+            cx="50"
+            cy="50"
+            r="20"
+            fill="none"
+            stroke-width="2"
+            stroke-miterlimit="10"
+          />
+        </svg>
+      </div>
+    </app-root>
     <noscript>
       Bitte aktivieren Sie JavaScript, um diese Anwendung weiterhin nutzen zu
       können.

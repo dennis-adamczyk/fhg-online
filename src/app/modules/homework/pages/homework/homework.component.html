@@ -312,7 +312,7 @@
           chevron_left
         </mat-icon>
       </button>
-      <h2>
+      <h2 (click)="setWeekToThisWeek()">
         Woche {{ homework.getWeekNumber(week) }}
         {{ getOptionalYear(week) ? '– ' + getOptionalYear(week) : '' }}
       </h2>
@@ -326,7 +326,13 @@
         </mat-icon>
       </button>
     </div>
-    <div class="body">
+    <div
+      class="body"
+      (swipeleft)="
+        !isLoading && !homework.isThisWeek(week) ? onChangeWeek(1) : undefined
+      "
+      (swiperight)="!isLoading ? onChangeWeek(-1) : undefined"
+    >
       <div class="loading" *ngIf="isLoading">
         <mat-spinner diameter="32"></mat-spinner>
       </div>

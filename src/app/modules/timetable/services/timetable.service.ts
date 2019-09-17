@@ -154,7 +154,9 @@ export class TimetableService {
     this.subs.push(
       this.auth.user$.subscribe(user => {
         if (
+          user &&
           user.courses &&
+          localStorage.getItem(courseNamesKey) &&
           JSON.stringify(
             JSON.parse(localStorage.getItem(courseNamesKey))
               .names.filter(course =>

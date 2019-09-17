@@ -690,4 +690,8 @@ export class HomeworkComponent implements OnInit {
     }
     return false;
   }
+
+  setWeekToThisWeek() {
+    this.week = new Date();
+  }
 }

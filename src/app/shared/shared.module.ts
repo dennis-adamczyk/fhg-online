@@ -13,6 +13,32 @@ import {
 import { AppDateAdapter, APP_DATE_FORMATS } from './adapters/app-date-adapters';
 import { SpeedDialFabComponent } from './components/speed-dial-fab/speed-dial-fab.component';
 import { IntroComponent } from './components/intro/intro.component';
+import * as Hammer from 'hammerjs';
+import {
+  HammerGestureConfig,
+  HAMMER_GESTURE_CONFIG
+} from '@angular/platform-browser';
+
+export class MyHammerConfig extends HammerGestureConfig {
+  overrides = <any>{
+    swipe: { direction: Hammer.DIRECTION_ALL }
+  };
+
+  buildHammer(element: HTMLElement): HammerManager {
+    return new Hammer.Manager(element, {
+      touchAction: 'auto',
+      inputClass: Hammer.TouchInput,
+      recognizers: [
+        [
+          Hammer.Swipe,
+          {
+            direction: Hammer.DIRECTION_HORIZONTAL
+          }
+        ]
+      ]
+    });
+  }
+}
 
 @NgModule({
   declarations: [DocPipe, ColPipe, SpeedDialFabComponent, IntroComponent],
@@ -30,7 +56,8 @@ import { IntroComponent } from './components/intro/intro.component';
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
     { provide: DateAdapter, useClass: AppDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS }
+    { provide: MAT_DATE_FORMATS, useValue: APP_DATE_FORMATS },
+    { provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig }
   ]
 })
 export class SharedModule {}

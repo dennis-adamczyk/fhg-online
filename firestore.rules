@@ -1,0 +1,154 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isGuard() {
+      return (request.auth.token.guard && request.auth.token.guard == true) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.guard == true;
+    }
+
+    function isAdmin() {
+      return (request.auth.token.admin && request.auth.token.admin == true) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.admin == true;
+    }
+
+    function isTeacher() {
+      return (request.auth.token.teacher && request.auth.token.teacher == true) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.teacher == true;
+    }
+
+    function isStudent() {
+      return (request.auth.token.student && request.auth.token.student == true) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.student == true;
+    }
+
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    function userData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isIndex(name) {
+      return name == '--index--';
+    }
+
+    function hasInteractionSanction() {
+      return userData().sanctions.interaction && (userData().sanctions.interaction.permanent ||
+        (userData().sanctions.interaction.until is timestamp &&
+        userData().sanctions.interaction.until.toMillis() < request.time.toMillis()));
+    }
+
+    match /{document=**} {
+      allow read: if isGuard();
+    }
+
+    match /users/{userId} {
+      function isValidUser() {
+        return request.resource.data.email &&
+          request.resource.data.name is map &&
+          request.resource.data.name.first_name &&
+          request.resource.data.name.last_name && 
+          request.resource.data.roles is map &&
+          request.resource.data.roles.keys().hasOnly(['guard', 'admin', 'teacher', 'student']) &&
+          request.resource.data.status is number &&
+          request.resource.data.status >= 0
+      }
+
+      allow read: if isLoggedIn();
+      allow create: if isGuard();
+      allow update: if isGuard() || (!isIndex(userId) && isValidUser() && (isGuard() || isAdmin() || request.auth.uid == userId));
+      allow delete: if isGuard() || request.auth.uid == userId;
+
+      match /{subUser=**} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+
+    match /years/{year} {
+      allow read: if isLoggedIn();
+      allow write: if isGuard() || (!isIndex(year) && isAdmin() && userData().class == year);
+
+      match /courses/{course} {
+        function isValidCourse() {
+          return request.resource.data.class is list &&
+            request.resource.data.lessons is map &&
+            request.resource.data.multi is bool &&
+            request.resource.data.room is string &&
+            request.resource.data.short is string &&
+            request.resource.data.subject is string &&
+            request.resource.data.teacher is map;
+        }
+
+        allow read: if isGuard() || (isAdmin() && userData().class in resource.data.class) ||
+                        (isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
+                        (isLoggedIn() && userData().class in resource.data.class && resource.data.multi == false) ||
+                        (isLoggedIn() && course in userData().course && resource.data.multi == true);
+        allow write: if isValidCourse() && (isGuard() || (isAdmin() && userData().class in resource.data.class) ||
+                          (isTeacher() && resource.data.teacher.last_name == userData().name.last_name));
+
+        match /homework/{homeworkId} {
+          function isValidHomework() {
+            return request.resource.data.by is map &&
+              request.resource.data.by.id is string &&
+              exists(/databases/$(database)/documents/users/$(request.resource.data.by.id)) &&
+              request.resource.data.by.name is map &&
+              request.resource.data.by.name == get(/databases/$(database)/documents/users/$(request.resource.data.by.id)).data.name &&
+              request.resource.data.by.roles is map &&
+              request.resource.data.by.roles == get(/databases/$(database)/documents/users/$(request.resource.data.by.id)).data.roles &&
+              request.resource.data.details is string &&
+              request.resource.data.entered is map &&
+              request.resource.data.entered.date is timestamp &&
+              request.resource.data.entered.lesson is number &&
+              request.resource.data.entered.lesson > 0 &&
+              request.resource.data.title is string &&
+              request.resource.data.title.size() > 0 &&
+              request.resource.data.until is map &&
+              request.resource.data.until.date is timestamp &&
+              request.resource.data.until.lesson is number &&
+              request.resource.data.until.lesson > 0 &&
+              request.resource.data.until.date.toMillis() > request.resource.data.entered.date.toMillis();
+          }
+
+          function onlyCorrect() {
+            return request.resource.data.by == resource.data.by &&
+              request.resource.data.details == resource.data.details &&
+              request.resource.data.entered == resource.data.entered &&
+              request.resource.data.title == resource.data.title &&
+              request.resource.data.until == resource.data.until &&
+              request.resource.data.attachments == resource.data.attachments &&
+              request.resource.data.blocked == resource.data.blocked;
+          }
+
+          allow read: if isGuard() || (!hasInteractionSanction() && ((isAdmin() && userData().class in resource.data.class) ||
+                        (isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
+                        (isLoggedIn() && userData().class in resource.data.class && resource.data.multi == false) ||
+                        (isLoggedIn() && course in userData().course && resource.data.multi == true)));
+          allow create: if isValidHomework() && (
+                            isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isAdmin() && userData().class in resource.data.class) ||
+                            (!isIndex(homeworkId) && isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && userData().class in resource.data.class && resource.data.multi == false) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && course in userData().course && resource.data.multi == true)))
+                          );
+          allow update: if isValidHomework() && (
+                            isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == resource.data.by.id) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && onlyCorrect() &&
+                              ((userData().class in resource.data.class && resource.data.multi == false)
+                                || (course in userData().course && resource.data.multi == true)))))
+                          );
+          allow delete: if isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == resource.data.by.id)));
+        }
+      }
+    }
+
+    match /requests/{requestId} {
+      allow read: if isGuard() || (!isIndex(requestId) && isLoggedIn() && resource.data.by.id == request.auth.uid);
+      allow create: if isLoggedIn();
+      allow update: if isGuard() || (!isIndex(requestId) && isLoggedIn() && resource.data.by.id == request.auth.uid);
+      allow delete: if isGuard();
+    }
+
+    match /articles/{articleId} {
+      allow read;
+      allow write: if isGuard();
+    }
+  }
+} 

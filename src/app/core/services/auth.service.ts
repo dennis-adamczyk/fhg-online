@@ -104,6 +104,10 @@ export class AuthService {
       });
   }
 
+  rawLogin(email: string, password: string) {
+    return this.afAuth.auth.signInWithEmailAndPassword(email, password);
+  }
+
   async register(
     role: string,
     email: string,
@@ -158,6 +162,19 @@ export class AuthService {
         }
       });
     });
+  }
+
+  setPassword(password: string) {
+    return this.afAuth.auth.currentUser
+      .updatePassword(password)
+      .then(() => {
+        this.snackBar.open('Dein Passwort wurde geändert', null, {
+          duration: 4000
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   sendEmailVerification() {

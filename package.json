@@ -32,6 +32,7 @@
     "@angular/pwa": "^0.800.1",
     "@angular/router": "~8.0.0",
     "@angular/service-worker": "~8.0.0",
+    "@firebase/testing": "^0.13.1",
     "@nguniversal/express-engine": "^7.0.2",
     "@nguniversal/module-map-ngfactory-loader": "^7.0.2",
     "core-js": "^3.1.3",

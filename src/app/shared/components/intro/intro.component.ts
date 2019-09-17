@@ -119,12 +119,14 @@ export class IntroComponent implements OnInit {
     }, 100);
   }
 
-  previousSection() {
+  previousSection(event?: any) {
+    if (event && (event.pointerType !== 'touch' || event.distance < 20)) return;
     if (this.section == 1) return;
     this.section--;
   }
 
-  nextSection() {
+  nextSection(event?: any) {
+    if (event && (event.pointerType !== 'touch' || event.distance < 20)) return;
     if (this.section == this.maxSections) return;
     this.section++;
   }
