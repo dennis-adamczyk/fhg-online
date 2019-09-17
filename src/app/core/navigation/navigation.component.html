@@ -40,6 +40,9 @@
         <div class="large">
           <div class="logo" routerLink="/">
             <img src="assets/logo_white.svg" alt="FHG Online" />
+            <div class="badge">
+              Beta
+            </div>
           </div>
           <p>FHG Online</p>
         </div>
@@ -122,7 +125,12 @@
           <mat-icon mat-list-icon>home</mat-icon>
           <p mat-line>Start</p>
         </a>
-        <a mat-list-item routerLink="/about" routerLinkActive="active">
+        <a
+          mat-list-item
+          routerLink="/about"
+          routerLinkActive="active"
+          *ngIf="false"
+        >
           <mat-icon mat-list-icon>group</mat-icon>
           <p mat-line>Über Uns</p>
         </a>

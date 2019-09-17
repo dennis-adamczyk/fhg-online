@@ -36,10 +36,6 @@ export interface UserElement {
   styleUrls: ['./users.component.sass']
 })
 export class UsersComponent implements OnInit {
-  toolbar: Element;
-  sidenavContent: Element;
-  toolbarExtention: Element;
-  scrollListener: any;
   sub: boolean = !!this.route.children.length;
 
   displayedColumns: string[] = ['select', 'name', 'role', 'last_login'];
@@ -65,6 +61,11 @@ export class UsersComponent implements OnInit {
   ) {}
 
   /* ##### Toolbar Extention ##### */
+
+  toolbar: Element;
+  sidenavContent: Element;
+  toolbarExtention: Element;
+  scrollListener: any;
 
   ngOnInit() {
     this.router.events
