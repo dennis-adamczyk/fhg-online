@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { HttpsError } from 'firebase-functions/lib/providers/https';
 
-export const registerUser = functions.https.onCall((data, context) => {
+export const registerUser = functions.https.onCall(async (data, context) => {
   // Get data
   const role: string = data.role;
   const email: string = data.email;
@@ -85,34 +85,35 @@ export const registerUser = functions.https.onCall((data, context) => {
 
   // Async Validation
 
-  admin
+  await admin
     .firestore()
     .collection('users')
     .where('email', '==', email)
     .get()
     .then(data => {
       if (data.size) {
-        throw new HttpsError(
-          'failed-precondition',
-          'Die E-Mail ist bereits vergeben.'
+        throw new functions.https.HttpsError(
+          'already-exists',
+          'Die E-Mail ist bereits vergeben'
         );
       }
     });
 
-  admin
+  await admin
     .auth()
     .getUserByEmail(email)
     .then(userRecord => {
       if (userRecord.uid) {
         throw new HttpsError(
-          'failed-precondition',
+          'already-exists',
           'Die E-Mail ist bereits vergeben.'
         );
       }
     })
-    .catch();
+    .catch(error => {});
 
   if (
+    context.auth &&
     context.auth.uid &&
     !admin
       .auth()
@@ -121,7 +122,7 @@ export const registerUser = functions.https.onCall((data, context) => {
         return (userRecord.customClaims as { guard: boolean })!.guard == true;
       })
   )
-    admin
+    await admin
       .firestore()
       .collection('users')
       .where('index', '==', true)

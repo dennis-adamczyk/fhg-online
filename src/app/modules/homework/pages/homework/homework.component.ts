@@ -13,7 +13,7 @@ import { isPlatformBrowser, Location } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
 import { map, take, filter } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatDialog } from '@angular/material';
 import * as firebase from 'firebase/app';
 import {
   trigger,
@@ -40,6 +40,7 @@ import {
   homeworkKey,
   courseNamesKey
 } from 'src/configs/constants';
+import { SanctionDialog } from 'src/app/core/dialogs/sanction/sanction.component';
 
 @Component({
   selector: 'app-homework',
@@ -145,11 +146,10 @@ export class HomeworkComponent implements OnInit {
     private db: FirestoreService,
     private auth: AuthService,
     private router: Router,
-    private settings: SettingsService,
     private snackBar: MatSnackBar,
+    private dialog: MatDialog,
     private renderer: Renderer2,
     private elem: ElementRef,
-    private location: Location,
     private route: ActivatedRoute,
     private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string
@@ -181,6 +181,11 @@ export class HomeworkComponent implements OnInit {
     this.detailsCourseName = route.params['course'];
     this.detailsId = route.params['id'];
     this.detailsPersonal = route.url[0].path == 'p';
+
+    if (this.auth.hasSanction('interaction') && !this.detailsPersonal)
+      return this.dialog.open(SanctionDialog, {
+        data: this.auth.user.sanctions
+      });
 
     this.isLoading = true;
 
@@ -363,6 +368,8 @@ export class HomeworkComponent implements OnInit {
   /* ##### LOAD DATA ##### */
 
   loadWeeksHomework() {
+    let noShared = this.auth.hasSanction('interaction');
+
     if (
       this.week.getFullYear() == new Date().getFullYear() &&
       this.homework.getWeekNumber(this.week) >
@@ -420,60 +427,89 @@ export class HomeworkComponent implements OnInit {
           newHomework.push(homework);
         });
         this.homework.data = this.homework.convertToDateList(newHomework);
+        if (
+          !this.loadedWeeks.includes(
+            this.homework.getWeekNumber(this.week) +
+              '-' +
+              this.week.getFullYear()
+          )
+        )
+          this.loadedWeeks.push(
+            this.homework.getWeekNumber(this.week) +
+              '-' +
+              this.week.getFullYear()
+          );
+        if (
+          noShared ||
+          JSON.parse(localStorage.getItem(courseNamesKey)).names.length == 0
+        ) {
+          this.isLoading = false;
+        }
       });
 
-    this.homework.checkCourseNames().then(() => {
-      JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
-        (courseName, i) => {
-          this.db
-            .colWithIds$(
-              `years/${this.helper.getYear(this.auth.user
-                .class as string)}/courses/${courseName}/homework`,
-              ref =>
-                ref
-                  .where('entered.date', '>=', monday)
-                  .where('entered.date', '<=', sunday)
-            )
-            .pipe(take(1))
-            .subscribe((homeworkList: Homework[]) => {
-              if (
-                i ==
-                JSON.parse(localStorage.getItem(courseNamesKey)).names.length -
-                  1
-              ) {
-                this.isLoading = false;
-                this.loadedWeeks.push(
-                  this.homework.getWeekNumber(this.week) +
-                    '-' +
-                    this.week.getFullYear()
-                );
-              }
+    if (!noShared)
+      this.homework.checkCourseNames().then(() => {
+        JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
+          (courseName, i) => {
+            this.db
+              .colWithIds$(
+                `years/${this.helper.getYear(this.auth.user
+                  .class as string)}/courses/${courseName}/homework`,
+                ref =>
+                  ref
+                    .where('entered.date', '>=', monday)
+                    .where('entered.date', '<=', sunday)
+              )
+              .pipe(take(1))
+              .subscribe((homeworkList: Homework[]) => {
+                if (
+                  i ==
+                  JSON.parse(localStorage.getItem(courseNamesKey)).names
+                    .length -
+                    1
+                ) {
+                  this.isLoading = false;
+                  if (
+                    !this.loadedWeeks.includes(
+                      this.homework.getWeekNumber(this.week) +
+                        '-' +
+                        this.week.getFullYear()
+                    )
+                  )
+                    this.loadedWeeks.push(
+                      this.homework.getWeekNumber(this.week) +
+                        '-' +
+                        this.week.getFullYear()
+                    );
+                }
 
-              if (!homeworkList.length) return;
+                if (!homeworkList.length) return;
 
-              let courseDetails = JSON.parse(
-                localStorage.getItem(timetableKey)
-              ).courses.filter(c => c.id == courseName)[0] as Course;
+                let courseDetails = JSON.parse(
+                  localStorage.getItem(timetableKey)
+                ).courses.filter(c => c.id == courseName)[0] as Course;
 
-              homeworkList.forEach(homework => {
-                newHomework = newHomework.filter(
-                  h => h.id !== homework.id || h.personal
-                );
-                newHomework.push({
-                  ...homework,
-                  course: {
-                    id: courseName,
-                    subject: courseDetails.subject,
-                    short: courseDetails.short,
-                    color: courseDetails.color
-                  }
+                homeworkList.forEach(homework => {
+                  newHomework = newHomework.filter(
+                    h => h.id !== homework.id || h.personal
+                  );
+                  newHomework.push({
+                    ...homework,
+                    course: {
+                      id: courseName,
+                      subject: courseDetails.subject,
+                      short: courseDetails.short,
+                      color: courseDetails.color
+                    }
+                  });
                 });
+                this.homework.data = this.homework.convertToDateList(
+                  newHomework
+                );
               });
-              this.homework.data = this.homework.convertToDateList(newHomework);
-            });
-        }
-      );
-    });
+          }
+        );
+      });
   }
 
   /* ##### TRIGGERS ###### */

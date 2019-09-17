@@ -47,7 +47,7 @@ export class SettingsService {
     this.sync();
   }
 
-  onChange(): Observable<string[] | null> {
+  onChange(): Observable<Settings> {
     return this.changes.asObservable();
   }
 
@@ -106,7 +106,7 @@ export class SettingsService {
           .subscribe(data => {
             let settings = this.strictSettings(data);
             this.setLocalSettings(settings);
-            this.changes.next(null);
+            this.changes.next(settings);
           });
       }
     });
@@ -151,6 +151,7 @@ export class SettingsService {
   }
 
   private setLocalSettings(data: Settings, changed?: number) {
+    this.changes.next(data);
     localStorage.setItem(
       this.storageKey,
       JSON.stringify({

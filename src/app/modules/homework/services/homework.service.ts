@@ -69,12 +69,13 @@ export class HomeworkService {
       this.router.navigate(['/start']);
       return;
     }
+    let sanction = this.auth.hasSanction('interaction');
     if (
       !localStorage.getItem(homeworkKey) ||
       !localStorage.getItem(homeworkKey).length ||
       !JSON.parse(localStorage.getItem(homeworkKey)).homework
     ) {
-      this.downloadHomework();
+      this.downloadHomework(sanction);
     } else {
       this.data = this.convertToDateList(
         JSON.parse(localStorage.getItem(homeworkKey)).homework
@@ -84,12 +85,13 @@ export class HomeworkService {
         localStorage.getItem(homeworkKey)
       ).correction;
       this.isLoading = false;
-      this.updateHomework();
+      this.updateHomework(sanction);
     }
-    this.settings.onChange().subscribe(() => {
-      if (this.settings.get('homework.sort_by') !== this.sort_by) {
-        this.sort_by = this.settings.get('homework.sort_by');
-        this.max_days = parseInt(this.settings.get('homework.max_days')) | 0;
+    this.settings.onChange().subscribe(settings => {
+      if (!settings) return;
+      if (settings.homework.sort_by !== this.sort_by) {
+        this.sort_by = settings.homework.sort_by;
+        this.max_days = parseInt(settings.homework.max_days.toString()) | 0;
 
         if (
           localStorage.getItem(homeworkKey) &&
@@ -109,86 +111,92 @@ export class HomeworkService {
     });
   }
 
-  updateHomework() {
+  updateHomework(noShared?) {
     this.subs.forEach(sub => sub.unsubscribe());
-    this.subs.push(
-      this.db
-        .doc$(`years/${this.helper.getYear(this.auth.user.class as string)}`)
-        .subscribe(
-          (year: {
-            classes: string[];
-            homework_updated: { [key: string]: firebase.firestore.Timestamp };
-          }) => {
-            if (!year || !year.homework_updated) return;
-            this.checkCourseNames().then(go => {
-              if (!go) return;
-              let localyUpdated = JSON.parse(localStorage.getItem(homeworkKey))
-                ? JSON.parse(localStorage.getItem(homeworkKey)).updated
-                : 0;
-              JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
-                courseName => {
-                  if (!year.homework_updated[courseName]) return;
-                  if (
-                    year.homework_updated[courseName].toMillis() > localyUpdated
-                  ) {
-                    this.db
-                      .doc$(
-                        `years/${this.helper.getYear(this.auth.user
-                          .class as string)}/courses/${courseName}/homework/--index--`
-                      )
-                      .pipe(take(1))
-                      .subscribe((index: { homework: Homework[] }) => {
-                        let courseDetails = JSON.parse(
-                          localStorage.getItem(timetableKey)
-                        ).courses.filter(c => c.id == courseName)[0] as Course;
+    if (!noShared)
+      this.subs.push(
+        this.db
+          .doc$(`years/${this.helper.getYear(this.auth.user.class as string)}`)
+          .subscribe(
+            (year: {
+              classes: string[];
+              homework_updated: { [key: string]: firebase.firestore.Timestamp };
+            }) => {
+              if (!year || !year.homework_updated) return;
+              this.checkCourseNames().then(go => {
+                if (!go) return;
+                let localyUpdated = JSON.parse(
+                  localStorage.getItem(homeworkKey)
+                )
+                  ? JSON.parse(localStorage.getItem(homeworkKey)).updated
+                  : 0;
+                JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
+                  courseName => {
+                    if (!year.homework_updated[courseName]) return;
+                    if (
+                      year.homework_updated[courseName].toMillis() >
+                      localyUpdated
+                    ) {
+                      this.db
+                        .doc$(
+                          `years/${this.helper.getYear(this.auth.user
+                            .class as string)}/courses/${courseName}/homework/--index--`
+                        )
+                        .pipe(take(1))
+                        .subscribe((index: { homework: Homework[] }) => {
+                          let courseDetails = JSON.parse(
+                            localStorage.getItem(timetableKey)
+                          ).courses.filter(
+                            c => c.id == courseName
+                          )[0] as Course;
 
-                        let newHomework = JSON.parse(
-                          localStorage.getItem(homeworkKey)
-                        ).homework.filter(
-                          (h: Homework) =>
-                            h.course.id !== courseName || h.personal
-                        );
+                          let newHomework = JSON.parse(
+                            localStorage.getItem(homeworkKey)
+                          ).homework.filter(
+                            (h: Homework) =>
+                              h.course.id !== courseName || h.personal
+                          );
 
-                        index.homework.forEach(homework => {
-                          newHomework.push({
-                            ...homework,
-                            course: {
-                              id: courseName,
-                              subject: courseDetails.subject,
-                              short: courseDetails.short,
-                              color: courseDetails.color
-                            }
-                          });
-                          if (
-                            this.correction &&
-                            this.correction[homework.id] &&
-                            !homework.corrected.includes(
-                              this.correction[homework.id].id
-                            )
-                          )
-                            this.db.update(
-                              `users/${this.auth.user.id}/singles/homework`,
-                              {
-                                [`correction.${homework.id}`]: null
+                          index.homework.forEach(homework => {
+                            newHomework.push({
+                              ...homework,
+                              course: {
+                                id: courseName,
+                                subject: courseDetails.subject,
+                                short: courseDetails.short,
+                                color: courseDetails.color
                               }
-                            );
+                            });
+                            if (
+                              this.correction &&
+                              this.correction[homework.id] &&
+                              !homework.corrected.includes(
+                                this.correction[homework.id].id
+                              )
+                            )
+                              this.db.update(
+                                `users/${this.auth.user.id}/singles/homework`,
+                                {
+                                  [`correction.${homework.id}`]: null
+                                }
+                              );
+                          });
+                          localStorage.setItem(
+                            homeworkKey,
+                            JSON.stringify({
+                              homework: newHomework,
+                              updated: Date.now()
+                            })
+                          );
+                          this.data = this.convertToDateList(newHomework);
                         });
-                        localStorage.setItem(
-                          homeworkKey,
-                          JSON.stringify({
-                            homework: newHomework,
-                            updated: Date.now()
-                          })
-                        );
-                        this.data = this.convertToDateList(newHomework);
-                      });
+                    }
                   }
-                }
-              );
-            });
-          }
-        )
-    );
+                );
+              });
+            }
+          )
+      );
     this.subs.push(
       this.auth.user$.subscribe(user => {
         if (!user) return;
@@ -266,7 +274,7 @@ export class HomeworkService {
     );
   }
 
-  downloadHomework() {
+  downloadHomework(noShared?) {
     this.checkCourseNames().then(go => {
       if (!go) return;
       let clazz = this.auth.user.class as string;
@@ -309,38 +317,42 @@ export class HomeworkService {
         this.isLoading = false;
       }
 
-      courses.forEach((course, i) => {
-        let courseDetails = JSON.parse(
-          localStorage.getItem(timetableKey)
-        ).courses.filter(c => c.id == course)[0] as Course;
-        this.db
-          .doc$(`years/${year}/courses/${course}/homework/--index--`)
-          .pipe(take(1))
-          .subscribe((index: { homework: Homework[] }) => {
-            if (index && index.homework && index.homework.length) {
-              index.homework.forEach(homework => {
-                homeworkList.push({
-                  ...homework,
-                  course: {
-                    id: course,
-                    subject: courseDetails.subject,
-                    short: courseDetails.short,
-                    color: courseDetails.color
-                  }
+      if (!noShared)
+        courses.forEach((course, i) => {
+          let courseDetails = JSON.parse(
+            localStorage.getItem(timetableKey)
+          ).courses.filter(c => c.id == course)[0] as Course;
+          this.db
+            .doc$(`years/${year}/courses/${course}/homework/--index--`)
+            .pipe(take(1))
+            .subscribe((index: { homework: Homework[] }) => {
+              if (index && index.homework && index.homework.length) {
+                index.homework.forEach(homework => {
+                  homeworkList.push({
+                    ...homework,
+                    course: {
+                      id: course,
+                      subject: courseDetails.subject,
+                      short: courseDetails.short,
+                      color: courseDetails.color
+                    }
+                  });
                 });
-              });
-            }
-            if (i == courses.length - 1) {
-              this.data = this.convertToDateList(homeworkList);
-              localStorage.setItem(
-                homeworkKey,
-                JSON.stringify({ homework: homeworkList, updated: Date.now() })
-              );
-              this.updateHomework();
-              this.isLoading = false;
-            }
-          });
-      });
+              }
+              if (i == courses.length - 1) {
+                this.data = this.convertToDateList(homeworkList);
+                localStorage.setItem(
+                  homeworkKey,
+                  JSON.stringify({
+                    homework: homeworkList,
+                    updated: Date.now()
+                  })
+                );
+                this.updateHomework();
+                this.isLoading = false;
+              }
+            });
+        });
     });
   }
 

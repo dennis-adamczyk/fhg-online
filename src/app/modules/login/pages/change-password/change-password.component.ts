@@ -65,10 +65,13 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-      'recaptcha-container'
-    );
-    window['recaptchaVerifier'] = this.recaptchaVerifier;
+    setTimeout(() => {
+      this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+        'recaptcha-container',
+        { size: 'normal' }
+      );
+      window['recaptchaVerifier'] = this.recaptchaVerifier;
+    }, 0);
   }
 
   get email() {

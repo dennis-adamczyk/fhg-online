@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
@@ -9,9 +9,11 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { FirestoreService } from '../../../../core/services/firestore.service';
 import { take, debounceTime, map, tap } from 'rxjs/operators';
 import { message } from '../../../../../configs/messages';
-import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
 import { constant } from 'src/configs/constants';
-import { MatSnackBar } from '@angular/material';
+import { MatVerticalStepper, MatSnackBar } from '@angular/material';
+import { of } from 'rxjs';
+import { CdkStep } from '@angular/cdk/stepper';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -27,11 +29,14 @@ export class RegisterComponent implements OnInit {
   registered: boolean = false;
   constant = constant;
 
+  @ViewChild('emailStep', { static: false }) emailStep: CdkStep;
+
   constructor(
     private snackBar: MatSnackBar,
     public auth: AuthService,
     private fb: FormBuilder,
-    private db: FirestoreService
+    private db: FirestoreService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -53,8 +58,7 @@ export class RegisterComponent implements OnInit {
                 Validators.required,
                 Validators.minLength(3),
                 Validators.pattern(/^([a-zA-Z-]+\.[a-zA-Z-]+)+$/)
-              ],
-              [RegisterValidator.email(this.db)]
+              ]
             ]
           }),
           this.fb.group({
@@ -214,6 +218,8 @@ export class RegisterComponent implements OnInit {
   }
 
   onStepChange(event: any) {
+    this.emailStep.hasError = false;
+    this.emailStep._showError = false;
     if (event.selectedIndex == 2) {
       if (this.first_name.untouched && this.last_name.untouched) {
         let splitedName = String(this.email.value).split(/\.(.+)/);
@@ -255,6 +261,22 @@ export class RegisterComponent implements OnInit {
         .catch(error => {
           this.loading = false;
           this.registered = false;
+          if (error.code == 'already-exists') {
+            this.emailStep.errorMessage = 'E-Mail wird bereits verwendet';
+            this.emailStep.hasError = true;
+            this.emailStep._showError = true;
+            this.emailStep.select();
+            this.email.setErrors({ alreadyExists: true });
+            this.snackBar
+              .open(
+                'Benutze eine E-Mail, die noch nicht verwendet wird',
+                'Schon registriert?',
+                { duration: 4000 }
+              )
+              .onAction()
+              .subscribe(() => this.router.navigate(['/login']));
+            return;
+          }
           this.snackBar.open(
             `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
             null,
@@ -267,42 +289,26 @@ export class RegisterComponent implements OnInit {
 }
 
 export class RegisterValidator {
-  static email(db: FirestoreService) {
-    return (control: AbstractControl) => {
-      const email = String(control.value).toLowerCase() + constant.emailSuffix;
-      return db
-        .col$('users', ref => ref.where('email', '==', email))
-        .pipe(
-          debounceTime(500),
-          take(1),
-          map(arr => (arr.length ? { alreadyExists: true } : null))
-        );
-    };
-  }
-
   static teachersEmail(db: FirestoreService) {
     return (control: AbstractControl) => {
       if (control.get([0]).get('role').value != 'teacher') return of(null);
       const email = String(control.get([1]).get('email').value).toLowerCase();
-      return db
-        .col$('users', ref =>
-          ref
-            .where('index', '==', true)
-            .where('teachers', 'array-contains', email)
-        )
-        .pipe(
-          debounceTime(500),
-          take(1),
-          map(arr => {
+      return db.doc$('users/--index--').pipe(
+        debounceTime(500),
+        take(1),
+        map((index: object) => {
+          if ((index['teachers'] as string[]).includes(email)) {
+            let arr = index['teachers'] as string[];
             if (!arr.length && control.get([1]).get('email').valid) {
               control
                 .get([1])
                 .get('email')
                 .setErrors({ invalidTeacher: true });
             }
-            return null;
-          })
-        );
+          }
+          return null;
+        })
+      );
     };
   }
 

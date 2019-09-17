@@ -102,9 +102,9 @@ export class ClassComponent implements OnInit {
       if (!params.class) return this.location.back();
       this.class = params.class;
 
-      if (params.class.charAt(0).match(/\d/)) {
+      if (this.helper.isClass(params.class)) {
         this.db
-          .doc$(`years/${this.helper.getYear()}`)
+          .doc$(`years/${this.helper.getYear(this.class)}`)
           .pipe(take(1))
           .subscribe((result: { classes: string[] }) => {
             if (!result || !result.classes.includes(this.class)) {

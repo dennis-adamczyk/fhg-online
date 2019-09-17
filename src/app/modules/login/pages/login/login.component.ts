@@ -40,10 +40,16 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required]],
       secure: [true, [Validators.requiredTrue]]
     });
-    this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-      'recaptcha-container'
-    );
-    window['recaptchaVerifier'] = this.recaptchaVerifier;
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+        'recaptcha-container',
+        { size: 'normal' }
+      );
+      window['recaptchaVerifier'] = this.recaptchaVerifier;
+    }, 0);
   }
 
   get email() {

@@ -8,6 +8,7 @@
       linear="true"
       class="stepper"
       (selectionChange)="onStepChange($event)"
+      [selectedIndex]="stepperIndex ? stepperIndex : undefined"
       #stepper
     >
       <mat-step
@@ -46,6 +47,7 @@
         formGroupName="1"
         [stepControl]="formArray?.get([1])"
         [editable]="!loading"
+        #emailStep
       >
         <ng-template matStepLabel>Deine IServ-E-Mail eingeben</ng-template>
         <div class="content email">

@@ -2,19 +2,23 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isGuard() {
-      return (request.auth.token.guard && request.auth.token.guard == true) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.guard == true;
+      return (request.auth.token.guard && request.auth.token.guard == true) ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.guard == true;
     }
 
     function isAdmin() {
-      return (request.auth.token.admin && request.auth.token.admin == true) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.admin == true;
+      return (request.auth.token.admin && request.auth.token.admin == true) ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.admin == true;
     }
 
     function isTeacher() {
-      return (request.auth.token.teacher && request.auth.token.teacher == true) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.teacher == true;
+      return (request.auth.token.teacher && request.auth.token.teacher == true) ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.teacher == true;
     }
 
     function isStudent() {
-      return (request.auth.token.student && request.auth.token.student == true) || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.student == true;
+      return (request.auth.token.student && request.auth.token.student == true) ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.student == true;
     }
 
     function isLoggedIn() {
@@ -27,12 +31,6 @@ service cloud.firestore {
 
     function isIndex(name) {
       return name == '--index--';
-    }
-
-    function hasInteractionSanction() {
-      return userData().sanctions.interaction && (userData().sanctions.interaction.permanent ||
-        (userData().sanctions.interaction.until is timestamp &&
-        userData().sanctions.interaction.until.toMillis() < request.time.toMillis()));
     }
 
     match /{document=**} {
@@ -51,7 +49,7 @@ service cloud.firestore {
           request.resource.data.status >= 0
       }
 
-      allow read: if isLoggedIn();
+      allow read: if isLoggedIn() || isIndex(userId);
       allow create: if isGuard();
       allow update: if isGuard() || (!isIndex(userId) && isValidUser() && (isGuard() || isAdmin() || request.auth.uid == userId));
       allow delete: if isGuard() || request.auth.uid == userId;
@@ -62,7 +60,7 @@ service cloud.firestore {
     }
 
     match /years/{year} {
-      allow read: if isLoggedIn();
+      allow read: if isLoggedIn() || isIndex(year);
       allow write: if isGuard() || (!isIndex(year) && isAdmin() && userData().class == year);
 
       match /courses/{course} {
@@ -78,8 +76,8 @@ service cloud.firestore {
 
         allow read: if isGuard() || (isAdmin() && userData().class in resource.data.class) ||
                         (isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
-                        (isLoggedIn() && userData().class in resource.data.class && resource.data.multi == false) ||
-                        (isLoggedIn() && course in userData().course && resource.data.multi == true);
+                        (isLoggedIn() && userData().class in resource.data.class) ||
+                        (isLoggedIn() && course in userData().course);
         allow write: if isValidCourse() && (isGuard() || (isAdmin() && userData().class in resource.data.class) ||
                           (isTeacher() && resource.data.teacher.last_name == userData().name.last_name));
 
@@ -106,6 +104,17 @@ service cloud.firestore {
               request.resource.data.until.date.toMillis() > request.resource.data.entered.date.toMillis();
           }
 
+          function hasInteractionSanction() {
+            return "sanctions" in userData() && "interaction" in userData().sanctions &&
+              userData().sanctions.interaction is map && userData().sanctions.interaction.keys().size() > 0 &&
+              (userData().sanctions.interaction.permanent == true ||
+                (userData().sanctions.interaction.until is timestamp && math.abs(userData().sanctions.interaction.until - request.time.toMillis()) < 0));
+          }
+
+          function courseData() {
+            return get(/databases/$(database)/documents/years/$(year)/courses/$(course)).data;
+          }
+
           function onlyCorrect() {
             return request.resource.data.by == resource.data.by &&
               request.resource.data.details == resource.data.details &&
@@ -116,25 +125,25 @@ service cloud.firestore {
               request.resource.data.blocked == resource.data.blocked;
           }
 
-          allow read: if isGuard() || (!hasInteractionSanction() && ((isAdmin() && userData().class in resource.data.class) ||
-                        (isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
-                        (isLoggedIn() && userData().class in resource.data.class && resource.data.multi == false) ||
-                        (isLoggedIn() && course in userData().course && resource.data.multi == true)));
+          allow read: if isGuard() || (!hasInteractionSanction() && ((isAdmin() && userData().class in courseData().class) ||
+                        (isTeacher() && courseData().teacher.last_name == userData().name.last_name) ||
+                        (isLoggedIn() && userData().class in courseData().class) ||
+                        (isLoggedIn() && course in userData().course)));
           allow create: if isValidHomework() && (
-                            isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isAdmin() && userData().class in resource.data.class) ||
-                            (!isIndex(homeworkId) && isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
-                            (!isIndex(homeworkId) && isLoggedIn() && userData().class in resource.data.class && resource.data.multi == false) ||
-                            (!isIndex(homeworkId) && isLoggedIn() && course in userData().course && resource.data.multi == true)))
+                            isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isAdmin() && userData().class in courseData().class) ||
+                            (!isIndex(homeworkId) && isTeacher() && courseData().teacher.last_name == userData().name.last_name) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && userData().class in courseData().class && courseData().multi == false) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && course in userData().course && courseData().multi == true)))
                           );
           allow update: if isValidHomework() && (
-                            isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
-                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == resource.data.by.id) ||
+                            isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isTeacher() && courseData().teacher.last_name == userData().name.last_name) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == courseData().by.id) ||
                             (!isIndex(homeworkId) && isLoggedIn() && onlyCorrect() &&
-                              ((userData().class in resource.data.class && resource.data.multi == false)
-                                || (course in userData().course && resource.data.multi == true)))))
+                              ((userData().class in courseData().class && courseData().multi == false)
+                                || (course in userData().course && courseData().multi == true)))))
                           );
-          allow delete: if isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
-                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == resource.data.by.id)));
+          allow delete: if isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isTeacher() && courseData().teacher.last_name == userData().name.last_name) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == courseData().by.id)));
         }
       }
     }

@@ -1,5 +1,5 @@
 <div [class]="theme">
-  <app-intro *ngIf="auth.user && auth.user.status !== 2"></app-intro>
+  <app-intro *ngIf="auth.user && auth.user.status == 1"></app-intro>
   <app-navigation>
     <router-outlet></router-outlet>
   </app-navigation>

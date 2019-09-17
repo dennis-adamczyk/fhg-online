@@ -106,6 +106,8 @@ export class HomeComponent implements OnInit {
     )
       return;
 
+    let noShared = this.auth.hasSanction('interaction');
+
     // if (!this.loadedDays.includes(this.homework.getKeyDateFormat(current)))
     //   this.homeworkLoading = true;
 
@@ -150,68 +152,62 @@ export class HomeComponent implements OnInit {
         this.homework.data = this.homework.convertToDateList(newHomework);
       });
 
-    this.homework.checkCourseNames().then(() => {
-      JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
-        (courseName, i) => {
-          this.db
-            .colWithIds$(
-              `years/${this.helper.getYear(this.auth.user
-                .class as string)}/courses/${courseName}/homework`,
-              ref =>
-                ref
-                  .where('until.date', '>=', min)
-                  .where('until.date', '<=', max)
-            )
-            .pipe(take(1))
-            .subscribe((homeworkList: Homework[]) => {
-              if (
-                i ==
-                JSON.parse(localStorage.getItem(courseNamesKey)).names.length -
-                  1
-              ) {
-                // this.homeworkLoading = false;
-                // this.loadedDays.push(this.homework.getKeyDateFormat(this.day));
-              }
+    if (!noShared)
+      this.homework.checkCourseNames().then(() => {
+        JSON.parse(localStorage.getItem(courseNamesKey)).names.forEach(
+          (courseName, i) => {
+            this.db
+              .colWithIds$(
+                `years/${this.helper.getYear(this.auth.user
+                  .class as string)}/courses/${courseName}/homework`,
+                ref =>
+                  ref
+                    .where('until.date', '>=', min)
+                    .where('until.date', '<=', max)
+              )
+              .pipe(take(1))
+              .subscribe((homeworkList: Homework[]) => {
+                if (!homeworkList.length) return;
 
-              if (!homeworkList.length) return;
+                let courseDetails = JSON.parse(
+                  localStorage.getItem(timetableKey)
+                ).courses.filter(c => c.id == courseName)[0] as Course;
 
-              let courseDetails = JSON.parse(
-                localStorage.getItem(timetableKey)
-              ).courses.filter(c => c.id == courseName)[0] as Course;
-
-              homeworkList.forEach(homework => {
-                newHomework = newHomework.filter(
-                  h => h.id !== homework.id || h.personal
-                );
-                newHomework.push({
-                  ...homework,
-                  course: {
-                    id: courseName,
-                    subject: courseDetails.subject,
-                    short: courseDetails.short,
-                    color: courseDetails.color
-                  }
-                });
-                if (
-                  this.homework.correction &&
-                  this.homework.correction[homework.id] &&
-                  homework.corrections &&
-                  !homework.corrections[
-                    this.homework.correction[homework.id].id
-                  ]
-                )
-                  this.db.update(
-                    `users/${this.auth.user.id}/singles/homework`,
-                    {
-                      [`correction.${homework.id}`]: null
-                    }
+                homeworkList.forEach(homework => {
+                  newHomework = newHomework.filter(
+                    h => h.id !== homework.id || h.personal
                   );
+                  newHomework.push({
+                    ...homework,
+                    course: {
+                      id: courseName,
+                      subject: courseDetails.subject,
+                      short: courseDetails.short,
+                      color: courseDetails.color
+                    }
+                  });
+                  if (
+                    this.homework.correction &&
+                    this.homework.correction[homework.id] &&
+                    homework.corrections &&
+                    !homework.corrections[
+                      this.homework.correction[homework.id].id
+                    ]
+                  )
+                    this.db.update(
+                      `users/${this.auth.user.id}/singles/homework`,
+                      {
+                        [`correction.${homework.id}`]: null
+                      }
+                    );
+                });
+                this.homework.data = this.homework.convertToDateList(
+                  newHomework
+                );
               });
-              this.homework.data = this.homework.convertToDateList(newHomework);
-            });
-        }
-      );
-    });
+          }
+        );
+      });
   }
 
   /* ##### TRIGGERS ##### */

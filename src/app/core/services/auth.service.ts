@@ -54,7 +54,7 @@ export class AuthService {
       : null;
     this.user$ = this.afAuth.authState.pipe(
       switchMap(user => {
-        if (user) {
+        if (user && user.uid) {
           return this.db.docWithId$<User>(`users/${user.uid}`);
         } else {
           return of(null);
@@ -137,11 +137,6 @@ export class AuthService {
           });
       })
       .catch(error => {
-        this.snackBar.open(
-          'Fehler aufgetreten. Bitte versuche es später erneut.',
-          null,
-          { duration: 4000 }
-        );
         throw error;
       });
   }
