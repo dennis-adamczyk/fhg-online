@@ -6,6 +6,9 @@ import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { Course } from 'src/app/modules/timetable/models/timetable.model';
 import { SettingsService } from 'src/app/core/services/settings.service';
 import { introAnimations } from './intro.animations';
+import { UpdateService } from 'src/app/core/services/update.service';
+import { MatSnackBar } from '@angular/material';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-intro',
@@ -44,7 +47,10 @@ export class IntroComponent implements OnInit {
     public auth: AuthService,
     public helper: HelperService,
     private settings: SettingsService,
-    private db: FirestoreService
+    private db: FirestoreService,
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private update: UpdateService
   ) {}
 
   ngOnInit() {
@@ -153,5 +159,26 @@ export class IntroComponent implements OnInit {
     if (this.selectedCourses[index] == id)
       return delete this.selectedCourses[index];
     this.selectedCourses[index] = id;
+  }
+
+  canInstall(): boolean {
+    return !!this.update.deferredPromt;
+  }
+
+  installWebApp() {
+    this.update.deferredPromt.prompt();
+    this.update.deferredPromt.userChoice.then(choiceResult => {
+      if (choiceResult.outcome === 'accepted')
+        this.snackBar.open('WebApp erfolgreich installiert', null, {
+          duration: 4000
+        });
+      else
+        this.snackBar
+          .open('Installation der App blockiert', 'Einstellungen', {
+            duration: 4000
+          })
+          .onAction()
+          .subscribe(() => this.router.navigate(['/settings']));
+    });
   }
 }

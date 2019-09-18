@@ -15,6 +15,7 @@ import { MatSelect, MatDialog, MatSnackBar } from '@angular/material';
 import { take, filter } from 'rxjs/operators';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { isPlatformBrowser } from '@angular/common';
+import { UpdateService } from 'src/app/core/services/update.service';
 
 @Component({
   selector: 'app-settings',
@@ -38,6 +39,7 @@ export class SettingsComponent implements OnInit {
     public settings: SettingsService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private update: UpdateService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -197,5 +199,26 @@ export class SettingsComponent implements OnInit {
           });
         }
       });
+  }
+
+  canInstall(): boolean {
+    return !!this.update.deferredPromt;
+  }
+
+  installWebApp() {
+    this.update.deferredPromt.prompt();
+    this.update.deferredPromt.userChoice.then(choiceResult => {
+      if (choiceResult.outcome === 'accepted')
+        this.snackBar.open('WebApp erfolgreich installiert', null, {
+          duration: 4000
+        });
+      else
+        this.snackBar
+          .open('Installation der App blockiert', 'Wiederholen', {
+            duration: 4000
+          })
+          .onAction()
+          .subscribe(() => this.installWebApp());
+    });
   }
 }

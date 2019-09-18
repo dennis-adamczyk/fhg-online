@@ -1,12 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { MatSnackBar } from '@angular/material';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UpdateService {
-  constructor(updates: SwUpdate, snackBar: MatSnackBar) {
+  deferredPromt;
+
+  constructor(
+    updates: SwUpdate,
+    snackBar: MatSnackBar,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
     updates.available.subscribe(event => {
       snackBar
         .open('Ein Update ist verfügbar.', 'Installieren', {
@@ -18,5 +25,11 @@ export class UpdateService {
           updates.activateUpdate().then(() => document.location.reload());
         });
     });
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('beforeinstallprompt', e => {
+        this.deferredPromt = e;
+        console.log(e);
+      });
+    }
   }
 }

@@ -10,6 +10,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { MatSnackBar, MatDialog } from '@angular/material';
 import * as firebase from 'firebase/app';
+const perf = firebase.performance();
 import { SanctionDialog } from '../dialogs/sanction/sanction.component';
 import { AcceptCancelDialog } from '../dialogs/accept-cancel/accept-cancel.component';
 

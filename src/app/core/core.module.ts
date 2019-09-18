@@ -1,6 +1,7 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 
 import { AngularFireModule } from '@angular/fire';
+import { AngularFirePerformanceModule } from '@angular/fire/performance';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import {
@@ -8,6 +9,7 @@ import {
   FUNCTIONS_ORIGIN
 } from '@angular/fire/functions';
 import { AngularFireStorageModule } from '@angular/fire/storage';
+import * as firebase from 'firebase/app';
 
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { RouterModule } from '@angular/router';
@@ -54,6 +56,7 @@ if (
     AngularFirestoreModule,
     AngularFireFunctionsModule,
     AngularFireStorageModule,
+    AngularFirePerformanceModule,
     RouterModule,
     LayoutModule,
     SharedModule

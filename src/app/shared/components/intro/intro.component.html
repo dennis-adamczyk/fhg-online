@@ -178,7 +178,14 @@
       >
         <mat-icon>chevron_right</mat-icon>
       </button>
-      <button mat-button (click)="onSubmit()" *ngIf="section == maxSections">
+      <button mat-button (click)="installWebApp()" *ngIf="canInstall()">
+        App installieren
+      </button>
+      <button
+        mat-button
+        (click)="onSubmit()"
+        *ngIf="section == maxSections && !canInstall()"
+      >
         Fertig
       </button>
     </div>

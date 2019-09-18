@@ -204,7 +204,8 @@ export class HomeworkService {
         this.checkCourseNames().then(go => {
           if (!go) return;
           let localyUpdated = JSON.parse(localStorage.getItem(homeworkKey))
-            .updated;
+            ? JSON.parse(localStorage.getItem(homeworkKey)).updated
+            : 0;
           if (user.homework_updated.toMillis() > localyUpdated) {
             this.db
               .doc$(`users/${user.id}/personalHomework/--index--`)
