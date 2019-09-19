@@ -78,8 +78,10 @@ service cloud.firestore {
                         (isTeacher() && resource.data.teacher.last_name == userData().name.last_name) ||
                         (isLoggedIn() && userData().class in resource.data.class) ||
                         (isLoggedIn() && course in userData().course);
-        allow write: if isValidCourse() && (isGuard() || (isAdmin() && userData().class in resource.data.class) ||
+        allow create, update: if isValidCourse() && (isGuard() || (isAdmin() && userData().class in resource.data.class) ||
                           (isTeacher() && resource.data.teacher.last_name == userData().name.last_name));
+        allow delete: if isGuard() || (isAdmin() && userData().class in resource.data.class) ||
+                          (isTeacher() && resource.data.teacher.last_name == userData().name.last_name);
 
         match /homework/{homeworkId} {
           function isValidHomework() {

@@ -28,7 +28,6 @@ export class UpdateService {
     if (isPlatformBrowser(this.platformId)) {
       window.addEventListener('beforeinstallprompt', e => {
         this.deferredPromt = e;
-        console.log(e);
       });
     }
   }

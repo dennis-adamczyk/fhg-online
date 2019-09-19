@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UpdateService } from './core/services/update.service';
 import { AuthService } from './core/services/auth.service';
+import { AnalyticsService } from './core/services/analytics.service';
 
 @Component({
   selector: 'app-root',
@@ -10,5 +11,13 @@ import { AuthService } from './core/services/auth.service';
 export class AppComponent {
   theme: string = 'light-theme';
 
-  constructor(private updater: UpdateService, public auth: AuthService) {}
+  constructor(
+    private updater: UpdateService,
+    public auth: AuthService,
+    private analytics: AnalyticsService
+  ) {}
+
+  ngOnInit() {
+    this.analytics.init();
+  }
 }

@@ -142,7 +142,8 @@ export class IntroComponent implements OnInit {
   }
 
   getCourseNumber(id: string) {
-    return id.match(/([\d]+)$/)[0];
+    if (id.match(/([\d]+)$/)) return id.match(/([\d]+)$/)[0];
+    return '';
   }
 
   indexOf(item: any, array: any[]) {
@@ -179,6 +180,7 @@ export class IntroComponent implements OnInit {
           })
           .onAction()
           .subscribe(() => this.router.navigate(['/settings']));
+      this.onSubmit();
     });
   }
 }

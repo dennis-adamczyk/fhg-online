@@ -10,7 +10,6 @@ import { isPlatformBrowser } from '@angular/common';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import { MatSnackBar, MatDialog } from '@angular/material';
 import * as firebase from 'firebase/app';
-const perf = firebase.performance();
 import { SanctionDialog } from '../dialogs/sanction/sanction.component';
 import { AcceptCancelDialog } from '../dialogs/accept-cancel/accept-cancel.component';
 
@@ -69,6 +68,19 @@ export class AuthService {
         return;
       }
 
+      if (this.afAuth.auth.currentUser.emailVerified && user.status == 0) {
+        this.db
+          .update(`users/${user.id}`, { status: 1 })
+          .catch(error =>
+            this.snackBar.open(
+              'Beim Verifizieren deines Kontos ist ein Fehler in der Datenbank aufgetreten.',
+              null,
+              { duration: 4000 }
+            )
+          );
+        user.status = 1;
+      }
+
       if (
         this.user &&
         this.user.class !== user.class &&
@@ -100,8 +112,17 @@ export class AuthService {
       .signInWithEmailAndPassword(email, password)
       .then(credentials => {
         // TODO: Send verification email if not verified
-        this.router.navigate([url || '/'], navExtras || {});
-        return credentials;
+        if (credentials.user.emailVerified) {
+          this.router.navigate([url || '/'], navExtras || {});
+          return credentials;
+        } else if (credentials.user) {
+          this.snackBar.open(
+            'Du musst deine E-Mail erst verifizieren, bevor du dich anmeldest.',
+            null,
+            { duration: 4000 }
+          );
+          this.logout();
+        }
       });
   }
 

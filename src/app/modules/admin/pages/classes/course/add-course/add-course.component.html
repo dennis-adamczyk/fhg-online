@@ -23,7 +23,7 @@
             matInput
             formControlName="short"
             trim="blur"
-            oninput="this.value = this.value.toUpperCase()"
+            (input)="$event.target.value = upperCase($event.target.value)"
             (blur)="onShortBlur()"
           />
           <mat-error *ngIf="short.invalid">{{
@@ -60,7 +60,7 @@
             matInput
             formControlName="short"
             trim="blur"
-            oninput="this.value = this.value.toUpperCase()"
+            (input)="$event.target.value = upperCase($event.target.value)"
           />
           <mat-error *ngIf="teacher_short.invalid">{{
             getTeacherShortErrorMessage()

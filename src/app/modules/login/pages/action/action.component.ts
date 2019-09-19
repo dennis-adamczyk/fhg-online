@@ -335,32 +335,9 @@ export class ActionComponent implements OnInit {
         auth
           .applyActionCode(actionCode)
           .then(() => {
-            this.db
-              .colWithIds$<User>('users', ref =>
-                ref.where('email', '==', resp.data.email)
-              )
-              .pipe(
-                take(1),
-                tap(data => {
-                  if (data.length == 0) {
-                    return ($this.error =
-                      'Das Konto, das du verifizieren möchtest, wurde gelöscht. Bitte registriere dich erneut.');
-                  }
-
-                  this.db
-                    .update(`users/${data[0].id}`, { status: 1 })
-                    .then(() => {
-                      if (continueUrl) this.continueUrl = continueUrl;
-                      this.loading = false;
-                      this.submitted = true;
-                    })
-                    .catch(error => {
-                      $this.error =
-                        'Beim Verifizieren deines Kontos ist ein Fehler in der Datenbank aufgetreten.';
-                    });
-                })
-              )
-              .subscribe();
+            if (continueUrl) this.continueUrl = continueUrl;
+            this.loading = false;
+            this.submitted = true;
           })
           .catch(error => {
             $this.error =

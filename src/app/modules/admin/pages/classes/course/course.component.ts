@@ -99,7 +99,7 @@ export class CourseComponent implements OnInit {
         [
           Validators.required,
           Validators.pattern(/^[^\s]+$/),
-          Validators.maxLength(5)
+          Validators.maxLength(8)
         ]
       ],
       room: ['', [Validators.required, Validators.maxLength(5)]],
@@ -478,5 +478,15 @@ export class CourseComponent implements OnInit {
     if (this.class.hasError('required')) {
       return message.errors.admin.course.color.required;
     }
+  }
+
+  upperCase(str: string) {
+    let original = str.toLocaleLowerCase();
+    let uppercased = str.toUpperCase();
+    for (var i = 0; i < original.length; i++) {
+      if (original.charAt(i) == 'ß')
+        uppercased = uppercased.substr(0, i) + 'ß' + uppercased.substr(i + 2);
+    }
+    return uppercased;
   }
 }

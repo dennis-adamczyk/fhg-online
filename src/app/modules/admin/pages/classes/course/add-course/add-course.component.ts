@@ -88,7 +88,7 @@ export class AddCourseComponent implements OnInit {
         [
           Validators.required,
           Validators.pattern(/^[^\s]+$/),
-          Validators.maxLength(5)
+          Validators.maxLength(8)
         ]
       ],
       room: ['', [Validators.required, Validators.maxLength(5)]],
@@ -283,15 +283,16 @@ export class AddCourseComponent implements OnInit {
         )
         .pipe(take(1))
         .subscribe((result: object[]) => {
-          var max = 0;
-          result.forEach(val => {
-            if (val['id'].slice(-1).match(/\d/)) {
-              if (parseInt(val['id'].slice(-1)) > max)
-                max = parseInt(val['id'].slice(-1));
-            }
-          });
+          //TODO: Multi course numbers
+          // var max = 0;
+          // result.forEach(val => {
+          //   if (val['id'].slice(-1).match(/\d/)) {
+          //     if (parseInt(val['id'].slice(-1)) > max)
+          //       max = parseInt(val['id'].slice(-1));
+          //   }
+          // });
 
-          name += max + 1;
+          // name += max + 1;
           this.db
             .set(`years/${year}/courses/${name}`, val)
             .then(() => {
@@ -519,5 +520,15 @@ export class AddCourseComponent implements OnInit {
     if (this.class.hasError('required')) {
       return message.errors.admin.course.color.required;
     }
+  }
+
+  upperCase(str: string) {
+    let original = str.toLocaleLowerCase();
+    let uppercased = str.toUpperCase();
+    for (var i = 0; i < original.length; i++) {
+      if (original.charAt(i) == 'ß')
+        uppercased = uppercased.substr(0, i) + 'ß' + uppercased.substr(i + 2);
+    }
+    return uppercased;
   }
 }

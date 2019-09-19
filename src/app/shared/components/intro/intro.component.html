@@ -84,7 +84,7 @@
               <div class="text">
                 <p class="subject">{{ course.subject }}</p>
                 <p class="short">
-                  {{ course.short + getCourseNumber(course.id) }}
+                  {{ course.short }}
                 </p>
                 <p class="room">
                   {{
@@ -178,7 +178,11 @@
       >
         <mat-icon>chevron_right</mat-icon>
       </button>
-      <button mat-button (click)="installWebApp()" *ngIf="canInstall()">
+      <button
+        mat-button
+        (click)="installWebApp()"
+        *ngIf="section == maxSections && canInstall()"
+      >
         App installieren
       </button>
       <button

@@ -154,7 +154,6 @@ export const onChangeHomework = functions.firestore
                 corrected: getCorrected(),
                 blocked: blocked
               });
-            console.log(index);
             return admin
               .firestore()
               .doc(indexSnap.ref.path)

@@ -353,7 +353,6 @@ export class EditHomeworkComponent {
                 [`correction.${this.loadedData.id}`]: corrData
               })
               .then(() => {
-                console.log(corrData);
                 this.snackBar.open(
                   'Bearbeitungsvorschlag zur Hausaufgabe hinzugefügt',
                   null,

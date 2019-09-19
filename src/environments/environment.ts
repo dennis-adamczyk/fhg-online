@@ -8,5 +8,6 @@ export const environment = {
     storageBucket: 'fhg-online.appspot.com',
     messagingSenderId: '482394872244',
     appId: '1:482394872244:web:bd2e9c0b8279ea12'
-  }
+  },
+  googleAnalyticsKey: 'UA-148221978-1'
 };

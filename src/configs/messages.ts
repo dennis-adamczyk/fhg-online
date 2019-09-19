@@ -80,7 +80,7 @@ export const message = {
         short: {
           required: 'Kürzel benötigt',
           pattern: 'Kürzel beinhaltet Leerzeichen',
-          maxlength: 'Maximal 5 Zeichen'
+          maxlength: 'Maximal 8 Zeichen'
         },
         room: {
           required: 'Raum benötigt',
