@@ -24,7 +24,7 @@ export class NoAuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | boolean {
-    if (isPlatformBrowser(this.platformId)) {
+    if (typeof window !== 'undefined') {
       return this.auth.user$.pipe(
         take(1),
         map(user => !user),

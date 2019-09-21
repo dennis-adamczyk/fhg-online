@@ -28,7 +28,7 @@ export class IsAdminOrGuardGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | boolean {
-    if (isPlatformBrowser(this.platformId)) {
+    if (typeof window !== 'undefined') {
       return this.auth.user$.pipe(
         take(1),
         map(user => user && (user.roles.admin || user.roles.guard)),

@@ -160,7 +160,7 @@ export class TimetableService {
           JSON.stringify(
             JSON.parse(localStorage.getItem(courseNamesKey))
               .names.filter(course =>
-                this.helper.isClass(user.class as string)
+                this.helper.isClass(user.class)
                   ? course.charAt(1).match(/\-/)
                   : course.charAt(2).match(/\-/)
               )
@@ -183,14 +183,18 @@ export class TimetableService {
             let localyUpdated = this.getTimetableLocalStorage().updated;
 
             for (const courseName in year.updated) {
-              if (year.updated.hasOwnProperty(courseName)) {
+              if (
+                year.updated.hasOwnProperty(courseName) &&
+                year.updated[courseName]
+              ) {
                 if (
                   this.helper.isClass(this.auth.user.id) &&
                   courseName.match(`^${this.auth.user.class}-`) &&
                   !(JSON.parse(localStorage.getItem(courseNamesKey))
                     .names as string[]).includes(courseName)
-                )
+                ) {
                   return this.downloadTimetable();
+                }
               }
             }
 

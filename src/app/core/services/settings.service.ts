@@ -161,7 +161,7 @@ export class SettingsService {
   }
 
   private get isNotLoggedIn(): boolean {
-    return !this.auth.user;
+    return !this.auth.user || this.auth.user.status <= 0;
   }
 
   private get isWrongPlattform(): boolean {
