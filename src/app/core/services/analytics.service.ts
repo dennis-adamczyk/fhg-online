@@ -50,7 +50,7 @@ export class AnalyticsService {
   private listenForRouteChanges() {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        gtag('config', environment.firebase, {
+        gtag('config', environment.googleAnalyticsKey, {
           page_path: event.urlAfterRedirects
         });
       }

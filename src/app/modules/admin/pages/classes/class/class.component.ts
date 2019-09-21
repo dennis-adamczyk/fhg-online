@@ -207,7 +207,7 @@ export class ClassComponent implements OnInit {
           } löschen?`,
           content: `Die ${
             this.helper.isClass() ? 'Klasse' : 'Stufe'
-          } wird mitsamt allen Mitgliedern, Administratoren und Kursen unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können. Wirklich sicher, dass diese Aktion ausgeführt werden soll?`,
+          } wird mitsamt allen Mitgliedern, Administratoren und Kursen unwiderruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können. Wirklich sicher, dass diese Aktion ausgeführt werden soll?`,
           defaultCancel: true,
           accept: 'Unwiederruflich löschen'
         }
@@ -303,7 +303,7 @@ export class ClassComponent implements OnInit {
             this.snackBar.open(
               `Die ${this.helper.isClass() ? 'Klasse' : 'Stufe'} ${
                 this.class
-              } wurde unwiederruflich gelöscht`,
+              } wurde unwiderruflich gelöscht`,
               null,
               { duration: 4000 }
             );

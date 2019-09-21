@@ -12,7 +12,7 @@ export const registerUser = functions.https.onCall(async (data, context) => {
   };
   const password: string = data.password;
   const clazz: string | null = data.class || null;
-  const skipVerification: boolean = data.skipVerification || false;
+  const skipVerification: boolean = data.skipVerification || true; //TODO: Change to || false
 
   // Validation
 
@@ -254,7 +254,7 @@ function deleteQueryBatch(db: any, query: any, resolve: any, reject: any) {
 
       // Delete documents in a batch
       let batch = db.batch();
-      snapshot.docs.forEach(doc => {
+      snapshot.docs.forEach((doc: any) => {
         batch.delete(doc.ref);
       });
 

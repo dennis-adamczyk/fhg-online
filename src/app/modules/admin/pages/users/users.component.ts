@@ -197,7 +197,7 @@ export class UsersComponent implements OnInit {
         .open(AcceptCancelDialog, {
           data: {
             title: 'Konto löschen?',
-            content: `Die Konten werden unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.\n\nBetroffen sind folgende Konten:\n<b>${names}</b>`,
+            content: `Die Konten werden unwiderruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.\n\nBetroffen sind folgende Konten:\n<b>${names}</b>`,
             accept: 'Unwiederruflich löschen',
             defaultCancel: true
           }
@@ -244,7 +244,7 @@ export class UsersComponent implements OnInit {
         .open(AcceptCancelDialog, {
           data: {
             title: 'Konto löschen?',
-            content: `Das Konto von <b>${selected.name}</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
+            content: `Das Konto von <b>${selected.name}</b> wird unwiderruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
             accept: 'Unwiederruflich löschen',
             defaultCancel: true
           }

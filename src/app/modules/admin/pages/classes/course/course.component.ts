@@ -242,7 +242,7 @@ export class CourseComponent implements OnInit {
       .open(AcceptCancelDialog, {
         data: {
           title: 'Kurs löschen?',
-          content: `Der Kurs <b>${this.course}</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
+          content: `Der Kurs <b>${this.course}</b> wird unwiderruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
           accept: 'Unwiederruflich löschen',
           defaultCancel: true
         }

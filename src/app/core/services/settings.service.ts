@@ -106,7 +106,6 @@ export class SettingsService {
           .subscribe(data => {
             let settings = this.strictSettings(data);
             this.setLocalSettings(settings);
-            this.changes.next(settings);
           });
       }
     });

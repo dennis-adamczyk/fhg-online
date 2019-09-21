@@ -89,9 +89,14 @@ export class HomeworkService {
     }
     this.settings.onChange().subscribe(settings => {
       if (!settings) return;
-      if (settings.homework.sort_by !== this.sort_by) {
+      if (
+        settings.homework.sort_by !== this.sort_by ||
+        settings.homework.max_days !== this.max_days
+      ) {
         this.sort_by = settings.homework.sort_by;
-        this.max_days = parseInt(settings.homework.max_days.toString()) | 0;
+        let max_days: any = settings.homework.max_days;
+        if (typeof max_days !== 'number') max_days = parseInt(max_days);
+        this.max_days = max_days;
 
         if (
           localStorage.getItem(homeworkKey) &&

@@ -176,7 +176,7 @@ export class SettingsComponent implements OnInit {
         data: {
           title: 'Konto löschen?',
           content:
-            'Dein Konto wird unwiederruflich gelöscht, sodass du dich nicht mehr anmelden kannst.',
+            'Dein Konto wird unwiderruflich gelöscht, sodass du dich nicht mehr anmelden kannst.',
           accept: 'Unwiederruflich löschen',
           defaultCancel: true
         }

@@ -8,15 +8,37 @@
       <mat-spinner diameter="32"></mat-spinner>
     </div>
     <table *ngIf="!isLoading">
-      <tr class="table-header">
-        <th></th>
+      <tr
+        class="table-header"
+        [class.no-time]="
+          !settings.get('timetable.show_lesson_number') &&
+          !settings.get('timetable.show_lesson_time')
+        "
+      >
+        <th
+          *ngIf="
+            settings.get('timetable.show_lesson_number') ||
+            settings.get('timetable.show_lesson_time')
+          "
+        ></th>
         <th *ngFor="let day of helper.keysOf(constant.weekDayShort)">
           {{ constant.weekDayShort[day] }}
         </th>
       </tr>
 
-      <tr *ngFor="let period of helper.arrayOf(constant.maxLessons)">
-        <th>
+      <tr
+        *ngFor="let period of helper.arrayOf(constant.maxLessons)"
+        [class.no-time]="
+          !settings.get('timetable.show_lesson_number') &&
+          !settings.get('timetable.show_lesson_time')
+        "
+      >
+        <th
+          *ngIf="
+            settings.get('timetable.show_lesson_number') ||
+            settings.get('timetable.show_lesson_time')
+          "
+        >
           <span
             class="number"
             *ngIf="settings.get('timetable.show_lesson_number')"

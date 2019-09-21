@@ -355,7 +355,7 @@ export class UserComponent {
           content: `Das Konto von <b>${this.first_name.value +
             ' ' +
             this.last_name
-              .value}</b> wird unwiederruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
+              .value}</b> wird unwiderruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
           accept: 'Unwiederruflich löschen',
           defaultCancel: true
         }

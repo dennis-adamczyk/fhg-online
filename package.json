@@ -32,6 +32,7 @@
     "@angular/pwa": "^0.803.4",
     "@angular/router": "~8.2.7",
     "@angular/service-worker": "~8.2.7",
+    "@firebase/performance": "^0.2.19-1",
     "@firebase/testing": "^0.13.1",
     "@nguniversal/aspnetcore-engine": "^8.1.1",
     "@nguniversal/express-engine": "^8.1.1",
@@ -46,6 +47,7 @@
     "ngx-trim-directive": "^1.0.3",
     "rxjs": "~6.5.2",
     "tslib": "^1.9.0",
+    "typescript": "^3.5.3",
     "zone.js": "^0.10.2"
   },
   "devDependencies": {
@@ -72,7 +74,6 @@
     "ts-loader": "^6.0.2",
     "ts-node": "^8.4.1",
     "tslint": "^5.15.0",
-    "typescript": "^3.5.3",
     "webpack-cli": "^3.1.0",
     "ws": "^7.0.0",
     "xhr2": "^0.2.0"

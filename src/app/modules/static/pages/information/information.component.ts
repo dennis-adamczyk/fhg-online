@@ -44,6 +44,14 @@ export class InformationComponent implements OnInit {
         case 'terms':
           this.tabGroup.selectedIndex = 2;
           break;
+        default:
+          if (!fragment) break;
+          try {
+            document
+              .querySelector('#' + fragment)
+              .scrollIntoView({ behavior: 'smooth' });
+          } catch (e) {}
+          break;
       }
     });
   }

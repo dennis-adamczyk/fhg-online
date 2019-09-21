@@ -56,7 +56,7 @@ if (
     AngularFirestoreModule,
     AngularFireFunctionsModule,
     AngularFireStorageModule,
-    // AngularFirePerformanceModule,
+    AngularFirePerformanceModule,
     RouterModule,
     LayoutModule,
     SharedModule

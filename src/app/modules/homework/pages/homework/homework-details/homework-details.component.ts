@@ -147,7 +147,7 @@ export class HomeworkDetailsComponent implements OnInit {
     let dialogData = {
       title: 'Hausaufgabe löschen?',
       content:
-        'Bist du sicher, dass du die Hausaufgabe unwiederruflich löschen möchtest?',
+        'Bist du sicher, dass du die Hausaufgabe unwiderruflich löschen möchtest?',
       defaultCancel: true,
       accept: 'Unwiederruflich löschen'
     };
@@ -186,7 +186,7 @@ export class HomeworkDetailsComponent implements OnInit {
             homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.data.id}`;
 
           return this.db.delete(homeworkRef).then(() => {
-            this.snackBar.open('Hausaufgabe unwiederruflich gelöscht', null, {
+            this.snackBar.open('Hausaufgabe unwiderruflich gelöscht', null, {
               duration: 4000
             });
           });
@@ -288,7 +288,7 @@ export class HomeworkDetailsComponent implements OnInit {
       .open(AcceptCancelDialog, {
         data: {
           title: 'Korrektur löschen',
-          content: `Sicher, dass du die Korrektur #${id} unwiederruflich löschen möchtest?`,
+          content: `Sicher, dass du die Korrektur #${id} unwiderruflich löschen möchtest?`,
           defaultCancel: true,
           accept: 'Unwiederruflich löschen'
         }
