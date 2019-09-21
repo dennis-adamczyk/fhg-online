@@ -1,0 +1,85 @@
+@import ../../../../var
+
+.colors
+    margin: 0 auto
+    max-width: 200px
+    display: flex
+    flex-wrap: wrap
+    justify-content: space-between
+
+    .color
+        margin: 8px
+        width: 24px
+        height: 24px
+        cursor: pointer
+        border-radius: 50%
+        box-shadow: 0 0 2px 1px mat-color($foreground-light, icon)
+        outline: none
+        -webkit-tap-highlight-color: transparent
+        user-select: none
+
+        .check
+            mat-icon
+                padding: 3px
+                width: 18px
+                height: 18px
+                font-size: 18px
+                color: #ffffff
+
+.selected
+    .selection
+        width: 100%
+        margin: 16px auto 12px auto
+        font-size: 16px
+        text-align: center
+
+        .color
+            padding: 0 8px 0 0
+            font-weight: 500
+            text-transform: uppercase
+
+        .shade
+            font-family: 'Roboto Mono', monospace
+            font-weight: 500
+            color: mat-color($foreground-light, secondary-text)
+
+    .shades,
+    .singleShade
+        margin: 0 0 8px 0
+        width: calc(100% + 48px)
+        height: 28px
+        position: relative
+        left: -24px
+        display: flex
+        flex-wrap: nowrap
+        justify-content: center
+        align-content: stretch
+
+        .shade
+            width: 100%
+            cursor: pointer
+            transition: all 150ms $ease-in-out-curve-function
+
+            &:hover
+                +mat-elevation(4)
+                transform-origin: center center
+                transform: scale(1.2)
+
+            &.selected
+                border-radius: 50%
+
+    .singleShade
+        width: 28px
+        left: 50%
+        transform: translateX(-50%)
+
+        .shade
+            border: 1px solid #000000
+            
+
+@media not all and ($mat-xsmall)
+    .colors
+        max-width: 168px
+
+        .color
+            margin: 4px

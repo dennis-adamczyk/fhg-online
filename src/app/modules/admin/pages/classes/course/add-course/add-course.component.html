@@ -1,0 +1,148 @@
+<div class="toolbar-extention"></div>
+<div class="course">
+  <header>
+    <h1>Neuer Kurs</h1>
+    <div class="actions"></div>
+  </header>
+  <div class="body">
+    <div class="loading" *ngIf="isLoading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <form [formGroup]="courseForm">
+      <section class="subject">
+        <mat-form-field>
+          <mat-label>Fach</mat-label>
+          <input matInput formControlName="subject" trim="blur" />
+          <mat-error *ngIf="subject.invalid">{{
+            getSubjectErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Kürzel</mat-label>
+          <input
+            matInput
+            formControlName="short"
+            trim="blur"
+            (input)="$event.target.value = upperCase($event.target.value)"
+            (blur)="onShortBlur()"
+          />
+          <mat-error *ngIf="short.invalid">{{
+            getShortErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Raum</mat-label>
+          <input matInput formControlName="room" trim="blur" />
+          <mat-error *ngIf="room.invalid">{{
+            getRoomErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+      </section>
+      <section class="teacher" formGroupName="teacher">
+        <h4>Lehrer</h4>
+        <mat-form-field>
+          <mat-label>Anrede</mat-label>
+          <input matInput formControlName="title" trim="blur" />
+          <mat-error *ngIf="teacher_title.invalid">{{
+            getTeacherTitleErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Nachname</mat-label>
+          <input matInput formControlName="last_name" trim="blur" />
+          <mat-error *ngIf="teacher_last_name.invalid">{{
+            getTeacherLastNameErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Kürzel</mat-label>
+          <input
+            matInput
+            formControlName="short"
+            trim="blur"
+            (input)="$event.target.value = upperCase($event.target.value)"
+          />
+          <mat-error *ngIf="teacher_short.invalid">{{
+            getTeacherShortErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+      </section>
+      <section class="class">
+        <mat-form-field *ngIf="!multi.value">
+          <mat-label>Klasse</mat-label>
+          <mat-select formControlName="class">
+            <mat-option *ngFor="let class of classes" [value]="class">{{
+              class
+            }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="class.invalid">{{
+            getClassErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="multi.value">
+          <mat-label>Klassen</mat-label>
+          <mat-select formControlName="class" multiple>
+            <mat-option *ngFor="let class of classes" [value]="class">{{
+              class
+            }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="class.invalid">{{
+            getClassErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+        <mat-checkbox
+          color="primary"
+          formControlName="multi"
+          (change)="onChangeMulti($event)"
+          >Multi</mat-checkbox
+        >
+
+        <mat-form-field class="color" (click)="onClickColor($event)">
+          <mat-label>Farbe</mat-label>
+          <input
+            matInput
+            formControlName="color"
+            trim="blur"
+            (keydown)="onKeyColor($event)"
+            readonly="true"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            [style.color]="getColor(color.value)"
+          >
+            <mat-icon
+              [style.text-shadow]="'0 0 2px ' + getContrastColor(color.value)"
+              >color_lens</mat-icon
+            >
+          </button>
+          <mat-error *ngIf="color.invalid">{{
+            getColorErrorMessage()
+          }}</mat-error>
+        </mat-form-field>
+      </section>
+      <section class="lessons">
+        <h4>Unterrichtszeiten</h4>
+        <button
+          mat-icon-button
+          matTooltip="Bearbeiten"
+          (click)="onEditLessons()"
+        >
+          <mat-icon>{{
+            isObjectEmpty(lessons.value) ? 'add' : 'edit'
+          }}</mat-icon>
+        </button>
+        <ul>
+          <li *ngFor="let lesson of getLessonsStringArray()">
+            {{ lesson }}
+          </li>
+        </ul>
+      </section>
+      <section class="submit">
+        <button mat-raised-button color="primary" (click)="onSubmit()">
+          Kurs erstellen
+        </button>
+      </section>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,407 @@
+@import ../../../../../var
+$correction: #FF9800
+
+.fab
+    position: fixed 
+    bottom: 16px
+    right: 16px
+    z-index: 6
+
+.due_day,
+.entered
+    width: 100%
+    height: 100%
+    margin: 0
+    padding: 0
+    user-select: none
+
+    .header
+        display: block
+        margin: 16px 0 0 0
+        padding: 0 16px
+
+        h2
+            margin: 0
+            padding: 0
+            font-size: 16px
+            font-weight: 400
+
+    .body
+        position: relative
+        margin: 0
+        padding: 0 0 64px 0
+        width: 100%
+        height: 100%
+
+        .loading
+            position: absolute
+            top: 0
+            left: 0
+            bottom: 0
+            right: 0
+            background: mat-color($background-light, disabled-button)
+            z-index: 1
+            display: flex
+            align-items: center
+            justify-content: center
+
+        article.day
+            margin: 0
+            padding: 12px 0
+            width: 100%
+            border-bottom: 1px solid mat-color($foreground-light, divider)
+
+            &:last-child
+                border-bottom: none
+
+            .heading
+                display: flex
+                align-items: center
+                margin: 0
+                padding: 0 16px
+                height: 32px
+                width: auto
+
+                .date
+                    display: flex
+                    flex-wrap: wrap
+                    flex-direction: column
+                    justify-content: center
+                    width: 40px
+                    height: 100%
+
+                    p
+                        margin: 0
+                        padding: 0
+                        width: 100%
+                        color: mat-color($primary-light)
+                        text-align: center
+
+                        &.day
+                            font-size: 16px
+                            font-weight: 400
+                            height: 16px
+
+                        &.month
+                            font-size: 10px
+                            font-weight: 500
+                            height: 10px
+                            text-transform: uppercase
+
+                h4
+                    margin: 0 0 0 16px
+                    font-size: 14px
+                    font-weight: 500
+
+            .content
+                margin: 0
+                padding: 4px 0
+
+                .no-homework
+                    margin: 0
+                    padding: 12px 16px 4px 16px
+                    display: flex
+                    align-items: center
+                    justify-content: flex-start
+
+                    .icon
+                        display: flex
+                        justify-content: center
+                        align-items: center
+                        flex-shrink: 0
+                        width: 40px
+                        
+                        mat-icon
+                            color: mat-color($foreground-light, icon)
+
+                    p
+                        margin: 0 8px 0 16px
+                        padding: 0
+                        flex-grow: 1
+                        font-size: 12px
+                        font-weight: 500
+                        color: mat-color($foreground-light, secondary-text)
+                        align-text: left
+
+                .pending,
+                .done
+                    .item
+                        margin: 0
+                        padding: 4px 16px
+                        display: flex
+                        align-items: center
+                        justify-content: space-between
+                        cursor: pointer
+                        text-decoration: initial
+                        color: initial
+
+                        &.deleted
+                            opacity: .54
+
+                        &.corrected
+                            .subject
+                                position: relative
+                                overflow: visible
+
+                                &::after
+                                    content: '!'
+                                    display: block
+                                    width: 16px
+                                    height: 16px
+                                    position: absolute
+                                    top: -2px
+                                    right: -2px
+                                    color: mat-color($foreground-dark, text)
+                                    font-size: 12px
+                                    font-weight: 500
+                                    line-height: 16px
+                                    text-align: center
+                                    background-color: $correction
+                                    border-radius: 50%
+                                    +mat-elevation(2)
+
+                        .subject
+                            margin: 0
+                            padding: 0
+                            display: flex
+                            justify-content: center
+                            align-items: center
+                            flex-shrink: 0
+                            width: 40px
+                            height: 40px
+                            background-color: mat-color($primary-light)
+                            border-radius: 50%
+                            overflow: hidden
+
+                            p
+                                margin: 0
+                                padding: 0
+                                font-size: 16px
+                                font-weight: 400
+                                text-align: center
+                                color: mat-color($foreground-dark, text)
+
+                        .title
+                            margin: 0 8px 0 16px
+                            padding: 0
+                            flex-grow: 1
+                            font-size: 14px
+                            font-weight: 400
+                            text-align: left
+                            white-space: pre-line
+
+                        mat-checkbox
+                            &.mat-checkbox-checked,
+                            &:active
+                                ::ng-deep .mat-checkbox-background,
+                                ::ng-deep .mat-ripple-element
+                                    background-color: #757575
+
+                .done
+                    .expander
+                        margin: 0
+                        padding: 4px 16px
+                        height: 32px
+                        display: flex
+                        align-items: center
+                        justify-content: space-between
+                        cursor: pointer
+                        transition: background 100ms $ease-in-out-curve-function, margin 200ms $ease-in-out-curve-function
+
+                        &:not(.opened)
+                            margin: 0 0 -4px 0
+
+                        &:not(.opened):hover
+                            background-color: mat-color($background-light, hover)
+
+                        p
+                            margin: 0
+                            padding: 0
+                            font-size: 12px
+                            font-weight: 500
+                            text-transform: uppercase
+                            color: mat-color($foreground-light, secondary-text)
+
+                        button
+                            margin: -12px
+
+                            mat-icon
+                                transform: rotate(180deg)
+                                color: mat-color($foreground-light, icon)
+                                transition: transform 200ms $ease-in-out-curve-function
+
+                    .expansion
+                        overflow: hidden
+
+
+                    .item
+                        .subject
+                            opacity: .56
+
+                        .title
+                            opacity: .56
+                            text-decoration: line-through
+
+            &.outside
+                .heading
+                    .date
+                        p
+                            color: mat-color($foreground-light, icon)
+
+.entered
+    max-height: calc(100vh - 56px)
+    max-height: calc(var(--vh, 1vh) * 100 - 56px)
+    overflow: auto
+
+    .header
+        display: flex
+        align-items: center
+        justify-content: space-between
+        margin: 0
+        padding: 0 20px
+        height: 56px
+        position: sticky
+        top: 0
+        left: 0
+        right: 0
+        background-color: mat-color($primary-light)
+        z-index: 3
+        +mat-elevation(4)
+
+        h2
+            margin: 0
+            padding: 0
+            font-size: 16px
+            font-weight: 400
+            color: mat-color($foreground-dark, text)
+            cursor: pointer
+
+        button
+            margin: -12px
+            color: mat-color($foreground-dark, icon)
+
+            &:disabled
+                color: mat-color($foreground-dark, disabled)
+
+    .body
+        position: relative
+        margin: 0
+        padding: 0 0 64px 0
+        width: 100%
+        height: 100%
+
+        .loading
+            position: absolute
+            top: 0
+            left: 0
+            bottom: 0
+            right: 0
+            background: mat-color($background-light, disabled-button)
+            z-index: 1
+            display: flex
+            align-items: center
+            justify-content: center
+
+        article.day
+            .heading
+                &.future
+                    .date
+                        p
+                            color: mat-color($foreground-light, icon)
+
+            .content
+                .no-homework
+                    &.future
+                        min-height: 16px
+
+                        & > *
+                            display: none
+
+@media not all and ($mat-xsmall)
+    .toolbar-extention
+        position: absolute
+        left: 0
+        top: 0
+        right: 0
+        height: 128px
+        background-color: mat-color($primary-light)
+        z-index: -1
+        +mat-elevation(2)
+
+    .fab
+        bottom: 24px
+        right: 24px
+    
+    .due_day,
+    .entered
+        margin: 0 auto 24px auto
+        width: 576px
+        height: auto
+        background-color: mat-color($background-light, card)
+        border-radius: 4px
+        overflow: hidden
+        +mat-elevation(4)
+
+        .header
+            display: block 
+            height: 64px
+            width: 100%
+            margin: 0
+            padding: 0
+            border-bottom: 1px solid mat-color($foreground-light, divider)
+
+            h2
+                margin: 0 0 0 24px
+                padding: 0
+                font-size: 16px
+                font-weight: 400
+                line-height: 64px
+
+        .body
+            min-height: 200px
+            padding: 0
+
+            article.day
+                padding: 16px 0
+
+                .heading
+                    padding: 0 24px
+
+                .content
+                    .no-homework
+                        padding: 12px 24px 4px 24px
+
+                    .pending,
+                    .done
+                        .item
+                            padding: 4px 24px
+
+                    .done
+                        .expander
+                            padding: 4px 24px
+
+    .entered
+        max-height: none
+
+        .header
+            display: flex
+            width: auto
+            padding: 0 28px
+            position: initial
+            background-color: initial
+            z-index: auto
+            +mat-elevation(0)
+
+            h2
+                margin: 0
+                line-height: auto
+                color: mat-color($foreground-light, text)
+
+            button
+                color: mat-color($foreground-light, icon)
+
+                &:disabled
+                    color: mat-color($foreground-light, disabled)
+
+        .body
+            padding: 0

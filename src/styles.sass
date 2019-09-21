@@ -1,0 +1,70 @@
+@import ~@angular/material/theming
+
++mat-core
+
+@import ./themes/light-theme.sass
+@import ./themes/dark-theme.sass
+
+@import ./var
+
++angular-material-theme($light-theme)
+
+.light-theme
+    +angular-material-theme($light-theme)
+
+.dark-theme
+    +angular-material-theme($dark-theme)
+
+html, body
+    height: 100%
+    overflow-y: auto
+    overscroll-behavior-y: contain
+
+body
+    margin: 0
+    padding: 0
+    font-family: Roboto, 'Helvetica Neue', sans-serif
+
+*:focus
+    outline: none
+
+mat-icon
+    user-select: none
+
+.fullWithSheet
+    padding: 8px 0 !important
+
+.mobile-full-screen-dialog,
+.mobile-full-screen-dialog .mat-dialog-container
+    @media ($mat-xsmall)
+        max-width: none !important
+        width: 100vw !important
+        height: 100vh !important
+        border-radius: 0
+
+.full-screen-dialog,
+.full-screen-dialog .mat-dialog-container
+    @media ($mat-xsmall)
+        max-width: none !important
+        width: 100vw !important
+
+.mat-datepicker-dialog
+    .mat-dialog-container
+        box-sizing: content-box
+
+
+.mat-dialog-container
+    max-width: 560px
+
+    @media ($mat-xsmall)
+        max-width: 280px
+
+    .mat-dialog-actions
+        justify-content: flex-end
+
+        .mat-button
+            text-transform: uppercase
+
+
+.mat-simple-snackbar-action
+    color: mat-color($primary-dark)

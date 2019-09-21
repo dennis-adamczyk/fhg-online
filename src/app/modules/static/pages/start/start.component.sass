@@ -1,0 +1,80 @@
+@import ../../../../../var
+
+.home
+    position: absolute
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+    background-color: mat-color($primary-light)
+    margin: 0
+    padding: 0
+    display: flex
+    justify-content: stretch
+    align-items: stretch
+
+    .landing
+        margin: 0
+        padding: 56px 24px
+        display: flex
+        flex-flow: column
+        justify-content: space-around
+        align-items: center
+
+        .content
+            img
+                display: block
+                width: 128px
+                max-width: 80%
+                height: auto
+                margin: 0 auto
+
+            h1
+                margin: 16px 0 24px 0
+                padding: 0
+                font-family: 'Montserrat', 'Roboto', sans-serif
+                font-size: 36px
+                font-weight: 600
+                color: mat-color($foreground-dark, text)
+                text-align: center
+
+            p
+                margin: 0
+                padding: 0
+                font-size: 16px
+                font-weight: 300
+                color: mat-color($foreground-dark, secondary-text)
+                text-align: center
+
+        .cta
+            display: flex
+            flex-flow: column
+            align-items: center
+
+            a
+                display: block
+                margin: 0 0 8px 0
+                text-transform: uppercase
+                font-weight: 500
+
+                &:last-child
+                    margin: 0
+
+                &.register
+                    color: mat-color($primary-light)
+
+                &.login
+                    margin: 0 8px
+                    color: mat-color($foreground-dark, text)
+                    border-color: mat-color($foreground-dark, text)
+
+@media not all and ($mat-xsmall)
+    .home
+        justify-content: center
+
+        .landing
+            width: 576px
+
+            .cta
+                a
+                    margin: 0 0 12px 0

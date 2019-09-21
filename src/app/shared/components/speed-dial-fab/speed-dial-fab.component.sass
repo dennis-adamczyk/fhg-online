@@ -1,0 +1,42 @@
+@import ../../../../var
+
+.fab-dismiss
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    z-index: 5
+    background-color: rgba(mat-color($background-light, card), .87)
+
+.fab-container
+    display: flex
+    flex-direction: column-reverse
+    align-items: flex-end
+    z-index: 6
+
+    .fab-toggler
+        background-color: mat-color($primary-light)
+        z-index: 6
+
+    .fab-minis
+        display: flex
+        flex-direction: column-reverse
+        align-items: flex-end
+        z-index: 6
+
+        .fab-mini
+            display: flex
+            justify-content: flex-end
+            align-items: center
+            margin: 0 8px 16px 0
+            cursor: pointer
+
+            .label
+                margin: 0 16px 0 0
+                padding: 0
+                font-size: 14px
+                font-weight: 500
+
+            button
+                color: mat-color($primary-light)

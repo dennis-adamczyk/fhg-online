@@ -1,0 +1,106 @@
+<div class="toolbar-extention"></div>
+<div class="timetable">
+  <div class="header">
+    <p>Wochenansicht</p>
+  </div>
+  <div class="body">
+    <div class="loading" *ngIf="isLoading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <table *ngIf="!isLoading">
+      <tr
+        class="table-header"
+        [class.no-time]="
+          !settings.get('timetable.show_lesson_number') &&
+          !settings.get('timetable.show_lesson_time')
+        "
+      >
+        <th
+          *ngIf="
+            settings.get('timetable.show_lesson_number') ||
+            settings.get('timetable.show_lesson_time')
+          "
+        ></th>
+        <th *ngFor="let day of helper.keysOf(constant.weekDayShort)">
+          {{ constant.weekDayShort[day] }}
+        </th>
+      </tr>
+
+      <tr
+        *ngFor="let period of helper.arrayOf(constant.maxLessons)"
+        [class.no-time]="
+          !settings.get('timetable.show_lesson_number') &&
+          !settings.get('timetable.show_lesson_time')
+        "
+      >
+        <th
+          *ngIf="
+            settings.get('timetable.show_lesson_number') ||
+            settings.get('timetable.show_lesson_time')
+          "
+        >
+          <span
+            class="number"
+            *ngIf="settings.get('timetable.show_lesson_number')"
+            >{{ period }}.</span
+          >
+          <span class="time" *ngIf="settings.get('timetable.show_lesson_time')">
+            {{ constant.times[period].start }}
+            <span class="divider"></span>
+            {{ constant.times[period].end }}
+          </span>
+        </th>
+        <td *ngFor="let day of helper.keysOf(constant.weekDayShort)">
+          <div
+            class="lesson"
+            *ngIf="
+              timetable.lessonExists(day, period) &&
+              timetable.isSingleLesson(day, period)
+            "
+            [style.background-color]="
+              helper.getColor(timetable.data[day][period].color)
+            "
+            [class.contrast]="
+              helper.getContrastColor(timetable.data[day][period].color) ==
+              '#000000'
+            "
+            (click)="onClickLesson(day, period)"
+          >
+            <p class="subject">
+              {{
+                settings.get('timetable.subjects_abbreviation')
+                  ? timetable.data[day][period].short
+                  : timetable.data[day][period].subject
+              }}
+            </p>
+            <p class="teacher" *ngIf="settings.get('timetable.show_teacher')">
+              {{
+                settings.get('timetable.teacher_abbreviation')
+                  ? timetable.data[day][period].teacher.short
+                  : timetable.data[day][period].teacher.last_name
+              }}
+            </p>
+            <p class="room" *ngIf="settings.get('timetable.show_room')">
+              {{
+                getRoomPrefix(day, period) + timetable.data[day][period].room
+              }}
+            </p>
+          </div>
+          <div
+            class="multi-lesson"
+            *ngIf="
+              timetable.lessonExists(day, period) &&
+              !timetable.isSingleLesson(day, period)
+            "
+            (click)="onClickLesson(day, period)"
+          >
+            <p class="count">{{ timetable.data[day][period].length }}</p>
+          </div>
+          <div class="empty" *ngIf="!timetable.lessonExists(day, period)">
+            <p>+++++</p>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,234 @@
+@import ../../../var
+  
+.sidenav-container
+    // height: 100%
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+
+    .sidenav
+        position: absolute
+        width: 256px
+        user-select: none
+        max-width: calc(100% - 56px)
+
+        @media ($mat-xsmall)
+            width: 304px
+
+        mat-toolbar
+            $ease-in-out-transition: all 450ms $swift-ease-out-timing-function
+            background: linear-gradient(to bottom, #3F51B5 0%, #303F9F 100%)
+            height: 172px
+            position: relative
+            transition: $ease-in-out-transition
+
+            .large
+                position: absolute
+                top: 24px
+                left: 50%
+                transform: translateX(-50%)
+
+                .logo
+                    width: 96px
+                    height: 96px
+                    position: relative
+                    top: 0
+                    left: auto
+                    display: block
+
+                    .badge
+                        left: calc(100% - 24px)
+
+                p
+                    margin: 12px auto 0 auto
+                    padding: 0
+                    color: white
+                    font-size: 14px
+                    font-weight: 500
+                    text-align: center
+                    line-height: normal
+
+
+            .logo
+                width: 64px
+                height: 64px
+                position: absolute
+                top: 40px
+                left: 16px
+                cursor: pointer
+
+                .badge
+                    background-color: rgba(mat-color($foreground-dark, base), .14)
+                    border-radius: 12px
+                    color: mat-color($foreground-dark, text)
+                    display: inline-block
+                    font-size: 12px
+                    font-weight: 500
+                    letter-spacing: .5px
+                    line-height: 16px
+                    padding: 2px 12px
+                    position: absolute
+                    top: -4px
+                    left: calc(100% - 12px)
+
+                // &::after
+                //     content: 'β'
+                //     display: block
+                //     height: 16px
+                //     position: absolute
+                //     left: calc(100% - 10px)
+                //     bottom: calc(100% - 10px)
+                //     background-color: mat-color($background-light, raised-button)
+                //     border-radius: 16px
+                //     font-size: 14px
+                //     line-height: 16px
+                //     text-align: center
+                //     color: mat-color($primary-light)
+                //     margin: 0
+                //     padding: 0 8px
+
+            .classes
+                min-width: 32px
+                height: 32px
+                position: absolute
+                top: 40px
+                right: 12px
+                background-color: rgba(black, .16)
+                border-radius: 32px
+                display: flex
+                overflow: hidden
+
+                .class
+                    width: 32px
+                    height: 32px
+                    border-radius: 50%
+                    text-align: center
+                    line-height: 32px
+                    display: inline-block
+
+                    &.active  
+                        background-color: rgba(black, .38)
+
+                    p
+                        margin: 0
+                        padding: 0
+                        width: 100%
+                        line-height: 32px
+                        font-size: 16px
+                        font-weight: 500
+                        color: white
+
+            .user
+                position: absolute
+                left: 16px
+                right: 16px
+                bottom: 4px
+                display: flex
+                align-items: center
+                justify-content: space-between
+                color: white
+                transition: $ease-in-out-transition
+
+                .text
+                    transition: $ease-in-out-transition
+                    p
+                        margin: 0
+                        padding: 0
+                        font-size: 14px
+                        line-height: normal
+
+                        &.name
+                            font-weight: 500
+
+                        &.details
+                            height: 0px
+                            opacity: 0
+                            font-weight: 300
+                            transition: $ease-in-out-transition
+
+                .dropDown
+                    transform: translateX(8px)
+                    transition: $ease-in-out-transition
+
+            &.extended
+                height: 215px
+
+                .user
+                    bottom: 12px
+
+                    .text
+                        p.details
+                            height: 17px
+                            opacity: 1
+
+                    .dropDown
+                        transform: rotate(180deg) translateX(-8px)
+
+
+        .sidenav-list
+            a
+                [mat-list-icon]
+                    padding: 0
+                    margin-left: 8px
+                    opacity: 0.54
+
+                p
+                    margin-left: 8px
+                    font-size: 14px
+                    font-weight: 500
+
+                &.active
+                    [mat-list-icon]
+                        color:  mat-color($primary-light)
+                        opacity: 1
+
+                    p
+                        color: mat-color($primary-light)
+
+            mat-divider
+                margin: 4px 0
+
+.main-toolbar
+    position: sticky
+    top: 0
+    z-index: 4
+    padding: 0 8px
+    user-select: none
+    +mat-elevation(4)
+
+    &.extended
+        +mat-elevation(0)
+
+    .menu-btn, .back-btn
+        margin: 0 24px 0 0
+
+mat-sidenav-content
+    // height: 100vh
+    // height: calc(var(--vh, 1vh) * 100)
+    overflow: auto
+
+    main
+        height: auto
+
+*:host-context(.dark-theme)
+    .main-toolbar
+        background-color: mat-color($background-dark, card) !important
+        color: mat-color($foreground-dark, text) !important
+
+    .sidenav-container
+        .sidenav
+            mat-toolbar
+                background: inherit
+                border-bottom: 1px solid mat-color($foreground-dark, divider)
+
+            .sidenav-list
+                a.active
+                    [mat-list-icon]
+                        color:  mat-color($primary-dark)
+
+                    p
+                        color: mat-color($primary-dark)
+
+

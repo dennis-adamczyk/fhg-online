@@ -1,0 +1,80 @@
+<header>
+  <h1>Neuer Benutzer</h1>
+</header>
+<div class="body">
+  <div class="loading" *ngIf="isLoading">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+  <form [formGroup]="userForm">
+    <section formGroupName="name" class="name">
+      <mat-form-field>
+        <mat-label>Vorname</mat-label>
+        <input matInput formControlName="first_name" />
+        <mat-error *ngIf="first_name.invalid">{{
+          getFirstNameErrorMessage()
+        }}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Nachname</mat-label>
+        <input matInput formControlName="last_name" />
+        <mat-error *ngIf="last_name.invalid">{{
+          getLastNameErrorMessage()
+        }}</mat-error>
+      </mat-form-field>
+    </section>
+    <mat-form-field>
+      <mat-label>E-Mail</mat-label>
+      <input matInput formControlName="email" />
+      <p matSuffix>{{ constant.displayedEmailSuffix }}</p>
+      <mat-error *ngIf="email.invalid">{{ getEmailErrorMessage() }}</mat-error>
+    </mat-form-field>
+    <mat-radio-group formControlName="role" class="role">
+      <h4>Rolle</h4>
+      <mat-radio-button color="primary" value="student">{{
+        getRoleName('student')
+      }}</mat-radio-button>
+      <mat-radio-button
+        color="primary"
+        value="teacher"
+        (change)="onTeacherChange($event)"
+        >{{ getRoleName('teacher') }}</mat-radio-button
+      >
+    </mat-radio-group>
+    <mat-form-field>
+      <mat-label>Klasse/Stufe</mat-label>
+      <mat-select formControlName="class">
+        <mat-option value="">Keine Klasse</mat-option>
+        <mat-option *ngFor="let class of classes" [value]="class">{{
+          class
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="password">
+      <mat-label>Passwort</mat-label>
+      <input
+        matInput
+        [type]="showPassword ? 'text' : 'password'"
+        formControlName="password"
+        trim
+        required
+      />
+      <mat-icon
+        mat-icon-button
+        matSuffix
+        (click)="showPassword = !showPassword"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="showPassword"
+        class="passwordVisibility"
+        >{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon
+      >
+      <mat-error *ngIf="password.invalid">{{
+        getPasswordErrorMessage()
+      }}</mat-error>
+    </mat-form-field>
+    <section class="submit">
+      <button mat-raised-button color="primary" (click)="onSubmit()">
+        Benutzer erstellen
+      </button>
+    </section>
+  </form>
+</div>

@@ -1,0 +1,316 @@
+<div class="toolbar-extention"></div>
+<div class="action">
+  <!-- ##### EROOR ##### -->
+  <div class="error" *ngIf="error">
+    <img src="assets/undraw/cancel.svg" alt="Fehler" />
+    <div class="text">
+      <p class="headline">
+        Fehler
+      </p>
+      <p class="info">
+        {{ error }}
+      </p>
+      <div class="buttons">
+        <a mat-raised-button color="primary" routerLink="/login" class="button"
+          >Anmelden</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!error">
+    <!-- ##### RESET PASSWORD ##### -->
+    <div class="resetPassword" *ngIf="mode == 'resetPassword'">
+      <ng-container *ngIf="!submitted">
+        <img src="assets/undraw/my_password.svg" alt="Neues Passwort" />
+        <div class="text">
+          <p class="headline">
+            Passwort zurücksetzen
+          </p>
+          <div class="loading" *ngIf="loading">
+            <mat-spinner diameter="32"></mat-spinner>
+            <p>Passwort wird zurückgesetzt…</p>
+          </div>
+          <form [formGroup]="actionForm" *ngIf="!loading">
+            <p class="info">
+              Bitte gib ein neues Passwort, mit dem du dich künftig anmelden
+              möchtest, ein.
+            </p>
+            <mat-form-field hideRequiredMarker>
+              <mat-label>E-Mail</mat-label>
+              <input matInput type="text" [value]="email.value" disabled />
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Passwort</mat-label>
+              <input
+                matInput
+                [type]="showPassword1 ? 'text' : 'password'"
+                formControlName="password1"
+                trim
+                required
+              />
+              <mat-icon
+                mat-icon-button
+                matSuffix
+                (click)="showPassword1 = !showPassword1"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="showPassword1"
+                class="passwordVisibility"
+                >{{ showPassword1 ? 'visibility_off' : 'visibility' }}</mat-icon
+              >
+              <mat-error *ngIf="password1.invalid">{{
+                getPassword1ErrorMessage()
+              }}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Passwort wiederholen</mat-label>
+              <input
+                matInput
+                [type]="showPassword2 ? 'text' : 'password'"
+                formControlName="password2"
+                required
+              />
+              <mat-icon
+                mat-icon-button
+                matSuffix
+                (click)="showPassword2 = !showPassword2"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="showPassword2"
+                class="passwordVisibility"
+                >{{ showPassword2 ? 'visibility_off' : 'visibility' }}</mat-icon
+              >
+              <mat-error *ngIf="password2.invalid">{{
+                getPassword2ErrorMessage()
+              }}</mat-error>
+            </mat-form-field>
+            <div class="buttons">
+              <button
+                mat-raised-button
+                color="primary"
+                class="button"
+                [disabled]="actionForm.invalid"
+                (click)="submitResetPassword()"
+              >
+                Passwort zurücksetzen
+              </button>
+              <a mat-button routerLink="/login" class="button">Anmelden</a>
+            </div>
+          </form>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="submitted">
+        <img src="assets/undraw/security_on.svg" alt="Passwort zurückgesetzt" />
+        <div class="text">
+          <p class="headline">
+            Passwort erfolgreich geändert
+          </p>
+          <p class="info">
+            Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich nun
+            mit deinem neuen Passwort anmelden.
+          </p>
+          <div class="buttons">
+            <ng-container *ngIf="continueUrl">
+              <a
+                mat-raised-button
+                color="primary"
+                [href]="continueUrl"
+                class="button"
+                >Weiter</a
+              >
+              <a mat-button routerLink="/login" class="button">Anmelden</a>
+            </ng-container>
+            <ng-container *ngIf="!continueUrl">
+              <a
+                mat-raised-button
+                color="primary"
+                routerLink="/login"
+                class="button"
+                >Anmelden</a
+              >
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- ##### RECOVER EMAIL ##### -->
+    <div class="recoverEmail" *ngIf="mode == 'recoverEmail'">
+      <img src="assets/undraw/synchronize.svg" alt="E-Mail wiederherstellen" />
+      <div class="text">
+        <div class="loading" *ngIf="loading && status == 0">
+          <mat-spinner diameter="32"></mat-spinner>
+          <p>E-Mail wird wiederhergestellt…</p>
+        </div>
+        <div class="loading" *ngIf="loading && status == 1">
+          <mat-spinner diameter="32"></mat-spinner>
+          <p>Passwort wird zurückgesetzt…</p>
+        </div>
+        <ng-container *ngIf="!loading && submitted && status == 0">
+          <p class="headline">
+            E-Mail wiederhergestellt
+          </p>
+          <p class="info">
+            Deine alte E-Mail
+            <a [href]="restoredEmail">{{ restoredEmail }}</a> wurde erfolgreich
+            für dein Konto wiederhergestellt. Du kannst dich nun mit dieser
+            E-Mail anmelden.<br />
+            Für den Fall, dass das Konto angegriffen wurde, kannst du ebenfalls
+            dein Passwort zurücksetzen.
+          </p>
+          <div class="buttons">
+            <a
+              mat-raised-button
+              color="primary"
+              routerLink="/login"
+              class="button"
+              >Anmelden</a
+            >
+            <button
+              mat-button
+              color="primary"
+              class="button"
+              (click)="onRecoverEmailPasswordReset()"
+            >
+              Passwort zurücksetzen
+            </button>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="!loading && submitted && status == 1">
+          <p class="headline">
+            E-Mail gesendet
+          </p>
+          <p class="info">
+            Wir haben dir eine E-Mail mit einem Link, mithilfe dessen du ein
+            neues Passwort festlegen kannst, gesendet.
+          </p>
+          <div class="buttons">
+            <a
+              mat-raised-button
+              color="primary"
+              href="https://franz-haniel-gymnasium.eu/iserv/mail"
+              target="_blank"
+              class="button"
+              >Zu deinen Mails</a
+            >
+            <a mat-button routerLink="/login" class="button">Anmelden</a>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- ##### VERIFY EMAIL ##### -->
+    <div class="verifyEmail" *ngIf="mode == 'verifyEmail'">
+      <img src="assets/undraw/celebration.svg" alt="Yeahh!" />
+      <div class="text">
+        <p class="headline">
+          E-Mail verifiziert
+        </p>
+        <div class="loading" *ngIf="loading">
+          <mat-spinner diameter="32"></mat-spinner>
+          <p>E-Mail wird verifiziert…</p>
+        </div>
+        <ng-container *ngIf="!loading">
+          <p class="info">
+            Deine E-Mail wurde erfolgreich verifiziert. Du kannst dich nun mit
+            deiner E-Mail und deinem Passwort anmelden.
+          </p>
+          <div class="buttons">
+            <ng-container *ngIf="continueUrl"
+              ><a
+                mat-raised-button
+                color="primary"
+                [href]="continueUrl"
+                class="button"
+                >Weiter</a
+              >
+              <a mat-button routerLink="/login" class="button">Anmelden</a>
+            </ng-container>
+            <ng-container *ngIf="!continueUrl">
+              <a
+                mat-raised-button
+                color="primary"
+                routerLink="/login"
+                class="button"
+                >Anmelden</a
+              >
+            </ng-container>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- ##### FORGOT PASSWORD ##### -->
+    <div class="forgotPassword" *ngIf="mode == 'forgotPassword'">
+      <ng-container *ngIf="!submitted">
+        <img src="assets/undraw/forgot_password.svg" alt="Passwort vergessen" />
+        <div class="text">
+          <p class="headline">
+            Passwort vergessen?
+          </p>
+          <div class="loading" *ngIf="loading">
+            <mat-spinner diameter="32"></mat-spinner>
+            <p>E-Mail wird gesendet…</p>
+          </div>
+          <form [formGroup]="actionForm" *ngIf="!loading">
+            <p class="info">
+              Gib deine Konto-E-Mail ein, um einen Link zu erhalten, mit dem du
+              dein Passwort zurücksetzen kannst.
+            </p>
+            <mat-form-field hideRequiredMarker>
+              <mat-label>E-Mail</mat-label>
+              <input
+                matInput
+                type="text"
+                placeholder="vorname.nachname"
+                formControlName="email"
+                autocorrect="off"
+                autocapitalize="none"
+                trim
+                required
+              />
+              <p matSuffix>{{ constant.displayedEmailSuffix }}</p>
+              <mat-error *ngIf="email.invalid">{{
+                getEmailErrorMessage()
+              }}</mat-error>
+            </mat-form-field>
+            <div class="buttons">
+              <button
+                mat-raised-button
+                color="primary"
+                class="button"
+                [disabled]="actionForm.invalid"
+                (click)="submitForgotPassword()"
+              >
+                Passwort zurücksetzen
+              </button>
+              <a mat-button routerLink="/login" class="button">Anmelden</a>
+            </div>
+          </form>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="submitted">
+        <img src="assets/undraw/message_sent.svg" alt="E-Mail gesendet" />
+        <div class="text">
+          <p class="headline">
+            E-Mail gesendet
+          </p>
+          <p class="info">
+            Wir haben dir eine E-Mail mit einem Link, mithilfe dessen du ein
+            neues Passwort festlegen kannst, gesendet.
+          </p>
+          <div class="buttons">
+            <a
+              mat-raised-button
+              color="primary"
+              href="https://franz-haniel-gymnasium.eu/iserv/mail"
+              target="_blank"
+              class="button"
+              >Zu deinen Mails</a
+            >
+            <a mat-button routerLink="/login" class="button">Anmelden</a>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</div>

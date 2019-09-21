@@ -1,0 +1,45 @@
+<div class="toolbar-extention"></div>
+<div class="class">
+  <ng-container *ngIf="!sub">
+    <header>
+      <h1>{{ helper.isClass() ? 'Klasse' : 'Stufe' }} {{ class }}</h1>
+      <div class="actions">
+        <button mat-icon-button matTooltip="Löschen" (click)="onDelete()">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </header>
+    <div class="body">
+      <div class="loading" *ngIf="isLoading">
+        <mat-spinner diameter="32"></mat-spinner>
+      </div>
+      <mat-action-list class="list">
+        <button mat-list-item routerLink="members">
+          <p mat-line>
+            Mitglieder <span class="amount">({{ members.length }})</span>
+          </p>
+          <mat-icon matSuffix>chevron_right</mat-icon>
+        </button>
+        <button mat-list-item routerLink="admins">
+          <p mat-line>
+            Administratoren <span class="amount">({{ admins.length }})</span>
+          </p>
+          <mat-icon matSuffix>chevron_right</mat-icon>
+        </button>
+        <button mat-list-item routerLink="courses">
+          <p mat-line>
+            Kurse
+          </p>
+          <mat-icon matSuffix>chevron_right</mat-icon>
+        </button>
+        <button mat-list-item routerLink="timetable">
+          <p mat-line>
+            Stundenplan
+          </p>
+          <mat-icon matSuffix>chevron_right</mat-icon>
+        </button>
+      </mat-action-list>
+    </div>
+  </ng-container>
+  <router-outlet *ngIf="sub" (activate)="onActivate($event)"></router-outlet>
+</div>

@@ -1,0 +1,72 @@
+@import ../../../../../var
+
+.help
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: mat-color($background-light, background)
+    z-index: 6
+
+    mat-toolbar
+        padding: 0 8px
+
+        .close-btn
+            color: mat-color($foreground-light, icon)
+            margin: 0 24px 0 0
+            z-index: 1
+
+        .title
+            position: absolute
+            left: 0
+            width: 100%
+            text-align: center
+
+    .container
+        display: flex
+        justify-content: center
+        align-items: center
+        height: calc(100% - 56px)
+
+        .coming-soon
+            margin: 0
+            padding: 0 24px
+
+            h3
+                margin: 0
+                padding: 0
+                font-size: 16px
+                font-weight: 500
+                color: mat-color($foreground-light, text)
+                text-align: center
+
+            p
+                margin: 8px 0 0 0
+                padding: 0
+                font-size: 14px
+                font-weight: 400
+                color: mat-color($foreground-light, text)
+                text-align: center
+
+                a
+                    color: mat-color($primary-light)
+                    text-decoration: none
+
+                    &:hover
+                        text-decoration: underline
+
+@media not all and ($mat-xsmall)
+    .help
+        mat-toolbar
+            background-color:  mat-color($background-light, card)
+            border-bottom: 1px solid mat-color($foreground-light, divider)
+
+            .title
+                position: static
+                left: auto
+                width: auto
+                text-align: left
+
+        .container
+            height: calc(100% - 64px)

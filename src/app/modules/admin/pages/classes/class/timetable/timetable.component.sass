@@ -1,0 +1,256 @@
+@import ../../../../../../../var
+
+::ng-deep div.class
+    -webkit-transform: translate3d(0, 0, 0)
+
+header
+    display: block
+    position: relative
+    height: 64px
+    width: 100%
+    border-bottom: 1px solid mat-color($foreground-light, divider)
+
+    h1
+        margin: 0 0 0 16px
+        padding: 0
+        display: inline-block
+        font-size: 20px
+        font-weight: 400
+        line-height: 64px
+
+        mat-icon
+            position: relative
+            top: 3px
+            font-size: 20px
+            width: 20px
+            height: 20px
+            color: mat-color($foreground-light, icon)
+
+    .actions
+        position: absolute
+        right: 16px
+        top: 0
+        bottom: 0
+
+        .intermediate
+            padding: 8px
+            margin: 12px 0
+
+        button, a
+            margin: 12px 8px 12px 0
+
+            &:last-child
+                margin: 12px 0
+
+            mat-icon
+                color: mat-color($foreground-light, icon)
+
+.body
+    margin: 0
+    padding: 0
+    width: 100%
+    height: 100%
+    min-height: 200px
+    position: relative
+    overflow: auto
+
+    .loading
+        position: absolute
+        top: 0
+        left: 0
+        bottom: 0
+        right: 0
+        background: mat-color($background-light, disabled-button)
+        z-index: 1
+        display: flex
+        align-items: center
+        justify-content: center
+
+    table
+        width: 100%
+        height: 100%
+        border-collapse: collapse
+
+        tr
+            height: calc((100vh - 84px) / 7)
+
+            &:nth-child(5)
+                th, td
+                    border-bottom: 1px solid rgba(mat-color($foreground-light, divider), 0.24)
+
+        tr, td, th
+            padding: 0
+            border-bottom: 1px solid mat-color($foreground-light, divider)
+            border-right: 1px solid mat-color($foreground-light, divider)
+
+        td:last-child
+            border-right: none
+
+        th
+            padding: 0 4px 0 6px
+            font-size: 12px
+            font-weight: 400
+            text-align: right
+            color: mat-color($foreground-light, secondary-text)
+
+            .number
+                display: block
+
+            .time
+                display: block
+
+                .divider
+                    display: block
+                    height: 14px
+
+        .table-header
+            height: 20px
+            
+            th
+                padding: 0
+                line-height: 20px
+                font-size: 12px
+                font-weight: 500
+                text-align: center
+                color: mat-color($foreground-light, secondary-text)
+                border-right: none
+
+        .empty
+            display: flex
+            flex-wrap: wrap
+            align-content: center
+            height: calc(100% - 8px)
+            min-height: 64px
+            margin: 4px
+            overflow: hidden
+            cursor: pointer
+            
+            p
+                margin: 0
+                padding: 0
+                width: 100%
+                font-size: 16px
+                font-weight: 500
+                opacity: 0
+                text-align: center
+
+        .multi-lesson
+            display: flex
+            flex-wrap: wrap
+            align-items: center
+            height: calc(100% - 8px)
+            min-height: 64px
+            margin: 4px
+            background-color: mat-color($foreground-light, icon)
+            border-radius: 4px
+            overflow: hidden
+            cursor: pointer
+            transition: box-shadow 200ms $ease-in-out-curve-function
+            +mat-elevation(2)
+
+            p
+                margin: 0
+                padding: 0
+
+            .count
+                width: 100%
+                font-size: 20px
+                font-weight: 400
+                color: mat-color($foreground-dark, text)
+                text-align: center
+
+        .lesson
+            display: flex
+            flex-wrap: wrap
+            align-content: center
+            height: calc(100% - 8px)
+            min-height: 64px
+            margin: 4px
+            padding: 0 4px
+            background-color: mat-color($primary-light)
+            border-radius: 4px
+            overflow: hidden
+            cursor: pointer
+            transition: box-shadow 200ms $ease-in-out-curve-function
+            +mat-elevation(2)
+
+            &.contrast
+                .subject
+                    color: mat-color($foreground-light, text)
+
+                .teacher,
+                .room
+                    color: mat-color($foreground-light, secondary-text)
+
+            &:hover
+                +mat-elevation(4)
+
+            p
+                margin: 0
+                padding: 0
+
+            .subject
+                width: 100%
+                font-size: 16px
+                font-weight: 500
+                color: mat-color($foreground-dark, text)
+                text-align: center
+
+            .teacher,
+            .room
+                width: 100%
+                font-size: 12px
+                font-weight: 400
+                color: mat-color($foreground-dark, secondary-text)
+                text-align: center
+
+@media not all and ($mat-xsmall)
+    .header
+        display: block
+        height: 64px
+        width: 100%
+        border-bottom: 1px solid mat-color($foreground-light, divider)
+
+        h1
+            margin: 0 0 0 24px
+
+    .body
+        padding: 4px 0 0 0
+
+        table
+            tr
+                height: auto
+
+                &:nth-child(5)
+                    th, td
+                        border-bottom: 1px solid mat-color($foreground-light, divider)
+
+                &:last-child
+                    th, td
+                        padding-bottom: 8px
+
+                &.table-header
+                    th:last-child
+                        padding-right: 24px
+
+                td:last-child
+                    padding-right: 24px
+
+            th
+                padding: 0 4px 0 14px
+
+                .time
+                    .divider
+                        display: inline
+                        height: auto
+
+                        &::after
+                            content: '–'
+
+            tr, td, th
+                border-bottom: 1px solid rgba(mat-color($foreground-light, divider), 0.08)
+                border-right: 1px solid rgba(mat-color($foreground-light, divider), 0.08)
+
+            .table-header
+                th
+                    color: mat-color($foreground-light, secondary-text)

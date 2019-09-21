@@ -1,0 +1,117 @@
+@import ../../../../var
+
+form
+    ul
+        margin: 16px 0 0 0
+        list-style: none
+        padding: 0
+
+        li
+            width: 100%
+            padding: 0 0 16px 0
+
+            section
+                display: flex
+                flex-wrap: wrap
+                justify-content: space-between
+                align-content: center
+                height: 96px
+                padding: 0 0 16px 0
+                border-bottom: 1px solid mat-color($foreground-light, divider)
+
+                &.induvidual
+                    border-bottom: none
+
+                mat-form-field
+                    height: 64px
+                    width: calc(50% - 8px)
+
+                mat-checkbox
+                    height: 32px
+                    line-height: 32px
+                    width: 50%
+
+                button
+                    margin: -4px 0 0 0
+                    color: mat-color($foreground-light, icon)
+
+            ul
+                position: relative
+                padding: 0 0 0 32px
+                margin: 0 0 24px 0
+                border-left: 2px solid mat-color($foreground-light, divider)
+
+                &::after
+                    content: ''
+                    display: block
+                    position: absolute
+                    top: calc(100% + 20px)
+                    left: 0
+                    width: 100%
+                    height: 1px
+                    margin: 0
+                    background-color: mat-color($foreground-light, divider)
+
+                li
+                    width: 100%
+
+                    &.teacher
+                        display: flex
+                        flex-wrap: wrap
+                        justify-content: space-between
+
+                        h4
+                            margin: 0 0 4px 0
+                            width: 100%
+                            font-size: 14px
+                            font-weight: 500
+                            color: mat-color($foreground-light, secondary-text)
+
+                        mat-form-field
+                            &:nth-child(even)
+                                width: calc(25% - 8px)
+
+                            &:nth-child(odd)
+                                width: calc(50% - 8px)
+
+    button
+        color: mat-color($foreground-light, icon)
+
+p.invalid
+    color: mat-color($warn-light)
+    font-size: 14px
+    line-height: 20px
+
+    mat-icon
+        position: relative
+        top: 3px
+        font-size: 18px
+        width: 18px
+        height: 18px
+
+@media not all and ($mat-xsmall)
+    form
+        ul
+            li
+                padding: 0
+                margin: 0
+                border-bottom: none
+
+                section
+                    flex-wrap: nowrap
+                    justify-content: space-between
+                    align-items: center
+                    height: 64px
+                    line-height: 64px
+                    padding: 0
+                    border-bottom: none
+                    
+                    mat-form-field
+                        width: calc(35% - 8px)
+
+                    mat-checkbox
+                        width: calc(20% - 8px)
+
+                ul
+                    &::after
+                        display: none

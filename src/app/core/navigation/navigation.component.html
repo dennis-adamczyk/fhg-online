@@ -1,0 +1,195 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport="true"
+    (openedChange)="onChange()"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="!(isHandset$ | async)"
+  >
+    <mat-toolbar [class.extended]="extended && auth.user">
+      <ng-container *ngIf="auth.user as user">
+        <div class="logo" routerLink="/">
+          <img src="assets/logo_white.svg" alt="FHG Online" />
+          <div class="badge">
+            Beta
+          </div>
+        </div>
+
+        <div class="classes">
+          <div class="class active">
+            <p>{{ user.class }}</p>
+          </div>
+        </div>
+        <div class="user">
+          <div class="text">
+            <p class="name">
+              {{ auth.getDisplayName(user) }}
+            </p>
+            <p class="details">{{ auth.getRoleName(user) }}</p>
+          </div>
+          <button
+            type="button"
+            mat-icon-button
+            class="dropDown"
+            (click)="onExtendNavigation()"
+          >
+            <mat-icon mat-icon-button>arrow_drop_down</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!auth.user">
+        <div class="large">
+          <div class="logo" routerLink="/">
+            <img src="assets/logo_white.svg" alt="FHG Online" />
+            <div class="badge">
+              Beta
+            </div>
+          </div>
+          <p>FHG Online</p>
+        </div>
+      </ng-container>
+    </mat-toolbar>
+    <mat-nav-list class="sidenav-list">
+      <ng-container *ngIf="auth.user as user">
+        <ng-container *ngIf="!extended">
+          <a
+            mat-list-item
+            routerLink="/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <mat-icon mat-list-icon>home</mat-icon>
+            <p mat-line>Übersicht</p>
+          </a>
+          <a mat-list-item routerLink="/timetable" routerLinkActive="active">
+            <mat-icon mat-list-icon>access_time</mat-icon>
+            <p mat-line>Stundenplan</p>
+          </a>
+          <a mat-list-item routerLink="/homework" routerLinkActive="active">
+            <mat-icon mat-list-icon>list</mat-icon>
+            <p mat-line>Hausaufgaben</p>
+          </a>
+          <a
+            mat-list-item
+            routerLink="/calendar"
+            routerLinkActive="active"
+            *ngIf="false"
+          >
+            <mat-icon mat-list-icon>event</mat-icon>
+            <p mat-line>Kalender</p>
+          </a>
+          <mat-divider></mat-divider>
+          <a
+            mat-list-item
+            routerLink="/admin"
+            routerLinkActive="active"
+            *ngIf="auth.user.roles.guard || auth.user.roles.admin"
+          >
+            <mat-icon mat-list-icon>settings_applications</mat-icon>
+            <p mat-line>Administration</p>
+          </a>
+          <a mat-list-item routerLink="/settings" routerLinkActive="active">
+            <mat-icon mat-list-icon>settings</mat-icon>
+            <p mat-line>Einstellungen</p>
+          </a>
+          <a mat-list-item routerLink="/help" routerLinkActive="active">
+            <mat-icon mat-list-icon>help</mat-icon>
+            <p mat-line>Hilfe & Feedback</p>
+          </a>
+          <a mat-list-item routerLink="/info" routerLinkActive="active">
+            <mat-icon mat-list-icon>information</mat-icon>
+            <p mat-line>Informationen</p>
+          </a>
+        </ng-container>
+        <ng-container *ngIf="extended">
+          <a mat-list-item routerLink="/settings" fragment="account">
+            <mat-icon mat-list-icon>account_circle</mat-icon>
+            <p mat-line>Mein Konto</p>
+          </a>
+          <a mat-list-item (click)="auth.logout()">
+            <mat-icon mat-list-icon>exit_to_app</mat-icon>
+            <p mat-line>Abmelden</p>
+          </a>
+          <mat-divider></mat-divider>
+          <a mat-list-item routerLink="/help" routerLinkActive="active">
+            <mat-icon mat-list-icon>help</mat-icon>
+            <p mat-line>Hilfe & Feedback</p>
+          </a>
+          <a mat-list-item routerLink="/info" routerLinkActive="active">
+            <mat-icon mat-list-icon>information</mat-icon>
+            <p mat-line>Informationen</p>
+          </a>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="!auth.user">
+        <a mat-list-item routerLink="/start" routerLinkActive="active">
+          <mat-icon mat-list-icon>home</mat-icon>
+          <p mat-line>Start</p>
+        </a>
+        <a
+          mat-list-item
+          routerLink="/about"
+          routerLinkActive="active"
+          *ngIf="false"
+        >
+          <mat-icon mat-list-icon>group</mat-icon>
+          <p mat-line>Über Uns</p>
+        </a>
+        <mat-divider></mat-divider>
+        <a
+          mat-list-item
+          routerLink="/login"
+          [class.active]="isLinkActive('/login')"
+        >
+          <mat-icon mat-list-icon>exit_to_app</mat-icon>
+          <p mat-line>Anmelden</p>
+        </a>
+        <a mat-list-item routerLink="/login/register" routerLinkActive="active">
+          <mat-icon mat-list-icon>person_add</mat-icon>
+          <p mat-line>Registrieren</p>
+        </a>
+        <a mat-list-item routerLink="/info" routerLinkActive="active">
+          <mat-icon mat-list-icon>information</mat-icon>
+          <p mat-line>Informationen</p>
+        </a>
+      </ng-container>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar #mainToolbar class="main-toolbar" color="primary">
+      <ng-container [ngSwitch]="(activeMenuItem$ | async)?.iconFunction">
+        <ng-container *ngIf="(activeMenuItem$ | async)?.iconFunction == 'back'">
+          <button
+            type="button"
+            class="back-btn"
+            aria-label="Previous page"
+            mat-icon-button
+            (click)="location.back()"
+            [disableRipple]="isHandset$ | async"
+          >
+            <mat-icon aria-label="Side nav back icon">arrow_back</mat-icon>
+          </button>
+        </ng-container>
+        <ng-container *ngIf="(activeMenuItem$ | async)?.iconFunction == 'menu'">
+          <button
+            type="button"
+            class="menu-btn"
+            aria-label="Toggle sidenav"
+            mat-icon-button
+            (click)="drawer.toggle()"
+            [disableRipple]="isHandset$ | async"
+          >
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+        </ng-container>
+      </ng-container>
+
+      <span>{{ toolbarService.title$ | async }}</span>
+    </mat-toolbar>
+    <main>
+      <ng-content></ng-content>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

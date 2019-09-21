@@ -1,0 +1,89 @@
+<div class="symbol">
+  <mat-icon>
+    {{ sanctionName == 'ban' ? 'gavel' : '' }}
+    {{ sanctionName == 'block' ? 'lock' : '' }}
+    {{ sanctionName == 'interaction' ? 'link_off' : '' }}
+  </mat-icon>
+</div>
+<mat-dialog-content>
+  <h2 mat-dialog-title>
+    {{ getSanctionName() }}
+  </h2>
+  <div class="details" *ngIf="sanctionName == 'ban'">
+    <p>
+      Dein Konto wurde am
+      <span>{{ getFormattedDateOf(sanction.since) }}</span> um
+      <span>{{ getFormattedTimeOf(sanction.since) }}</span> Uhr von
+      <span>{{ sanction.by.name }}</span> dauerhaft suspendiert. Du hast künftig
+      keinen Zugriff mehr auf die Dienste von FHG Online.
+    </p>
+    <div class="reason" *ngIf="sanction.reason">
+      <h3>Anmerkungen</h3>
+      <p>{{ sanction.reason }}</p>
+    </div>
+  </div>
+  <div class="details" *ngIf="sanctionName == 'block'">
+    <p>
+      Dein Konto wurde am
+      <span>{{ getFormattedDateOf(sanction.since) }}</span> um
+      <span>{{ getFormattedTimeOf(sanction.since) }}</span> Uhr von
+      <span>{{ sanction.by.name }}</span> temporär
+      <span *ngIf="sanction.permanent">auf unbestimmte Zeit</span
+      ><span *ngIf="!sanction.permanent"
+        >für
+        {{
+          getFormattedDifferenceDurationOf(sanction.since, sanction.until)
+        }}</span
+      >
+      gesperrt. Du hast
+      <ng-container *ngIf="sanction.permanent"
+        >bis die Sperre aufgehoben wird</ng-container
+      >
+      <ng-container *ngIf="!sanction.permanent"
+        >bis zum <span>{{ getFormattedDateOf(sanction.until) }}</span> um
+        <span>{{ getFormattedTimeOf(sanction.until) }}</span> Uhr
+      </ng-container>
+      keinen Zugriff mehr auf die Dienste von FHG Online.
+    </p>
+    <div class="reason" *ngIf="sanction.reason">
+      <h3>Anmerkungen</h3>
+      <p>{{ sanction.reason }}</p>
+    </div>
+  </div>
+  <div class="details" *ngIf="sanctionName == 'interaction'">
+    <p>
+      Dir wurde am
+      <span>{{ getFormattedDateOf(sanction.since) }}</span> um
+      <span>{{ getFormattedTimeOf(sanction.since) }}</span> Uhr von
+      <span>{{ sanction.by.name }}</span> eine temporäre Interaktionssperre
+      <span *ngIf="sanction.permanent">auf unbestimmte Zeit</span
+      ><span *ngIf="!sanction.permanent"
+        >für
+        {{
+          getFormattedDifferenceDurationOf(sanction.since, sanction.until)
+        }}</span
+      >
+      verhängt. Du hast
+      <ng-container *ngIf="sanction.permanent"
+        >bis die Sperre aufgehoben wird</ng-container
+      >
+      <ng-container *ngIf="!sanction.permanent"
+        >bis zum <span>{{ getFormattedDateOf(sanction.until) }}</span> um
+        <span>{{ getFormattedTimeOf(sanction.until) }}</span> Uhr
+      </ng-container>
+      keinen Zugriff mehr auf geteilte Hausaufgaben auf FHG Online.
+    </p>
+    <div class="reason" *ngIf="sanction.reason">
+      <h3>Anmerkungen</h3>
+      <p>{{ sanction.reason }}</p>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button routerLink="/help" tabindex="-1" mat-dialog-close>
+    HILFE</button
+  ><!-- TODO: Help Link -->
+  <button mat-button color="primary" mat-dialog-close>
+    OK
+  </button>
+</mat-dialog-actions>

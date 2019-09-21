@@ -1,0 +1,204 @@
+<div class="homework-details" [class.desktop]="!(handset$ | async)">
+  <mat-toolbar>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      mat-icon-button
+      (click)="navigateBack()"
+    >
+      <mat-icon aria-label="Close homework icon">close</mat-icon>
+    </button>
+    <div class="actions">
+      <button
+        type="button"
+        class="share"
+        mat-icon-button
+        (click)="onShare()"
+        matTooltip="Teilen"
+        *ngIf="!data.personal"
+      >
+        <mat-icon>share</mat-icon>
+      </button>
+      <button
+        type="button"
+        class="report"
+        mat-icon-button
+        (click)="onReport()"
+        matTooltip="Melden"
+        *ngIf="!data.personal && data.by.id !== auth.user.id"
+      >
+        <mat-icon>report</mat-icon>
+      </button>
+      <button
+        type="button"
+        class="edit"
+        mat-icon-button
+        (click)="onEdit()"
+        matTooltip="Bearbeiten"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button
+        type="button"
+        class="delete"
+        mat-icon-button
+        (click)="onDelete()"
+        matTooltip="Löschen"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+      <mat-checkbox
+        class="done"
+        [checked]="data.done"
+        (change)="onChangeDone($event)"
+      ></mat-checkbox>
+    </div>
+  </mat-toolbar>
+  <div class="container">
+    <div class="title">
+      <div
+        class="icon"
+        [style.background-color]="helper.getColor(data.course.color)"
+      >
+        <p
+          class="subject"
+          [style.color]="helper.getContrastColor(data.course.color)"
+        >
+          {{ data.course.short }}
+        </p>
+      </div>
+      <h2>{{ data.title }}</h2>
+    </div>
+    <div class="details">
+      <div class="item">
+        <mat-icon>
+          subject
+        </mat-icon>
+        <p>
+          {{ data.details }}
+          <span *ngIf="!data.details">Keine Details</span>
+        </p>
+      </div>
+      <div class="item">
+        <mat-icon>
+          widgets
+        </mat-icon>
+        <p>
+          {{ data.course.subject }}
+        </p>
+      </div>
+      <div class="item" *ngIf="!data.personal">
+        <mat-icon>
+          share
+        </mat-icon>
+        <p>
+          {{ getDisplayClass(data.course.class) }}
+        </p>
+      </div>
+      <div class="item" *ngIf="data.personal">
+        <mat-icon>
+          lock
+        </mat-icon>
+        <p>
+          Persönliche Hausaufgabe
+        </p>
+      </div>
+      <div class="item" *ngIf="isAdmin() && !data.personal">
+        <mat-icon>person</mat-icon>
+        <p>
+          <a [routerLink]="'/admin/users/' + data.by.id">{{
+            data.by.name.first_name + ' ' + data.by.name.last_name
+          }}</a>
+        </p>
+      </div>
+      <div class="item">
+        <mat-icon>
+          event_available
+        </mat-icon>
+        <p>
+          {{ getDisplayLesson(data.until) }}
+        </p>
+      </div>
+      <div class="item">
+        <mat-icon>
+          event
+        </mat-icon>
+        <p>
+          {{ getDisplayLesson(data.entered) }}
+        </p>
+      </div>
+    </div>
+    <div class="corrections" *ngIf="correctionsOf(data.corrections).length">
+      <h3>Korrekturen</h3>
+      <div
+        class="correction"
+        [class.selected]="isSelectedCorrection(corr.id)"
+        *ngFor="let corr of correctionsOf(data.corrections)"
+      >
+        <div class="changes" *ngIf="corr.title || corr.details">
+          <div class="content">
+            <p class="title" *ngIf="corr.title">{{ corr.title }}</p>
+            <p class="details" *ngIf="corr.details">{{ corr.details }}</p>
+          </div>
+          <a
+            class="by"
+            *ngIf="isAdmin()"
+            [routerLink]="'/admin/users/' + corr.by.id"
+            >{{ corr.by.name.first_name + ' ' + corr.by.name.last_name }}</a
+          >
+        </div>
+        <div class="changes delete" *ngIf="corr.delete">
+          <div class="content">
+            <mat-icon>
+              delete
+            </mat-icon>
+            <p class="delete">Löschung</p>
+          </div>
+          <a
+            class="by"
+            *ngIf="isAdmin()"
+            [routerLink]="'/admin/users/' + corr.by.id"
+            >{{ corr.by.name.first_name + ' ' + corr.by.name.last_name }}</a
+          >
+        </div>
+        <button
+          mat-icon-button
+          class="delete"
+          matTooltip="Korrektur löschen"
+          (click)="deleteCorrection(corr.id)"
+          *ngIf="corr.by.id == auth.user.id || isAdmin()"
+        >
+          <mat-icon>
+            clear
+          </mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          class="edit"
+          matTooltip="Korrektur bearbeiten"
+          [routerLink]="'/homework/edit/' + data.course.id + '/' + data.id"
+          *ngIf="corr.by.id == auth.user.id && !corr.delete"
+        >
+          <mat-icon>
+            edit
+          </mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          class="select"
+          [matTooltip]="
+            isSelectedCorrection(corr.id)
+              ? 'Als korrekt markiert'
+              : 'Als korrekt markieren'
+          "
+          (click)="selectCorrection(corr.id)"
+        >
+          <mat-icon>
+            done
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

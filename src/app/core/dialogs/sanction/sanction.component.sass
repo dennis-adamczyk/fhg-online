@@ -1,0 +1,46 @@
+@import ../../../../var
+
+::ng-deep .mat-dialog-container
+    position: relative
+    overflow: visible
+
+.symbol
+    position: absolute
+    top: 0
+    left: 50%
+    margin: 0 auto
+    width: 64px 
+    height: 64px
+    background-color: mat-color($warn-light)
+    border-radius: 50%
+    transform: translate(-50%, -50%)
+
+    mat-icon
+        color: mat-color($foreground-dark, text)
+        padding: 20px
+
+mat-dialog-content
+    min-width: 192px
+    padding: 24px 24px 0 24px
+
+    h2
+        text-align: center
+
+    p
+        margin: 16px 0
+        font-size: 16px
+
+        span
+            font-weight: 500
+
+    div.reason
+        h3
+            margin: 0
+            font-size: 18px
+            font-weight: 500
+
+        p
+            margin: 8px 0 0 0
+
+
+    

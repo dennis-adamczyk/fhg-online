@@ -1,0 +1,157 @@
+@import ../../../../../var
+
+.register
+    width: 100%
+    height: 100%
+
+    p.tagline
+        margin: 48px 0
+        font-size: 14px
+        font-weight: 500
+        text-align: center
+        color: mat-color($foreground-light, secondary-text)
+
+    .stepper
+        background-color: inherit
+
+        .content
+            p
+                margin: 0
+                padding: 0
+                font-size: 14px
+                font-weight: 400
+
+            &.role
+                mat-radio-group
+                    display: block
+                    margin: 12px 0
+
+                    mat-radio-button
+                        display: block
+                        padding: 8px 0
+
+            &.email
+                mat-form-field
+                    width: 100%
+
+                    p[matSuffix]
+                        font-size: 12px
+
+                    .error-help
+                        float: right
+                        padding: 8px
+                        margin: -8px
+
+            &.name
+                display: flex
+                justify-content: space-between
+                flex-wrap: wrap
+
+                p
+                    width: 100%
+
+                mat-form-field
+                    margin: 12px 0 0 0
+                    width: calc(50% - 4px)
+
+            &.password
+                mat-form-field
+                    width: 100%
+
+                    .passwordVisibility
+                        user-select: none
+                        cursor: pointer
+                        color: mat-color($foreground-light, secondary-text)
+
+                mat-checkbox
+                    ::ng-deep
+                        .mat-checkbox-layout
+                            white-space: normal
+
+                        .mat-checkbox-label
+                            padding: 0 0 0 12px
+
+                            a
+                                color: mat-color($primary-light)
+                                text-decoration: none
+
+                                &:hover
+                                    text-decoration: underline
+
+        .loading
+            width: 100%
+            padding: 48px 0
+
+            mat-spinner
+                display: block
+                margin: 0 auto
+
+            p
+                display: block
+                margin: 16px 0 0 0
+                padding: 0
+                font-size: 14px
+                font-weight: 500
+                text-align: center
+                color: mat-color($foreground-light, secondary-text)
+
+
+        .bottom
+            margin: 16px 0 0 0
+
+            button
+                text-transform: uppercase
+
+                &.submit[disabled]
+                    background-color: rgba(mat-color($primary-light), .54)
+                    color: mat-color($foreground-dark, text)
+
+                &:first-child
+                    margin: 0 8px 0 0
+
+                &[matStepperPrevious]
+                    background-color: mat-color($background-light, disabled-button)
+                    color: mat-color($foreground-light, secondary-text)
+
+
+    .registered
+        margin: 64px 0
+        padding: 0 48px
+
+        img
+            display: block
+            margin: 0 auto
+            width: 80%
+            max-width: 256px
+            height: auto
+
+        .text
+            margin: 32px 0 0 0
+            
+
+            p
+                width: 100%
+                font-size: 14px
+                font-weight: 400
+                
+                &.headline
+                    font-size: 16px
+                    font-weight: 500
+
+            .buttons
+                display: flex
+                flex-wrap: wrap
+                justify-content: center
+                margin: 32px 0 0 0
+
+                a
+                    text-transform: uppercase
+                    margin: 0 8px 8px 0
+
+                    &:last-child
+                        margin: 0 0 8px 0
+
+@media not all and ($mat-xsmall)
+    .register
+        margin: 0 auto
+        width: 576px

@@ -1,0 +1,21 @@
+<div [@fabDismiss]="fabActive">
+  <div class="fab-dismiss" *ngIf="fabActive" (click)="onToggleFab()"></div>
+</div>
+
+<div class="fab-container">
+  <button mat-fab color="primary" class="fab-toggler" (click)="onToggleFab()">
+    <i class="material-icons" [@fabToggler]="fabActive">add</i>
+  </button>
+  <div class="fab-minis" [@speedDialStagger]="buttons.length">
+    <div
+      class="fab-mini"
+      (click)="$event.stopPropagation(); btn.click()"
+      *ngFor="let btn of buttons"
+    >
+      <p class="label" *ngIf="btn.label">{{ btn.label }}</p>
+      <button mat-mini-fab class="fab-secondary" color="secondary">
+        <i class="material-icons">{{ btn.icon }}</i>
+      </button>
+    </div>
+  </div>
+</div>

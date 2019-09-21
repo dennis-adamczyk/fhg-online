@@ -1,0 +1,282 @@
+<div class="register">
+  <p class="tagline" *ngIf="!registered">
+    Erstelle dein Konto in 5 einfachen Schritten
+  </p>
+  <form [formGroup]="registerForm" *ngIf="!registered">
+    <mat-vertical-stepper
+      formArrayName="formArray"
+      linear="true"
+      class="stepper"
+      (selectionChange)="onStepChange($event)"
+      [selectedIndex]="stepperIndex ? stepperIndex : undefined"
+      #stepper
+    >
+      <mat-step
+        formGroupName="0"
+        [stepControl]="formArray?.get([0])"
+        [editable]="!loading"
+      >
+        <ng-template matStepLabel>Wer bist du?</ng-template>
+        <div class="content role">
+          <p>Ich bin ein…</p>
+          <mat-radio-group formControlName="role" required>
+            <mat-radio-button value="student" color="primary"
+              >Schüler</mat-radio-button
+            >
+            <mat-radio-button value="teacher" color="primary"
+              >Lehrer</mat-radio-button
+            >
+            <mat-error *ngIf="role.invalid && role.touched">{{
+              getRoleErrorMessage()
+            }}</mat-error>
+          </mat-radio-group>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step
+        formGroupName="1"
+        [stepControl]="formArray?.get([1])"
+        [editable]="!loading"
+        #emailStep
+      >
+        <ng-template matStepLabel>Deine IServ-E-Mail eingeben</ng-template>
+        <div class="content email">
+          <mat-form-field>
+            <mat-label>E-Mail</mat-label>
+            <input
+              matInput
+              type="text"
+              placeholder="vorname.nachname"
+              formControlName="email"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="none"
+              trim
+              required
+            />
+            <p matSuffix>{{ constant.displayedEmailSuffix }}</p>
+            <mat-error *ngIf="email.invalid"
+              >{{ getEmailErrorMessage() }}
+              <mat-icon
+                *ngIf="email.hasError('invalidTeacher')"
+                class="error-help"
+                routerLink="help"
+                >help</mat-icon
+              ><!-- TODO: Link to Help page -->
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+          <button mat-button matStepperPrevious type="button">
+            Zurück
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step
+        formGroupName="2"
+        [stepControl]="formArray?.get([2])"
+        [editable]="!loading"
+      >
+        <ng-template matStepLabel>Namen überprüfen</ng-template>
+        <div class="content name">
+          <p>Ist das dein Name?</p>
+          <mat-form-field>
+            <mat-label>Vorname</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="first_name"
+              trim="blur"
+              required
+            />
+            <mat-error *ngIf="first_name.invalid">{{
+              getFirstNameErrorMessage()
+            }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Nachname</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="last_name"
+              trim="blur"
+              required
+            />
+            <mat-error *ngIf="last_name.invalid">{{
+              getLastNameErrorMessage()
+            }}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+          <button mat-button matStepperPrevious type="button">
+            Zurück
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step
+        formGroupName="3"
+        [stepControl]="formArray?.get([3])"
+        *ngIf="role.value == 'student'"
+        [editable]="!loading"
+      >
+        <ng-template matStepLabel>Klasse eingeben</ng-template>
+        <div class="content class">
+          <mat-form-field>
+            <mat-label>Klasse</mat-label>
+            <mat-select formControlName="class">
+              <mat-option *ngFor="let class of classes" [value]="class">{{
+                class
+              }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="class.invalid">{{
+              getClassErrorMessage()
+            }}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            matStepperNext
+            color="primary"
+            type="button"
+          >
+            Weiter
+          </button>
+          <button mat-button matStepperPrevious type="button">
+            Zurück
+          </button>
+        </div>
+      </mat-step>
+
+      <mat-step
+        formGroupName="4"
+        [stepControl]="formArray?.get([4])"
+        [editable]="!loading"
+      >
+        <ng-template matStepLabel>Passwort festlegen</ng-template>
+        <div class="content password" *ngIf="!loading">
+          <mat-form-field>
+            <mat-label>Passwort</mat-label>
+            <input
+              matInput
+              [type]="showPassword1 ? 'text' : 'password'"
+              formControlName="password1"
+              trim
+              required
+            />
+            <mat-icon
+              mat-icon-button
+              matSuffix
+              (click)="showPassword1 = !showPassword1"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="showPassword1"
+              class="passwordVisibility"
+              >{{ showPassword1 ? 'visibility_off' : 'visibility' }}</mat-icon
+            >
+            <mat-error *ngIf="password1.invalid">{{
+              getPassword1ErrorMessage()
+            }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Passwort wiederholen</mat-label>
+            <input
+              matInput
+              [type]="showPassword2 ? 'text' : 'password'"
+              formControlName="password2"
+              required
+            />
+            <mat-icon
+              mat-icon-button
+              matSuffix
+              (click)="showPassword2 = !showPassword2"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="showPassword2"
+              class="passwordVisibility"
+              >{{ showPassword2 ? 'visibility_off' : 'visibility' }}</mat-icon
+            >
+            <mat-error *ngIf="password2.invalid">{{
+              getPassword2ErrorMessage()
+            }}</mat-error>
+          </mat-form-field>
+          <mat-checkbox color="primary" formControlName="terms" class="terms">
+            Ich erkläre mich mit den
+            <a href="/info#privacy" target="_blank">Datenschutzbestimmungen</a>
+            und den
+            <a href="/info#terms" target="_blank">Nutzungsbedingungen</a> von
+            FHG Online einverstanden.
+          </mat-checkbox>
+        </div>
+        <div class="loading" *ngIf="loading">
+          <mat-spinner diameter="32"></mat-spinner>
+          <p>Konto wird erstellt…</p>
+        </div>
+        <div class="bottom">
+          <button
+            mat-raised-button
+            (click)="onSubmit()"
+            [disabled]="registerForm.invalid || loading"
+            type="submit"
+            class="submit"
+            color="primary"
+            type="button"
+          >
+            Fertig
+          </button>
+          <button mat-button matStepperPrevious type="button">
+            Zurück
+          </button>
+        </div>
+      </mat-step>
+    </mat-vertical-stepper>
+  </form>
+  <div class="registered" *ngIf="registered">
+    <img src="assets/undraw/happy_news.svg" alt="E-Mail gesendet" />
+    <div class="text">
+      <p class="headline">Verifiziere deine E-Mail</p>
+      <p>
+        Dein Konto wurde erfolgreich erstellt. Um dich anmelden zu können, musst
+        du auf den Link, den wir dir an deine IServ-E-Mail gesendet haben,
+        klicken.
+      </p>
+      <div class="buttons">
+        <a
+          mat-raised-button
+          color="primary"
+          href="https://franz-haniel-gymnasium.eu/iserv/mail"
+          target="_blank"
+        >
+          Zu deinen Mails
+        </a>
+        <a mat-button routerLink="/login">Anmelden</a>
+      </div>
+    </div>
+  </div>
+</div>

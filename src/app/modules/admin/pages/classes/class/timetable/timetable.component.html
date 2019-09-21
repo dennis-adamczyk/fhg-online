@@ -1,0 +1,83 @@
+<header>
+  <h1>
+    {{ title }}
+    <mat-icon>chevron_right</mat-icon>
+    Stundenplan
+  </h1>
+  <div class="actions">
+    <div class="intermediate" *ngIf="intermediate">
+      <mat-spinner diameter="24"></mat-spinner>
+    </div>
+  </div>
+</header>
+<div class="body">
+  <div class="loading" *ngIf="isLoading">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+  <table *ngIf="!isLoading">
+    <tr class="table-header">
+      <th></th>
+      <th *ngFor="let day of keysOf(constant.weekDayShort)">
+        {{ constant.weekDayShort[day] }}
+      </th>
+    </tr>
+
+    <tr *ngFor="let period of arrayOf(constant.maxLessons)">
+      <th>
+        <span
+          class="number"
+          *ngIf="settings.get('timetable.show_lesson_number')"
+          >{{ period }}.</span
+        >
+        <span class="time" *ngIf="settings.get('timetable.show_lesson_time')">
+          {{ constant.times[period].start }}
+          <span class="divider"></span>
+          {{ constant.times[period].end }}
+        </span>
+      </th>
+      <td *ngFor="let day of keysOf(constant.weekDayShort)">
+        <div
+          class="lesson"
+          *ngIf="lessonExists(day, period) && singleLesson(day, period)"
+          [style.background-color]="getColor(timetable[day][period].color)"
+          [class.contrast]="
+            getContrastColor(timetable[day][period].color) == '#000000'
+          "
+          (click)="onClickLesson(day, period)"
+        >
+          <p class="subject">
+            {{
+              settings.get('timetable.subjects_abbreviation')
+                ? timetable[day][period].short
+                : timetable[day][period].subject
+            }}
+          </p>
+          <p class="teacher" *ngIf="settings.get('timetable.show_teacher')">
+            {{
+              settings.get('timetable.teacher_abbreviation')
+                ? timetable[day][period].teacher.short
+                : timetable[day][period].teacher.last_name
+            }}
+          </p>
+          <p class="room" *ngIf="settings.get('timetable.show_room')">
+            {{ getRoomPrefix(day, period) + timetable[day][period].room }}
+          </p>
+        </div>
+        <div
+          class="multi-lesson"
+          *ngIf="lessonExists(day, period) && !singleLesson(day, period)"
+          (click)="onClickLesson(day, period)"
+        >
+          <p class="count">{{ timetable[day][period].length }}</p>
+        </div>
+        <div
+          class="empty"
+          *ngIf="!lessonExists(day, period)"
+          (click)="onAddLesson(day, period)"
+        >
+          <p>+++++</p>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

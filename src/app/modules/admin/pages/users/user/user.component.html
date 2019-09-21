@@ -1,0 +1,552 @@
+<header>
+  <h1>
+    {{ data ? data.name.first_name + ' ' + data.name.last_name : 'Benutzer' }}
+    <mat-icon
+      *ngIf="!isLoading && data.sanctions && data.sanctions.interaction"
+    >
+      link_off
+    </mat-icon>
+    <mat-icon *ngIf="!isLoading && data.sanctions && data.sanctions.block">
+      lock
+    </mat-icon>
+    <mat-icon *ngIf="!isLoading && data.sanctions && data.sanctions.ban">
+      gavel
+    </mat-icon>
+  </h1>
+  <div class="actions">
+    <button
+      mat-icon-button
+      matTooltip="Änderungen verwerfen"
+      (click)="onUndo()"
+      *ngIf="edited"
+    >
+      <mat-icon>undo</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      matTooltip="Speichern"
+      (click)="onSave()"
+      *ngIf="edited"
+    >
+      <mat-icon>save</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      matTooltip="Löschen"
+      (click)="onDelete()"
+      *ngIf="auth.user.roles.guard"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</header>
+<div class="body">
+  <div class="loading" *ngIf="isLoading">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+  <form [formGroup]="userForm" *ngIf="!isLoading">
+    <section formGroupName="name" class="name">
+      <mat-form-field>
+        <mat-label>Vorname</mat-label>
+        <input matInput formControlName="first_name" />
+        <mat-error *ngIf="first_name.invalid">{{
+          getFirstNameErrorMessage()
+        }}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Nachname</mat-label>
+        <input matInput formControlName="last_name" />
+        <mat-error *ngIf="last_name.invalid">{{
+          getLastNameErrorMessage()
+        }}</mat-error>
+      </mat-form-field>
+    </section>
+    <mat-form-field>
+      <mat-label>E-Mail</mat-label>
+      <input matInput formControlName="email" />
+      <p matSuffix>{{ constant.displayedEmailSuffix }}</p>
+      <mat-error *ngIf="email.invalid">{{ getEmailErrorMessage() }}</mat-error>
+    </mat-form-field>
+    <section formGroupName="roles" class="roles">
+      <h4>Rollen</h4>
+      <mat-checkbox color="primary" formControlName="guard">{{
+        getRoleName('guard')
+      }}</mat-checkbox>
+      <mat-checkbox color="primary" formControlName="admin">{{
+        getRoleName('admin')
+      }}</mat-checkbox>
+      <mat-checkbox
+        color="primary"
+        formControlName="teacher"
+        (change)="onTeacherChange($event)"
+        >{{ getRoleName('teacher') }}</mat-checkbox
+      >
+      <mat-checkbox
+        color="primary"
+        formControlName="student"
+        (change)="onStudentChange($event)"
+        >{{ getRoleName('student') }}</mat-checkbox
+      >
+    </section>
+    <mat-form-field (click)="loadClasses()">
+      <mat-label>Klasse/Stufe</mat-label>
+      <mat-select
+        formControlName="class"
+        (selectionChange)="onClassChange($event)"
+        *ngIf="isSingleClass"
+      >
+        <mat-option
+          [value]="userForm.get('class').value"
+          *ngIf="!classes.length"
+          >{{ userForm.get('class').value }}</mat-option
+        >
+        <mat-option *ngFor="let class of classes" [value]="class">{{
+          class
+        }}</mat-option>
+      </mat-select>
+      <mat-select formControlName="class" multiple *ngIf="!isSingleClass">
+        <mat-option
+          *ngFor="
+            let class of classes.length ? [] : userForm.get('class').value
+          "
+          [value]="class"
+          >{{ class }}</mat-option
+        >
+        <mat-option *ngFor="let class of classes" [value]="class">{{
+          class
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field (click)="loadCourses()">
+      <mat-label>Multikurse</mat-label>
+      <mat-select formControlName="courses" multiple>
+        <mat-option
+          *ngFor="
+            let course of courses.length ? [] : userForm.get('courses').value
+          "
+          [value]="course"
+          >{{ course }}</mat-option
+        >
+        <mat-option *ngFor="let course of courses" [value]="course">{{
+          course
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <section class="status">
+      <mat-form-field>
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option *ngFor="let status of max(2)" [value]="status">
+            {{ status }}</mat-option
+          >
+        </mat-select>
+        <mat-error *ngIf="status.invalid">{{
+          getStatusErrorMessage()
+        }}</mat-error>
+      </mat-form-field>
+      <p class="description">
+        0 – Registriert<br />
+        1 – Verifiziert<br />
+        2 – Aktiviert
+      </p>
+    </section>
+  </form>
+  <mat-expansion-panel class="sanctions">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Sanktionen
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="disabled" *ngIf="data && data.roles.guard">
+      <p>Dieser Benutzer kann nicht sanktioniert werden.</p>
+    </div>
+    <mat-accordion
+      [formGroup]="sanctionsForm"
+      *ngIf="data && !data.roles.guard"
+    >
+      <mat-expansion-panel
+        class="sanction interaction"
+        [class.active]="
+          !isLoading && data.sanctions && data.sanctions.interaction
+        "
+        *ngIf="!data.sanctions || !data.sanctions.ban"
+        #interaction
+        hideToggle
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>
+              link_off
+            </mat-icon>
+            <span>
+              Interaktionssperre
+            </span>
+          </mat-panel-title>
+          <mat-panel-description
+            *ngIf="!isLoading && data.sanctions && data.sanctions.interaction"
+          >
+            {{
+              data.sanctions.interaction.permanent
+                ? 'permanent'
+                : getSanctionCountdown('interaction')
+            }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="loading" *ngIf="sanctionLoading">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+        <form formGroupName="interaction">
+          <mat-radio-group
+            formControlName="permanent"
+            color="primary"
+            class="permanent"
+          >
+            <mat-radio-button [value]="false">bis</mat-radio-button>
+            <mat-radio-button [value]="true"
+              >auf unbestimmte Zeit</mat-radio-button
+            >
+          </mat-radio-group>
+          <div
+            class="time"
+            *ngIf="!sanctionsForm.get('interaction').get('permanent').value"
+          >
+            <div class="until">
+              <mat-form-field class="date">
+                <mat-label>Enddatum</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  [min]="now"
+                  (change)="onDateInput('interaction', $event)"
+                  formControlName="until"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker [touchUi]="isMobile()" #picker></mat-datepicker>
+              </mat-form-field>
+              <mat-form-field class="time">
+                <mat-label>Endzeit</mat-label>
+                <input
+                  matInput
+                  type="time"
+                  (change)="onTimeChange('interaction', $event)"
+                  [value]="
+                    getTimeFrom(
+                      sanctionsForm.get('interaction').get('until').value
+                    )
+                  "
+                />
+              </mat-form-field>
+            </div>
+            <div class="duration">
+              <h4>Dauer</h4>
+              <mat-form-field class="days">
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  (change)="onDurationDaysChange('interaction', $event)"
+                  [value]="
+                    getDurationDays(
+                      sanctionsForm.get('interaction').get('until').value,
+                      data && data.sanctions && data.sanctions.interaction
+                        ? getDateOf(data.sanctions.interaction.since)
+                        : null
+                    )
+                  "
+                />
+                <p matSuffix>Tage</p>
+              </mat-form-field>
+              <mat-form-field class="hours">
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  max="23"
+                  (change)="onDurationHourChange('interaction', $event)"
+                  [value]="
+                    getDurationHours(
+                      sanctionsForm.get('interaction').get('until').value,
+                      data && data.sanctions && data.sanctions.interaction
+                        ? getDateOf(data.sanctions.interaction.since)
+                        : null
+                    )
+                  "
+                />
+                <p matSuffix>Stunden</p>
+              </mat-form-field>
+            </div>
+          </div>
+          <mat-form-field>
+            <mat-label>Anmerkungen</mat-label>
+            <textarea
+              matInput
+              cdkTextareaAutosize
+              #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="5"
+              placeholder="z. B. Grund, Bedingung zur Aufhebung"
+              formControlName="reason"
+            ></textarea>
+          </mat-form-field>
+        </form>
+        <mat-action-row>
+          <button mat-button (click)="interaction.close()">Abbrechen</button>
+          <button
+            mat-button
+            color="primary"
+            (click)="onSanctionDelete('interaction')"
+            *ngIf="data && data.sanctions && data.sanctions.interaction"
+          >
+            Aufheben
+          </button>
+          <button
+            color="primary"
+            (click)="onSanctionSubmit('interaction')"
+            [disabled]="sanctionsForm.get('interaction').invalid"
+            mat-raised-button
+          >
+            {{
+              data && data.sanctions && data.sanctions.interaction
+                ? 'Aktuallisieren'
+                : 'Verhängen'
+            }}
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+      <mat-expansion-panel
+        class="sanction block"
+        [class.active]="!isLoading && data.sanctions && data.sanctions.block"
+        #block
+        *ngIf="!data.sanctions || !data.sanctions.ban"
+        hideToggle
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>
+              lock
+            </mat-icon>
+            <span>
+              Kontosperre
+            </span>
+          </mat-panel-title>
+          <mat-panel-description
+            *ngIf="!isLoading && data.sanctions && data.sanctions.block"
+          >
+            {{
+              data.sanctions.block.permanent
+                ? 'permanent'
+                : getSanctionCountdown('block')
+            }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="loading" *ngIf="sanctionLoading">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+        <form formGroupName="block">
+          <mat-radio-group
+            formControlName="permanent"
+            color="primary"
+            class="permanent"
+          >
+            <mat-radio-button [value]="false">bis</mat-radio-button>
+            <mat-radio-button [value]="true"
+              >auf unbestimmte Zeit</mat-radio-button
+            >
+          </mat-radio-group>
+          <div
+            class="time"
+            *ngIf="!sanctionsForm.get('block').get('permanent').value"
+          >
+            <div class="until">
+              <mat-form-field class="date">
+                <mat-label>Enddatum</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  [min]="now"
+                  (change)="onDateInput('block', $event)"
+                  formControlName="until"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker [touchUi]="isMobile()" #picker></mat-datepicker>
+              </mat-form-field>
+              <mat-form-field class="time">
+                <mat-label>Endzeit</mat-label>
+                <input
+                  matInput
+                  type="time"
+                  (change)="onTimeChange('block', $event)"
+                  [value]="
+                    getTimeFrom(sanctionsForm.get('block').get('until').value)
+                  "
+                />
+              </mat-form-field>
+            </div>
+            <div class="duration">
+              <h4>Dauer</h4>
+              <mat-form-field class="days">
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  (change)="onDurationDaysChange('block', $event)"
+                  [value]="
+                    getDurationDays(
+                      sanctionsForm.get('block').get('until').value,
+                      data && data.sanctions && data.sanctions.block
+                        ? getDateOf(data.sanctions.block.since)
+                        : null
+                    )
+                  "
+                />
+                <p matSuffix>Tage</p>
+              </mat-form-field>
+              <mat-form-field class="hours">
+                <input
+                  matInput
+                  type="number"
+                  min="0"
+                  max="23"
+                  (change)="onDurationHourChange('block', $event)"
+                  [value]="
+                    getDurationHours(
+                      sanctionsForm.get('block').get('until').value,
+                      data && data.sanctions && data.sanctions.block
+                        ? getDateOf(data.sanctions.block.since)
+                        : null
+                    )
+                  "
+                />
+                <p matSuffix>Stunden</p>
+              </mat-form-field>
+            </div>
+          </div>
+          <mat-form-field>
+            <mat-label>Anmerkungen</mat-label>
+            <textarea
+              matInput
+              cdkTextareaAutosize
+              #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="5"
+              placeholder="z. B. Grund, Bedingung zur Aufhebung"
+              formControlName="reason"
+            ></textarea>
+          </mat-form-field>
+        </form>
+        <mat-action-row>
+          <button mat-button (click)="block.close()">Abbrechen</button>
+          <button
+            mat-button
+            color="primary"
+            (click)="onSanctionDelete('block')"
+            *ngIf="data && data.sanctions && data.sanctions.block"
+          >
+            Aufheben
+          </button>
+          <button
+            color="primary"
+            (click)="onSanctionSubmit('block')"
+            [disabled]="sanctionsForm.get('block').invalid"
+            mat-raised-button
+          >
+            {{
+              data && data.sanctions && data.sanctions.block
+                ? 'Aktuallisieren'
+                : 'Verhängen'
+            }}
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+      <mat-expansion-panel
+        class="sanction ban"
+        [class.active]="!isLoading && data.sanctions && data.sanctions.ban"
+        #ban
+        hideToggle
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>
+              gavel
+            </mat-icon>
+            <span>
+              Kontoschließung
+            </span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="loading" *ngIf="sanctionLoading">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+        <form formGroupName="ban">
+          <mat-form-field>
+            <mat-label>Anmerkungen</mat-label>
+            <textarea
+              matInput
+              cdkTextareaAutosize
+              #autosize="cdkTextareaAutosize"
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="5"
+              formControlName="reason"
+              placeholder="z. B. Grund"
+            ></textarea>
+          </mat-form-field>
+        </form>
+        <mat-action-row>
+          <button mat-button (click)="ban.close()">Abbrechen</button>
+          <button
+            mat-button
+            color="primary"
+            (click)="onSanctionDelete('ban')"
+            *ngIf="data && data.sanctions && data.sanctions.ban"
+          >
+            Aufheben
+          </button>
+          <button
+            color="primary"
+            (click)="onSanctionSubmit('ban')"
+            [disabled]="sanctionsForm.get('ban').invalid"
+            mat-raised-button
+          >
+            {{
+              data && data.sanctions && data.sanctions.ban
+                ? 'Aktuallisieren'
+                : 'Verhängen'
+            }}
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-expansion-panel>
+  <mat-expansion-panel class="info">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Weitere Informationen
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <form [formGroup]="infoForm" *ngIf="!isLoading">
+      <mat-form-field>
+        <mat-label>Identifikations-Nummer</mat-label>
+        <input matInput formControlName="id" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Einstellungen geändert am</mat-label>
+        <input matInput formControlName="settings_changed" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Erstellt am</mat-label>
+        <input matInput formControlName="created_at" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Geändert am</mat-label>
+        <input matInput formControlName="updated_at" />
+      </mat-form-field>
+    </form>
+  </mat-expansion-panel>
+</div>

@@ -1,0 +1,315 @@
+@import ../../../../../../var
+
+$green: #009688
+
+.homework-details
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: mat-color($background-light, background)
+    z-index: 6
+    overflow: auto
+
+    mat-toolbar 
+        margin: 0
+        padding: 0 16px
+        display: flex
+        justify-content: space-between
+        align-items: center
+        background-color: mat-color($background-light, background)
+        height: 56px
+        overflow: hidden
+        position: sticky
+        top: 0
+
+        button
+            color: mat-color($foreground-light, icon)
+        
+        mat-checkbox
+            padding: 8px 11px
+
+            ::ng-deep
+                .mat-checkbox-inner-container
+                    height: 18px
+                    width: 18px
+
+            &.mat-checkbox-checked,
+            &:active
+                ::ng-deep .mat-checkbox-background,
+                ::ng-deep .mat-ripple-element
+                    background-color: #757575
+
+        button,
+        mat-checkbox
+            margin-right: 4px
+
+            &:last-child,
+            &.close
+                margin-right: 0
+
+            &.close
+                margin: -8px
+
+            &.done
+                padding-right: 3px
+
+    .container
+        display: flex
+        flex-direction: column
+        padding: 16px 16px 0 16px
+
+        .title
+            padding: 0
+            margin: 0
+            display: flex
+            justify-content: space-between
+            align-items: center
+
+            .icon
+                display: flex
+                justify-content: center
+                align-items: center
+                flex-shrink: 1
+                padding: 0
+                margin: 0 16px 0 0
+                width: 40px
+                height: 40px
+                background-color: mat-color($primary-light)
+                border-radius: 50%
+
+                .subject
+                    margin: 0
+                    padding: 0
+                    font-size: 16px
+                    font-weight: 400
+                    color: mat-color($foreground-dark, text)
+
+            h2
+                margin: 0
+                padding: 4px 0
+                flex-grow: 1
+                font-size: 18px
+                font-weight: 400
+                text-align: left
+                color: mat-color($foreground-light, text)
+                white-space: pre-line
+
+        .details
+            margin: 16px 0 0 0
+            padding: 0
+            display: flex
+            flex-direction: column
+            width: 100%
+
+            .item
+                margin: 0
+                padding: 12px 0
+                display: flex
+                justify-content: space-between
+                align-items: center
+                width: 100%
+                min-height: 24px
+
+                mat-icon
+                    margin: 0 12px 0 0
+                    padding: 0
+                    flex-shrink: 1
+                    color: mat-color($foreground-light, icon)
+
+                p
+                    margin: 0 
+                    padding: 4px 0
+                    flex-grow: 1
+                    font-size: 14px
+                    font-weight: 400
+                    text-align: left
+                    color: mat-color($foreground-light, text)
+                    white-space: pre-line
+
+                    span
+                        color: mat-color($foreground-light, secondary-text)
+
+                    a
+                        color: mat-color($primary-light)
+                        text-decoration: none
+
+                        &:hover
+                            text-decoration: underline
+
+        .corrections
+            margin: 16px 0 0 0
+            padding: 0
+            display: flex
+            flex-direction: column
+            width: 100%
+
+            h3
+                margin: 0
+                padding: 0
+                font-size: 14px
+                font-weight: 500
+                color: mat-color($foreground-light, secondary-text)
+                text-transform: uppercase
+
+            .correction
+                margin: 12px 0 0 0
+                padding: 0
+                display: flex
+                justify-content: space-between
+                align-items: center
+                width: 100%
+                border: 1px solid mat-color($foreground-light, divider)
+                border-radius: 4px
+
+                &.selected
+                    border-color: rgba($green, .54)
+                    background-color: rgba($green, .06)
+
+                    .select
+                        mat-icon
+                            color: $green
+
+                .changes
+                    flex-grow: 1
+                    margin: 0
+                    padding: 12px 0 12px 12px
+
+                    .content
+                        p
+                            margin: 0
+                            padding: 0
+                            font-weight: 400
+                            color: mat-color($foreground-light, text)
+                            white-space: pre-line
+
+                            &.title
+                                font-size: 16px
+
+                            &.details
+                                margin: 4px 0 0 0
+                                font-size: 14px
+
+                    a.by
+                        display: block
+                        margin: 8px 0 0 0
+                        padding: 0
+                        font-size: 14px
+                        font-weight: 500
+                        color: mat-color($foreground-light, secondary-text)
+                        text-decoration: none
+                        text-transform: uppercase
+
+                        &:hover
+                            text-decoration: underline
+                    
+                    &.delete
+                        .content
+                            display: flex
+                            align-items: center
+
+                            mat-icon
+                                margin: 0 12px 0 0
+                                color: mat-color($foreground-light, icon)
+
+                            p
+                                flex-grow: 1
+                                font-size: 16px
+
+                button
+                    padding: 0
+                    margin: 4px
+
+                    mat-icon
+                        color: mat-color($foreground-light, icon)
+
+
+    &.desktop
+        margin: 8px 0
+        position: static
+        background-color: mat-color($background-light, card)
+        z-index: 4
+        +mat-elevation(4)
+        overflow: hidden
+
+        mat-toolbar 
+            padding: 0 24px
+            height: 56px
+            background-color: transparent
+            position: static
+            
+            mat-checkbox
+                padding: 8px 12px
+
+                ::ng-deep
+                    .mat-checkbox-inner-container
+                        height: 16px
+                        width: 16px
+
+                &.mat-checkbox-checked,
+                &:active
+                    ::ng-deep .mat-checkbox-background,
+                    ::ng-deep .mat-ripple-element
+                        background-color: #757575
+
+            button,
+            mat-checkbox
+                margin-right: 4px
+
+                &:last-child,
+                &.close
+                    margin-right: 0
+
+                &.close
+                    margin: -8px
+
+                &.done
+                    padding-right: 0
+
+        .container
+            display: flex
+            flex-direction: column
+            padding: 8px 24px 0 24px
+
+            & > div:last-child
+                padding: 0 0 24px 0
+
+            .details
+                margin: 16px 0 0 0
+                padding: 0
+                display: block
+                flex-direction: column
+                width: 100%
+                column-count: 2
+
+                .item
+                    margin: 0
+                    padding: 12px 0
+                    display: flex
+                    justify-content: space-between
+                    align-items: center
+                    width: 100%
+                    min-height: 24px
+                    -webkit-column-break-inside: avoid
+                    page-break-inside: avoid
+                    break-inside: avoid
+
+                    mat-icon
+                        margin: 0 12px 0 0
+                        padding: 0
+                        flex-shrink: 1
+                        color: mat-color($foreground-light, icon)
+
+                    p
+                        margin: 0 
+                        padding: 4px 0
+                        flex-grow: 1
+                        font-size: 14px
+                        font-weight: 400
+                        text-align: left
+                        color: mat-color($foreground-light, text)
+                        white-space: pre-line
+
+                        span
+                            color: mat-color($foreground-light, secondary-text)

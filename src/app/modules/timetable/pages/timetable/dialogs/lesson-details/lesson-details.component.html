@@ -1,0 +1,73 @@
+<div class="header">
+  <button mat-icon-button mat-dialog-close>
+    <mat-icon>close</mat-icon>
+  </button>
+  <h2 mat-dialog-title>{{ getWeekDay(day) }}, {{ getPeriodText(period) }}</h2>
+</div>
+<mat-dialog-content>
+  <div class="multi" *ngIf="!isSingle">
+    <mat-tab-group>
+      <mat-tab *ngFor="let single of lesson">
+        <ng-template mat-tab-label>{{ getShortFromId(single.id) }}</ng-template>
+        <div class="course">
+          <div class="data">
+            <div class="subject">
+              <mat-icon
+                [class.contrast]="getContrastColor(single.color) == '#000000'"
+                [style.color]="getColor(single.color)"
+                >widgets</mat-icon
+              >
+              <p>{{ single.subject }}</p>
+            </div>
+            <div class="time">
+              <mat-icon>access_time</mat-icon>
+              <p>{{ time.start }} – {{ time.end }}</p>
+            </div>
+            <div class="teacher">
+              <mat-icon>person</mat-icon>
+              <p>{{ single.teacher.title }} {{ single.teacher.last_name }}</p>
+            </div>
+            <div class="room">
+              <mat-icon>place</mat-icon>
+              <p>{{ getRoomPrefix(single.room) + single.room }}</p>
+            </div>
+            <div class="class">
+              <mat-icon>class</mat-icon>
+              <p>{{ getClassString(single.class) }}</p>
+            </div>
+          </div>
+          <!-- TODO: Schnell erstellen -->
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div class="single" *ngIf="isSingle">
+    <div class="data">
+      <div class="subject">
+        <mat-icon
+          [class.contrast]="getContrastColor(lesson.color) == '#000000'"
+          [style.color]="getColor(lesson.color)"
+          >widgets</mat-icon
+        >
+        <p>{{ lesson.subject }}</p>
+      </div>
+      <div class="time">
+        <mat-icon>access_time</mat-icon>
+        <p>{{ time.start }} – {{ time.end }}</p>
+      </div>
+      <div class="teacher">
+        <mat-icon>person</mat-icon>
+        <p>{{ lesson.teacher.title }} {{ lesson.teacher.last_name }}</p>
+      </div>
+      <div class="room">
+        <mat-icon>place</mat-icon>
+        <p>{{ getRoomPrefix(lesson.room) + lesson.room }}</p>
+      </div>
+      <div class="class">
+        <mat-icon>class</mat-icon>
+        <p>{{ getClassString(lesson.class) }}</p>
+      </div>
+    </div>
+    <!-- TODO: Schnell erstellen -->
+  </div>
+</mat-dialog-content>

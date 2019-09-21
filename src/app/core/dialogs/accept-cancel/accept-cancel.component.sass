@@ -1,0 +1,19 @@
+@import ../../../../var
+
+:host
+    max-width: 212px
+
+.mat-dialog-content
+    ::ng-deep
+        a
+            color: mat-color($primary-light)
+            text-decoration: none
+
+            &:hover
+                text-decoration: underline
+
+        b
+            font-size: 500
+
+        .warn
+            color: mat-color($warn-light)

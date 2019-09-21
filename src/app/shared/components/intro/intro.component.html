@@ -1,0 +1,197 @@
+<div
+  class="intro"
+  [style.background-color]="colors[section]"
+  [@fadeOut]="submitted"
+  (@fadeOut.done)="hide = true"
+  [style.display]="submitted && hide ? 'none' : undefined"
+  (swipeleft)="nextSection($event)"
+  (swiperight)="previousSection($event)"
+>
+  <div
+    class="view"
+    [ngSwitch]="section"
+    [@sectionChange]="sectionChangeAnimation"
+    (@sectionChange.done)="sectionChangeAnimation = ''"
+  >
+    <section
+      *ngSwitchCase="1"
+      data-index="1"
+      class="circular"
+      [style.transform]="!sectionChangeAnimation ? 'none' : undefined"
+    >
+      <div class="img">
+        <img
+          src="assets/logo_white.svg"
+          alt="FHG Online Logo"
+          style="padding: 10%"
+        />
+      </div>
+      <div class="text">
+        <div class="title">
+          <p>Willkommen bei</p>
+          <h2>FHG Online</h2>
+        </div>
+        <p class="description">
+          Deinem neuen digitalen Schulplaner
+        </p>
+      </div>
+    </section>
+    <ng-container *ngIf="auth.user.roles.student">
+      <section
+        *ngSwitchCase="2"
+        data-index="2"
+        [style.transform]="!sectionChangeAnimation ? 'none' : undefined"
+      >
+        <div class="text">
+          <h2 class="title">Kurswahl</h2>
+          <p class="description">
+            Damit dein Stundenplan richtig angezeigt werden kann, müssen wir
+            wissen, welche der folgenden Kurse du gewählt hast:
+          </p>
+        </div>
+        <div class="courses">
+          <div class="no-course" *ngIf="!courseGroups">
+            <mat-icon>
+              not_interested
+            </mat-icon>
+            <p>Dein Stundenplan beinhaltet keine Wahlfächer</p>
+          </div>
+          <div class="courseGroup" *ngFor="let courseGroup of courseGroups">
+            <div
+              class="course"
+              (click)="
+                toggleSelectedCourse(
+                  indexOf(courseGroup, courseGroups),
+                  course.id
+                )
+              "
+              *ngFor="let course of courseGroup"
+            >
+              <div
+                class="icon"
+                [style.background-color]="helper.getColor(course.color)"
+              >
+                <mat-icon
+                  [style.color]="helper.getContrastColor(course.color)"
+                  *ngIf="
+                    selectedCourses[indexOf(courseGroup, courseGroups)] ==
+                    course.id
+                  "
+                >
+                  done
+                </mat-icon>
+              </div>
+              <div class="text">
+                <p class="subject">{{ course.subject }}</p>
+                <p class="short">
+                  {{ course.short }}
+                </p>
+                <p class="room">
+                  {{
+                    (hasRoomPrefix(course.room) ? 'Raum ' : '') + course.room
+                  }}
+                </p>
+                <p class="teacher">
+                  {{ course.teacher.title + ' ' + course.teacher.last_name }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section
+        *ngSwitchCase="3"
+        data-index="3"
+        [style.transform]="!sectionChangeAnimation ? 'none' : undefined"
+      >
+        <div class="text">
+          <h2 class="title">Hausaufgaben Sortierung</h2>
+          <p class="description">
+            Wann machst du deine Hausaufgaben? Immer am Tag, an dem du sie
+            aufbekommst? Dann ist die Sortierung nach Aufgabedatum deine erste
+            Wahl.<br />
+            Solltest du aber eher der Typ sein, der die Hausaufgaben wenige Tag
+            vorher macht, dann wähle lieber die Sortierung nach
+            Fälligkeitsdatum.
+          </p>
+        </div>
+        <div class="setting">
+          <p>Sortieren nach...</p>
+          <mat-radio-group
+            color="primary"
+            (change)="homeworkSorting = $event.value"
+            [value]="homeworkSorting"
+          >
+            <mat-radio-button value="entered">Aufgabedatum</mat-radio-button>
+            <mat-radio-button value="due_day"
+              >Fälligkeitsdatum</mat-radio-button
+            >
+          </mat-radio-group>
+        </div>
+        <p class="info">
+          Diese Einstellung kann nachher auch noch geändert werden
+        </p>
+      </section>
+    </ng-container>
+    <section
+      *ngSwitchCase="4"
+      data-index="4"
+      class="circular"
+      [style.transform]="!sectionChangeAnimation ? 'none' : undefined"
+    >
+      <div class="img">
+        <div class="background">
+          <mat-icon>done</mat-icon>
+        </div>
+      </div>
+      <div class="text">
+        <div class="title">
+          <h2>Los geht's</h2>
+        </div>
+        <p class="description">
+          Bitte stelle sicher, dass deine Kurswahl korrekt ist. Diese kann in
+          Zukunft nur durch einen Administrator oder deinem Klassenlehrer
+          geändert werden.
+        </p>
+      </div>
+    </section>
+  </div>
+  <div class="navigation">
+    <div class="left">
+      <button mat-icon-button *ngIf="section !== 1" (click)="previousSection()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+    </div>
+    <div class="dots">
+      <div
+        class="dot"
+        [class.active]="section == dot"
+        (click)="section = dot"
+        *ngFor="let dot of helper.arrayOf(maxSections)"
+      ></div>
+    </div>
+    <div class="right">
+      <button
+        mat-icon-button
+        *ngIf="section !== maxSections"
+        (click)="nextSection()"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <button
+        mat-button
+        (click)="installWebApp()"
+        *ngIf="section == maxSections && canInstall()"
+      >
+        App installieren
+      </button>
+      <button
+        mat-button
+        (click)="onSubmit()"
+        *ngIf="section == maxSections && !canInstall()"
+      >
+        Fertig
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+@import ../../../../var
+
+mat-action-list
+    mat-list-item
+        mat-icon
+            color: mat-color($foreground-light, icon)
+
+        .customIcon
+            opacity: .54
+
+    @media not all and ($mat-xsmall)
+        h3
+            padding: 16px 24px
+
+        mat-list-item
+            ::ng-deep .mat-list-item-content
+                padding: 0 24px

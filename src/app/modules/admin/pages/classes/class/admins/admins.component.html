@@ -1,0 +1,50 @@
+<header>
+  <h1>
+    {{ title }}
+    <mat-icon>chevron_right</mat-icon>
+    Administratoren
+  </h1>
+</header>
+<div class="body">
+  <div class="loading" *ngIf="isLoading">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+  <table
+    mat-table
+    [dataSource]="data"
+    matSort
+    matSortActive="name"
+    matSortDisableClear
+    matSortDirection="asc"
+  >
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+      <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+    </ng-container>
+
+    <!-- Role Column -->
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Rolle</th>
+      <td mat-cell *matCellDef="let element">{{ element.role }}</td>
+    </ng-container>
+
+    <!-- Last Login Column -->
+    <ng-container matColumnDef="created">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Erstellt</th>
+      <td mat-cell *matCellDef="let element">{{ element.created }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      [routerLink]="'/admin/users/' + row.uid"
+    ></tr>
+  </table>
+
+  <mat-paginator
+    [pageSize]="10"
+    [pageSizeOptions]="[5, 10, 25, 50]"
+  ></mat-paginator>
+</div>
