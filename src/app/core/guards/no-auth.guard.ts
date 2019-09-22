@@ -8,7 +8,8 @@ import {
 import { Observable, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { map, take, tap, switchMap } from 'rxjs/operators';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class NoAuthGuard implements CanActivate {
   constructor(
     private auth: AuthService,
     private router: Router,
+    private title: Title,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -24,17 +26,24 @@ export class NoAuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | boolean {
-    if (typeof window !== 'undefined') {
+    if (
+      typeof window == 'undefined' ||
+      !window ||
+      isPlatformServer(this.platformId) ||
+      this.auth.authentificated
+    )
+      return true;
+    else
       return this.auth.user$.pipe(
         take(1),
         map(user => !user),
-        tap(loggedOut => {
+        map(loggedOut => {
           if (!loggedOut) {
             this.router.navigate(['/']);
+            return false;
           }
+          return true;
         })
       );
-    }
-    return true;
   }
 }

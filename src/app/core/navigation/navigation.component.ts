@@ -50,7 +50,7 @@ export class NavigationComponent {
         withLatestFrom(this.isHandset$),
         filter(([a, b]) => b && a instanceof NavigationEnd)
       )
-      .subscribe(_ => this.drawer.close());
+      .subscribe(() => this.drawer.close());
 
     if (isPlatformBrowser(this.platformId)) {
       var isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);

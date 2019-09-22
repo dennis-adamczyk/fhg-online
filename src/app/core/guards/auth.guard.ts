@@ -10,7 +10,8 @@ import {
 import { Observable, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { take, map, tap, switchMap } from 'rxjs/operators';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class AuthGuard implements CanActivate {
     private auth: AuthService,
     private router: Router,
     private route: ActivatedRoute,
+    private title: Title,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -27,22 +29,30 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | boolean {
-    if (typeof window !== 'undefined') {
+    if (
+      typeof window == 'undefined' ||
+      !window ||
+      isPlatformServer(this.platformId) ||
+      this.auth.authentificated
+    )
+      return true;
+    else
       return this.auth.user$.pipe(
         take(1),
         map(user => !!user),
-        tap(loggedIn => {
+        map(loggedIn => {
           if (!loggedIn) {
             if (state.url == '/') {
-              return this.router.navigate(['/start']);
+              this.router.navigate(['/start']);
+              return false;
             }
             this.router.navigate(['/login'], {
               queryParams: { url: state.url }
             });
+            return false;
           }
+          return true;
         })
       );
-    }
-    return true;
   }
 }

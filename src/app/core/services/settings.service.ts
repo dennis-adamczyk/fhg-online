@@ -80,8 +80,7 @@ export class SettingsService {
   }
 
   private sync() {
-    if (this.isNotLoggedIn) return this.router.navigate(['/login']);
-    if (this.isWrongPlattform) return null;
+    if (this.isNotLoggedIn || this.isWrongPlattform) return null;
 
     if (!this.auth.user.settings_changed) {
       this.db.upsert(
