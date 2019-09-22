@@ -4,6 +4,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { Observable, Subject } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { constant } from '../../../configs/constants';
+import { SeoService } from './seo.service';
 
 export interface MenuItem {
   path: string;
@@ -18,14 +19,12 @@ export class AppToolbarService {
   activeMenuItem$: Observable<MenuItem>;
   title$ = new Subject<string>();
 
-  constructor(private router: Router, private titleService: Title) {
+  constructor(private router: Router, private seo: SeoService) {
     this.activeMenuItem$ = this.router.events.pipe(
       filter(e => e instanceof NavigationEnd),
       map(_ => this.router.routerState.root),
       map(route => {
         let active = this.lastRouteWithMenuItem(route.root);
-        if (active && active.title)
-          this.titleService.setTitle(active.title + constant.titleSuffix);
         this.title$.next(active.title);
         return active;
       })

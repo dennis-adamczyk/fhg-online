@@ -32,7 +32,6 @@ import {
 } from '@angular/router';
 import { HelperService } from 'src/app/core/services/helper.service';
 import { Homework } from '../../models/homework.model';
-import { TimetableService } from 'src/app/modules/timetable/services/timetable.service';
 import { HomeworkService } from '../../services/homework.service';
 import { Course } from 'src/app/modules/timetable/models/timetable.model';
 import {
@@ -154,6 +153,7 @@ export class HomeworkComponent implements OnInit {
     private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string
   ) {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.subs[0] = this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),

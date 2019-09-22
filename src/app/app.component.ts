@@ -2,6 +2,12 @@ import { Component } from '@angular/core';
 import { UpdateService } from './core/services/update.service';
 import { AuthService } from './core/services/auth.service';
 import { AnalyticsService } from './core/services/analytics.service';
+import {
+  Router,
+  NavigationStart,
+  NavigationEnd,
+  NavigationCancel
+} from '@angular/router';
 
 @Component({
   selector: 'app-root',

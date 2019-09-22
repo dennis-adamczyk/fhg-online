@@ -10,7 +10,12 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, of } from 'rxjs';
 import { map, withLatestFrom, filter, tap, startWith } from 'rxjs/operators';
 import { AppToolbarService, MenuItem } from '../services/app-toolbar.service';
-import { Router, NavigationEnd } from '@angular/router';
+import {
+  Router,
+  NavigationEnd,
+  NavigationStart,
+  NavigationCancel
+} from '@angular/router';
 import { MatSidenav } from '@angular/material/sidenav';
 import * as Hammer from 'hammerjs';
 import { AuthService } from '../services/auth.service';
@@ -35,6 +40,7 @@ export class NavigationComponent {
     );
   activeMenuItem$: Observable<MenuItem> = this.toolbarService.activeMenuItem$;
   extended: boolean = false;
+  loading = true;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -50,7 +56,7 @@ export class NavigationComponent {
         withLatestFrom(this.isHandset$),
         filter(([a, b]) => b && a instanceof NavigationEnd)
       )
-      .subscribe(_ => this.drawer.close());
+      .subscribe(() => this.drawer.close());
 
     if (isPlatformBrowser(this.platformId)) {
       var isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
@@ -75,6 +81,19 @@ export class NavigationComponent {
       }
     }
     this.updateHeight();
+  }
+
+  ngAfterViewInit(): void {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.loading = true;
+      } else if (
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel
+      ) {
+        this.loading = false;
+      }
+    });
   }
 
   onExtendNavigation() {

@@ -12,7 +12,7 @@ export const registerUser = functions.https.onCall(async (data, context) => {
   };
   const password: string = data.password;
   const clazz: string | null = data.class || null;
-  const skipVerification: boolean = data.skipVerification || true; //TODO: Change to || false
+  const skipVerification: boolean = data.skipVerification || false;
 
   // Validation
 

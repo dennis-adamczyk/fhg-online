@@ -68,6 +68,7 @@ export class EditHomeworkComponent {
   }
 
   ngAfterViewInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.subs[0] = this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),

@@ -11,6 +11,7 @@
 
 # secret
 /functions/src/*.json
+/src/environments/
 
 # Only exists if Bazel was run
 /bazel-out

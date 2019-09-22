@@ -10,7 +10,8 @@ import {
 import { Observable, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { take, map, tap, switchMap } from 'rxjs/operators';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'

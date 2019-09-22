@@ -157,10 +157,13 @@ export class HomeworkService {
 
                           let newHomework = JSON.parse(
                             localStorage.getItem(homeworkKey)
-                          ).homework.filter(
-                            (h: Homework) =>
-                              h.course.id !== courseName || h.personal
-                          );
+                          ).homework;
+                          newHomework = Array.isArray(newHomework)
+                            ? newHomework.filter(
+                                (h: Homework) =>
+                                  h.course.id !== courseName || h.personal
+                              )
+                            : [];
 
                           index.homework.forEach(homework => {
                             newHomework.push({
@@ -216,9 +219,11 @@ export class HomeworkService {
               .doc$(`users/${user.id}/personalHomework/--index--`)
               .pipe(take(1))
               .subscribe((index: { homework: Homework[] }) => {
-                let newHomework = JSON.parse(
-                  localStorage.getItem(homeworkKey)
-                ).homework.filter((h: Homework) => !h.personal);
+                let newHomework = JSON.parse(localStorage.getItem(homeworkKey))
+                  .homework;
+                newHomework = Array.isArray(newHomework)
+                  ? newHomework.filter((h: Homework) => !h.personal)
+                  : [];
                 index.homework.forEach(homework => {
                   let courseDetails = JSON.parse(
                     localStorage.getItem(timetableKey)

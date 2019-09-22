@@ -172,7 +172,12 @@
             <mat-icon aria-label="Side nav back icon">arrow_back</mat-icon>
           </button>
         </ng-container>
-        <ng-container *ngIf="(activeMenuItem$ | async)?.iconFunction == 'menu'">
+        <ng-container
+          *ngIf="
+            (activeMenuItem$ | async)?.iconFunction == 'menu' ||
+            !(activeMenuItem$ | async)
+          "
+        >
           <button
             type="button"
             class="menu-btn"
@@ -187,6 +192,13 @@
       </ng-container>
 
       <span>{{ toolbarService.title$ | async }}</span>
+
+      <mat-progress-bar
+        mode="indeterminate"
+        color="secondary"
+        class="loader"
+        *ngIf="loading"
+      ></mat-progress-bar>
     </mat-toolbar>
     <main>
       <ng-content></ng-content>

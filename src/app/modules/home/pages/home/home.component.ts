@@ -22,8 +22,7 @@ import {
 import { MatDialog } from '@angular/material';
 import { LessonDetailsDialog } from 'src/app/modules/timetable/pages/timetable/dialogs/lesson-details/lesson-details.component';
 import { take } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { until } from 'protractor';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Homework } from 'src/app/modules/homework/models/homework.model';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -53,6 +52,7 @@ export class HomeComponent implements OnInit {
     private auth: AuthService,
     private dialog: MatDialog,
     private router: Router,
+    private route: ActivatedRoute,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
   ) {}
@@ -80,8 +80,8 @@ export class HomeComponent implements OnInit {
         'scroll',
         event => scrollHandler()
       );
+      this.loadData();
     }
-    this.loadData();
   }
 
   ngOnDestroy() {

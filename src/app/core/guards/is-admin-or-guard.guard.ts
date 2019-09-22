@@ -9,7 +9,7 @@ import {
 } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { take, map, tap } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
 
