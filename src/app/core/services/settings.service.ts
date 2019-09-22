@@ -44,6 +44,7 @@ export class SettingsService {
       this.router.navigate(['/start']);
       return;
     }
+    if (!isPlatformBrowser(this.platformId)) return;
     this.sync();
   }
 
@@ -52,6 +53,7 @@ export class SettingsService {
   }
 
   get(key: string): any {
+    if (!isPlatformBrowser(this.platformId)) return;
     var settings = this.getAll();
     let keys = key.split('.');
     var setting = settings;
@@ -135,6 +137,7 @@ export class SettingsService {
   }
 
   private getLocalSettings(user?: User): Settings {
+    if (!isPlatformBrowser(this.platformId)) return;
     if (!localStorage.getItem(this.storageKey))
       this.db
         .doc$<Settings>(

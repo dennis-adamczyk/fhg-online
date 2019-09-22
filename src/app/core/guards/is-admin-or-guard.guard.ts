@@ -33,8 +33,7 @@ export class IsAdminOrGuardGuard implements CanActivate {
     if (
       typeof window == 'undefined' ||
       !window ||
-      isPlatformServer(this.platformId) ||
-      this.auth.authentificated
+      isPlatformServer(this.platformId)
     )
       return true;
     else

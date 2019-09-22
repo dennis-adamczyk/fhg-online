@@ -32,7 +32,6 @@ import {
 } from '@angular/router';
 import { HelperService } from 'src/app/core/services/helper.service';
 import { Homework } from '../../models/homework.model';
-import { TimetableService } from 'src/app/modules/timetable/services/timetable.service';
 import { HomeworkService } from '../../services/homework.service';
 import { Course } from 'src/app/modules/timetable/models/timetable.model';
 import {
@@ -41,7 +40,6 @@ import {
   courseNamesKey
 } from 'src/configs/constants';
 import { SanctionDialog } from 'src/app/core/dialogs/sanction/sanction.component';
-import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-homework',
@@ -153,10 +151,9 @@ export class HomeworkComponent implements OnInit {
     private elem: ElementRef,
     private route: ActivatedRoute,
     private breakpointObserver: BreakpointObserver,
-    private title: Title,
     @Inject(PLATFORM_ID) private platformId: string
   ) {
-    this.title.setTitle('TEST123');
+    if (!isPlatformBrowser(this.platformId)) return;
     this.subs[0] = this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),

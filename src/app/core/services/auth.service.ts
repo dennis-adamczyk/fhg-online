@@ -102,10 +102,6 @@ export class AuthService {
     });
   }
 
-  get authentificated(): boolean {
-    return !!this.afAuth.auth.currentUser && !!this.afAuth.auth.currentUser.uid;
-  }
-
   async login(
     email: string,
     password: string,

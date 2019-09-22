@@ -4,6 +4,7 @@ import { StartComponent } from './pages/start/start.component';
 import { AboutComponent } from './pages/about/about.component';
 import { NoAuthGuard } from 'src/app/core/guards/no-auth.guard';
 import { InformationComponent } from './pages/information/information.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 const routes: Routes = [
   {
@@ -27,6 +28,13 @@ const routes: Routes = [
     component: InformationComponent,
     data: {
       title: 'Informationen'
+    }
+  },
+  {
+    path: '404',
+    component: NotFoundComponent,
+    data: {
+      title: 'Seite nicht gefunden'
     }
   }
 ];

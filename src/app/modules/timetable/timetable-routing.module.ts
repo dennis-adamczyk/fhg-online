@@ -7,8 +7,7 @@ const routes: Routes = [
     path: '',
     component: TimetableComponent,
     data: {
-      title: 'Stundenplan',
-      description: ''
+      title: 'Stundenplan'
     }
   }
 ];

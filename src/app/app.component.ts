@@ -16,7 +16,6 @@ import {
 })
 export class AppComponent {
   theme: string = 'light-theme';
-  loading: boolean = true;
 
   constructor(
     private updater: UpdateService,
@@ -27,18 +26,5 @@ export class AppComponent {
 
   ngOnInit() {
     this.analytics.init();
-  }
-
-  ngAfterViewInit(): void {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart) {
-        this.loading = true;
-      } else if (
-        event instanceof NavigationEnd ||
-        event instanceof NavigationCancel
-      ) {
-        this.loading = false;
-      }
-    });
   }
 }

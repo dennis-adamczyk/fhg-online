@@ -46,6 +46,10 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: './modules/static/static.module#StaticModule'
+  },
+  {
+    path: '**',
+    redirectTo: '404'
   }
 ];
 

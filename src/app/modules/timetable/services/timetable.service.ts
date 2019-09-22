@@ -71,7 +71,7 @@ export class TimetableService {
   }
 
   downloadTimetable() {
-    let clazz = this.auth.user.class as string;
+    let clazz = this.auth.user.class;
     let singleCourses: Course[] = [],
       multiCourses: Course[] = [];
     let singles = false,
