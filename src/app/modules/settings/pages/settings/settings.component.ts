@@ -16,6 +16,7 @@ import { take, filter } from 'rxjs/operators';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { isPlatformBrowser } from '@angular/common';
 import { UpdateService } from 'src/app/core/services/update.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-settings',
@@ -25,6 +26,7 @@ import { UpdateService } from 'src/app/core/services/update.service';
 export class SettingsComponent implements OnInit {
   constant = constant;
   language = language;
+  version = environment.version;
   objectKeys = Object.keys;
   groups = this.objectKeys(new Settings());
   settingDefaults = new Settings();

@@ -139,12 +139,14 @@ export const onChangeHomework = functions.firestore
         (indexSnap): Promise<any> => {
           if (indexSnap.exists) {
             let index = indexSnap.data() as { homework: Homework[] };
-            index.homework = index.homework.filter(
-              h =>
-                (getDate(h.entered.date).getTime() >= min.getTime() ||
-                  getDate(h.until.date).getTime() >= min.getTime()) &&
-                h.id !== homeworkId
-            );
+            if (Array.isArray(index.homework))
+              index.homework = index.homework.filter(
+                h =>
+                  (getDate(h.entered.date).getTime() >= min.getTime() ||
+                    getDate(h.until.date).getTime() >= min.getTime()) &&
+                  h.id !== homeworkId
+              );
+            else index.homework = [];
             if (addCurrent)
               index.homework.push({
                 id: homeworkId,
@@ -200,7 +202,7 @@ export const onChangePersonalHomework = functions.firestore
   .document('users/{userId}/personalHomework/{homeworkId}')
   .onWrite((change, context) => {
     const newValue = change.after.data()! as Homework;
-    const previousValue = change.before.data()! as Homework;
+    // const previousValue = change.before.data()! as Homework;
     const userId = context.params.userId;
     const homeworkId = context.params.homeworkId;
 
@@ -240,11 +242,13 @@ export const onChangePersonalHomework = functions.firestore
       .then((indexSnap): any => {
         if (indexSnap.exists) {
           let index = indexSnap.data() as { homework: Homework[] };
-          index.homework = index.homework.filter(
-            h =>
-              getDate(h.entered.date).getTime() >= min.getTime() &&
-              h.id !== homeworkId
-          );
+          if (Array.isArray(index.homework))
+            index.homework = index.homework.filter(
+              h =>
+                getDate(h.entered.date).getTime() >= min.getTime() &&
+                h.id !== homeworkId
+            );
+          else index.homework = [];
           if (addCurrent)
             index.homework.push({
               id: homeworkId,

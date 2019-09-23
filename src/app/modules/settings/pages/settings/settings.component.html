@@ -57,6 +57,14 @@
       Allgemein
     </h3>
     <div class="list">
+      <mat-list-item disableRipple>
+        <h4 mat-line>
+          Version
+        </h4>
+        <p mat-line>
+          {{ version }}
+        </p>
+      </mat-list-item>
       <button mat-list-item (click)="installWebApp()" *ngIf="canInstall()">
         <mat-icon matListIcon>get_app</mat-icon>
         <h4 mat-line>WebApp installieren</h4>
