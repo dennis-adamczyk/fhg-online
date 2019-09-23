@@ -68,13 +68,18 @@ export class NavigationComponent {
         hammertime.on('panright', ev => {
           if (
             ev.pointerType !== 'mouse' &&
-            ev.center.x >= 1 &&
-            ev.center.x <= 50
-          )
+            ev.changedPointers[0].clientX - ev.deltaX >= 1 &&
+            ev.changedPointers[0].clientX - ev.deltaX <= 50
+          ) {
             this.drawer.open();
+            ev.preventDefault();
+          }
         });
         hammertime.on('panleft', ev => {
-          if (ev.pointerType !== 'mouse') this.drawer.close();
+          if (ev.pointerType !== 'mouse') {
+            this.drawer.close();
+            ev.preventDefault();
+          }
         });
         hammertime.on('panup', event => false);
         hammertime.on('pandown', event => false);

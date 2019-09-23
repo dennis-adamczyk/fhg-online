@@ -521,7 +521,8 @@ export class HomeworkComponent implements OnInit {
     this.homework.done[id] = event.checked;
   }
 
-  onChangeWeek(add: number) {
+  onChangeWeek(add: number, ev) {
+    if (ev && ev.changedPointers[0].clientX - ev.deltaX <= 50) return;
     this.week.setDate(this.week.getDate() + 7 * add);
     this.loadWeeksHomework();
   }

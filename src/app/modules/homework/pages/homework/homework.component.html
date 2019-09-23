@@ -329,9 +329,11 @@
     <div
       class="body"
       (swipeleft)="
-        !isLoading && !homework.isThisWeek(week) ? onChangeWeek(1) : undefined
+        !isLoading && !homework.isThisWeek(week)
+          ? onChangeWeek(1, $event)
+          : undefined
       "
-      (swiperight)="!isLoading ? onChangeWeek(-1) : undefined"
+      (swiperight)="!isLoading ? onChangeWeek(-1, $event) : undefined"
     >
       <div class="loading" *ngIf="isLoading">
         <mat-spinner diameter="32"></mat-spinner>

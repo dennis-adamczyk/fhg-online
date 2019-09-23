@@ -328,6 +328,7 @@ export class HomeComponent implements OnInit {
     let weekDay = tomorrow.getDay() || 7;
     if (weekDay >= 6) tomorrow.setDate(tomorrow.getDate() + 8 - weekDay);
     if (!this.homework.isInFuture(new Date())) this.day = tomorrow;
+    else this.day = new Date();
   }
 
   private isToday(d: Date) {
