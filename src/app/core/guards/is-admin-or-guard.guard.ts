@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth.service';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { take, map, tap } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
+import { Title } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ export class IsAdminOrGuardGuard implements CanActivate {
     private auth: AuthService,
     private snackBar: MatSnackBar,
     private router: Router,
+    private title: Title,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -28,11 +30,17 @@ export class IsAdminOrGuardGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | boolean {
-    if (isPlatformBrowser(this.platformId)) {
+    if (
+      typeof window == 'undefined' ||
+      !window ||
+      isPlatformServer(this.platformId)
+    )
+      return true;
+    else
       return this.auth.user$.pipe(
         take(1),
         map(user => user && (user.roles.admin || user.roles.guard)),
-        tap(isAdminOrGuard => {
+        map(isAdminOrGuard => {
           if (!isAdminOrGuard) {
             this.snackBar.open(
               'Du hast unzureichende Rechte um diese Seite aufzurufen.',
@@ -42,9 +50,8 @@ export class IsAdminOrGuardGuard implements CanActivate {
             this.router.navigate(['/start']);
             return false;
           }
+          return true;
         })
       );
-    }
-    return true;
   }
 }

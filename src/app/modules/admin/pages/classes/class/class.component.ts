@@ -18,6 +18,7 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import * as firebase from 'firebase/app';
 import { HelperService } from 'src/app/core/services/helper.service';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-class',
@@ -38,6 +39,7 @@ export class ClassComponent implements OnInit {
   sub: boolean = !!this.route.children.length;
 
   constructor(
+    private seo: SeoService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private db: FirestoreService,
@@ -47,13 +49,20 @@ export class ClassComponent implements OnInit {
     public helper: HelperService,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Hab den Überblick über alle die Aktivität deiner Klasse, ihrem Stundenplan und ihren Kursen.',
+      keywords: 'Administration, Klasse, Schulplaner, FHG Online, FHG',
+      robots: 'noindex, nofollow'
+    });
+  }
 
   /* ##### Toolbar Extention ##### */
 
   ngOnInit() {
-    this.loadData();
-
     if (isPlatformBrowser(this.platformId)) {
       this.toolbar = document.querySelector('.main-toolbar');
       this.sidenavContent = document.querySelector('mat-sidenav-content');
@@ -74,6 +83,8 @@ export class ClassComponent implements OnInit {
         'scroll',
         event => scrollHandler()
       );
+
+      this.loadData();
     }
   }
 

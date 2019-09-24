@@ -9,12 +9,7 @@ import { InformationComponent } from './pages/information/information.component'
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 @NgModule({
-  declarations: [
-    StartComponent,
-    AboutComponent,
-    InformationComponent,
-    NotFoundComponent
-  ],
+  declarations: [StartComponent, AboutComponent, InformationComponent, NotFoundComponent],
   imports: [CommonModule, StaticRoutingModule, SharedModule]
 })
 export class StaticModule {}

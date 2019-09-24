@@ -9,7 +9,7 @@ import {
   OnChanges
 } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HomeworkService } from 'src/app/modules/homework/services/homework.service';
 import { TimetableService } from 'src/app/modules/timetable/services/timetable.service';
 import { HelperService } from 'src/app/core/services/helper.service';
@@ -27,6 +27,7 @@ import { Homework } from 'src/app/modules/homework/models/homework.model';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { Course } from 'src/app/modules/timetable/models/timetable.model';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-home',
@@ -45,6 +46,7 @@ export class HomeComponent implements OnInit {
   ];
 
   constructor(
+    private seo: SeoService,
     public homework: HomeworkService,
     public timetable: TimetableService,
     public helper: HelperService,
@@ -55,7 +57,16 @@ export class HomeComponent implements OnInit {
     private route: ActivatedRoute,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Alles Wichtige auf einen Blick. Die Startseite des digitalen Schulplaners des Franz-Haniel-Gymnasiums hält deine Organisation einfach und effektiv.',
+      keywords:
+        'Startseite, Start, Übersicht, Home, FHG Online, FHG, Schulplaner'
+    });
+  }
 
   /* ##### TOOLBAR EXTENTION ##### */
 
@@ -82,6 +93,8 @@ export class HomeComponent implements OnInit {
       );
       this.loadData();
     }
+    if (isPlatformServer(this.platformId) && !this.auth.user)
+      return this.router.navigate(['/start']);
   }
 
   ngOnDestroy() {
@@ -328,6 +341,7 @@ export class HomeComponent implements OnInit {
     let weekDay = tomorrow.getDay() || 7;
     if (weekDay >= 6) tomorrow.setDate(tomorrow.getDate() + 8 - weekDay);
     if (!this.homework.isInFuture(new Date())) this.day = tomorrow;
+    else this.day = new Date();
   }
 
   private isToday(d: Date) {

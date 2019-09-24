@@ -44,6 +44,7 @@ export class SettingsService {
       this.router.navigate(['/start']);
       return;
     }
+    if (!isPlatformBrowser(this.platformId)) return;
     this.sync();
   }
 
@@ -52,6 +53,7 @@ export class SettingsService {
   }
 
   get(key: string): any {
+    if (!isPlatformBrowser(this.platformId)) return;
     var settings = this.getAll();
     let keys = key.split('.');
     var setting = settings;
@@ -80,8 +82,7 @@ export class SettingsService {
   }
 
   private sync() {
-    if (this.isNotLoggedIn) return this.router.navigate(['/login']);
-    if (this.isWrongPlattform) return null;
+    if (this.isNotLoggedIn || this.isWrongPlattform) return null;
 
     if (!this.auth.user.settings_changed) {
       this.db.upsert(
@@ -136,6 +137,7 @@ export class SettingsService {
   }
 
   private getLocalSettings(user?: User): Settings {
+    if (!isPlatformBrowser(this.platformId)) return;
     if (!localStorage.getItem(this.storageKey))
       this.db
         .doc$<Settings>(
@@ -161,7 +163,7 @@ export class SettingsService {
   }
 
   private get isNotLoggedIn(): boolean {
-    return !this.auth.user;
+    return !this.auth.user || this.auth.user.status <= 0;
   }
 
   private get isWrongPlattform(): boolean {

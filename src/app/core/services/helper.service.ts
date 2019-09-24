@@ -1,13 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { constant } from 'src/configs/constants';
 import { AuthService } from './auth.service';
 import * as firebase from 'firebase/app';
+import { isPlatformServer } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HelperService {
-  constructor(private auth: AuthService) {}
+  constructor(
+    private auth: AuthService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   /**
    * Returns the flatten out array
@@ -184,5 +188,15 @@ export class HelperService {
     return Array.apply(null, Array(max)).map(function(x, i) {
       return i + min;
     });
+  }
+
+  /**
+   * Returns true if the platform is server
+   *
+   * @returns {boolean}
+   * @memberof HelperService
+   */
+  isServer(): boolean {
+    return isPlatformServer(this.platformId);
   }
 }

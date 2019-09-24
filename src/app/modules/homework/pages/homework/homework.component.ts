@@ -9,7 +9,7 @@ import {
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { SettingsService } from 'src/app/core/services/settings.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { isPlatformBrowser, Location } from '@angular/common';
+import { isPlatformBrowser, Location, isPlatformServer } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
 import { map, take, filter } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -40,6 +40,7 @@ import {
   courseNamesKey
 } from 'src/configs/constants';
 import { SanctionDialog } from 'src/app/core/dialogs/sanction/sanction.component';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-homework',
@@ -140,8 +141,9 @@ export class HomeworkComponent implements OnInit {
   detailsChanges: Subscription[] = [];
 
   constructor(
+    private seo: SeoService,
     public homework: HomeworkService,
-    private helper: HelperService,
+    public helper: HelperService,
     private db: FirestoreService,
     private auth: AuthService,
     private router: Router,
@@ -153,7 +155,17 @@ export class HomeworkComponent implements OnInit {
     private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string
   ) {
-    if (!isPlatformBrowser(this.platformId)) return;
+    let setSeo = () => {
+      let title = this.route.snapshot.data['title'];
+      this.seo.generateTags({
+        title: title,
+        description:
+          'Das digitale Hausaufgabenheft wird von der ganzen Klasse gemeinsam befüllt, sodass nie wieder eine Aufgabe vergessen werden kann.',
+        keywords:
+          'Hausaufgabe, Hausaufgabe, Hausaufgaben Heft, Schulplaner, FHG Online, FHG'
+      });
+    };
+
     this.subs[0] = this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
@@ -173,6 +185,7 @@ export class HomeworkComponent implements OnInit {
             this.detailsChanges.forEach(sub => sub.unsubscribe());
           this.details = false;
           this.detailsData = undefined;
+          setSeo();
         }
       });
   }
@@ -182,21 +195,36 @@ export class HomeworkComponent implements OnInit {
     this.detailsId = route.params['id'];
     this.detailsPersonal = route.url[0].path == 'p';
 
-    if (this.auth.hasSanction('interaction') && !this.detailsPersonal)
+    if (
+      isPlatformBrowser(this.platformId) &&
+      this.auth.hasSanction('interaction') &&
+      !this.detailsPersonal
+    )
       return this.dialog.open(SanctionDialog, {
         data: this.auth.user.sanctions
       });
 
+    if (isPlatformServer(this.platformId) && this.detailsPersonal) {
+      this.seo.generateTags({
+        title: 'Persönliche Aufgabe ◃ Hausaufgaben',
+        description:
+          'Diese Aufgabe wurde im digitalen Hausaufgabenheft als privat markiert. Diese kann also nur vom Ersteller gesehen werden.',
+        keywords:
+          'Hausaufgabe, Hausaufgabe, Hausaufgaben Heft, Persönlich, Privat, Schulplaner, FHG Online, FHG',
+        robots: 'noindex, nofollow'
+      });
+      return;
+    }
+
     this.isLoading = true;
 
     let homeworkRef: string;
-    if (this.detailsPersonal)
+    if (this.detailsPersonal && isPlatformBrowser(this.platformId))
       homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.detailsId}`;
     else
-      homeworkRef = `years/${this.helper.getYear(this.auth.user
-        .class as string)}/courses/${this.detailsCourseName}/homework/${
-        this.detailsId
-      }`;
+      homeworkRef = `years/${this.helper.getYearOfCourse(
+        this.detailsCourseName
+      )}/courses/${this.detailsCourseName}/homework/${this.detailsId}`;
     this.detailsChanges.push(
       this.db.docWithId$(homeworkRef).subscribe((homework: Homework) => {
         this.isLoading = false;
@@ -214,34 +242,48 @@ export class HomeworkComponent implements OnInit {
             duration: 4000
           });
         }
-        let courseDetails = JSON.parse(localStorage.getItem(timetableKey));
-        if (!courseDetails) {
-          return this.snackBar
-            .open('Ein Fehler ist aufgetreten', 'Erneut versuchen', {
-              duration: 4000
-            })
-            .onAction()
-            .pipe(take(1))
-            .subscribe(() => {
-              if (!isPlatformBrowser(this.platformId)) return;
-              location.reload();
-            });
+        if (isPlatformServer(this.platformId)) {
+          this.seo.generateTags({
+            title: homework.title + ' ◃ Hausaufgaben',
+            description: homework.details.length
+              ? homework.details
+              : 'Bei FHG Online trägt die gesamte Klasse die Hausaufgaben ein, sodass dort alles übersichtlich zusammengefasst ist.',
+            keywords:
+              'Hausaufgabe, Hausaufgabe, Hausaufgaben Heft, Schulplaner, FHG Online, FHG',
+            robots: 'noindex, nofollow'
+          });
+          return;
         }
-        courseDetails = courseDetails.courses.filter(
-          c =>
-            c.id ==
-            (this.detailsPersonal ? homework.course : this.detailsCourseName)
-        )[0] as Course;
-        if (!courseDetails) {
-          this.router.navigate(['/homework'], { replaceUrl: true });
-          return this.snackBar.open(
-            'Du bist kein Mitglied des Kurses der Hausaufgabe',
-            null,
-            { duration: 4000 }
-          );
+        if (isPlatformBrowser(this.platformId)) {
+          let courseDetails = JSON.parse(localStorage.getItem(timetableKey));
+          if (!courseDetails) {
+            return this.snackBar
+              .open('Ein Fehler ist aufgetreten', 'Erneut versuchen', {
+                duration: 4000
+              })
+              .onAction()
+              .pipe(take(1))
+              .subscribe(() => {
+                if (!isPlatformBrowser(this.platformId)) return;
+                location.reload();
+              });
+          }
+          courseDetails = courseDetails.courses.filter(
+            c =>
+              c.id ==
+              (this.detailsPersonal ? homework.course : this.detailsCourseName)
+          )[0] as Course;
+          if (!courseDetails) {
+            this.router.navigate(['/homework'], { replaceUrl: true });
+            return this.snackBar.open(
+              'Du bist kein Mitglied des Kurses der Hausaufgabe',
+              null,
+              { duration: 4000 }
+            );
+          }
+          homework.course = courseDetails;
         }
         if (this.detailsPersonal) homework.personal = true;
-        homework.course = courseDetails;
         homework.done =
           this.homework.done && this.homework.done[this.detailsId] === true;
         homework['selectedCorrection'] =
@@ -282,6 +324,20 @@ export class HomeworkComponent implements OnInit {
                   this.homework.correction[this.detailsId];
                 this.detailsData = homework;
                 this.details = true;
+                this.seo.generateTags({
+                  title:
+                    homework.title +
+                    (homework.personal ? ' ◃ Persönlich' : '') +
+                    ' ◃ Hausaufgaben',
+                  description: homework.details.length
+                    ? homework.details
+                    : homework.personal
+                    ? 'Diese Aufgabe wurde im digitalen Hausaufgabenheft als privat markiert. Diese kann also nur vom Ersteller gesehen werden.'
+                    : 'Bei FHG Online trägt die gesamte Klasse die Hausaufgaben ein, sodass dort alles übersichtlich zusammengefasst ist.',
+                  keywords:
+                    'Hausaufgabe, Hausaufgabe, Hausaufgaben Heft, Schulplaner, FHG Online, FHG',
+                  robots: 'noindex, nofollow'
+                });
                 if (this.homework.sort_by == 'entered') {
                   this.week = this.helper.getDateOf(homework.entered.date);
                   this.loadWeeksHomework();
@@ -521,7 +577,8 @@ export class HomeworkComponent implements OnInit {
     this.homework.done[id] = event.checked;
   }
 
-  onChangeWeek(add: number) {
+  onChangeWeek(add: number, ev) {
+    if (ev && ev.changedPointers[0].clientX - ev.deltaX <= 50) return;
     this.week.setDate(this.week.getDate() + 7 * add);
     this.loadWeeksHomework();
   }
@@ -729,5 +786,9 @@ export class HomeworkComponent implements OnInit {
 
   setWeekToThisWeek() {
     this.week = new Date();
+  }
+
+  isServer() {
+    return isPlatformServer(this.platformId);
   }
 }

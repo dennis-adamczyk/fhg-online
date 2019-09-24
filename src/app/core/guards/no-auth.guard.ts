@@ -18,6 +18,7 @@ export class NoAuthGuard implements CanActivate {
   constructor(
     private auth: AuthService,
     private router: Router,
+    private title: Title,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 

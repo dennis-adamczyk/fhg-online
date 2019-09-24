@@ -12,6 +12,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { MatTabGroup } from '@angular/material';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-information',
@@ -23,10 +24,20 @@ export class InformationComponent implements OnInit {
   @ViewChild('tabs', { static: true }) tabGroup: MatTabGroup;
 
   constructor(
+    private seo: SeoService,
     private route: ActivatedRoute,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Alle rechtlichen Informationen, das Impressum, die Datenschutzerklärung und die Nutzungsbedingungen wurden von dem uns transparent zusammengefasst.',
+      keywords:
+        'Rechtliches, Impressum, Datenschutz, Nutzungsbedingungen, Kontakt, Sanktionen, Strafen, Schulplaner, FHG Online, FHG'
+    });
+  }
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {

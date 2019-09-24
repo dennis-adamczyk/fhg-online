@@ -20,7 +20,8 @@ export class AppComponent {
   constructor(
     private updater: UpdateService,
     public auth: AuthService,
-    private analytics: AnalyticsService
+    private analytics: AnalyticsService,
+    private router: Router
   ) {}
 
   ngOnInit() {

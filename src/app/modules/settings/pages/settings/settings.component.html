@@ -57,6 +57,20 @@
       Allgemein
     </h3>
     <div class="list">
+      <a
+        mat-list-item
+        disableRipple
+        href="https://github.com/dennis-adamczyk/fhg-online/releases"
+        target="_blank"
+        rel="nofollow"
+      >
+        <h4 mat-line>
+          Version
+        </h4>
+        <p mat-line>
+          {{ version }}
+        </p>
+      </a>
       <button mat-list-item (click)="installWebApp()" *ngIf="canInstall()">
         <mat-icon matListIcon>get_app</mat-icon>
         <h4 mat-line>WebApp installieren</h4>
