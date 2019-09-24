@@ -13,7 +13,8 @@ import { constant } from 'src/configs/constants';
 import { MatVerticalStepper, MatSnackBar } from '@angular/material';
 import { of } from 'rxjs';
 import { CdkStep } from '@angular/cdk/stepper';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-register',
@@ -32,12 +33,23 @@ export class RegisterComponent implements OnInit {
   @ViewChild('emailStep', { static: false }) emailStep: CdkStep;
 
   constructor(
+    private seo: SeoService,
+    private route: ActivatedRoute,
     private snackBar: MatSnackBar,
     public auth: AuthService,
     private fb: FormBuilder,
     private db: FirestoreService,
     private router: Router
-  ) {}
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Erstelle dir in fünf einfachen Schritten dein eigenes Konto mithilfe von IServ, damit du anfangen kannst, den digitalen Schulplaner zu nutzen.',
+      keywords:
+        'Registrieren, Konto, Erstellen, Start, IServ, Franz-Haniel-Gymnasium, Schulplaner, FHG Online, FHG'
+    });
+  }
 
   ngOnInit() {
     this.showPassword1 = false;

@@ -10,14 +10,14 @@ const routes: Routes = [
     path: 'add',
     component: AddHomeworkComponent,
     data: {
-      title: 'Neue Hausaufgabe'
+      title: 'Hinzufügen ◃ Hausaufgaben'
     },
     canDeactivate: [PendingChangesGuard]
   },
   {
     path: 'edit',
     data: {
-      title: 'Hausaufgabe bearbeiten'
+      title: 'Bearbeiten ◃ Hausaufgaben'
     },
     children: [
       {

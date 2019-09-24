@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationExtras } from '@angular/router';
@@ -6,6 +6,8 @@ import { message } from '../../../../../configs/messages';
 import { constant } from '../../../../../configs/constants';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
+import { isPlatformServer, isPlatformBrowser } from '@angular/common';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-login',
@@ -20,10 +22,21 @@ export class LoginComponent implements OnInit {
   constant = constant;
 
   constructor(
+    private seo: SeoService,
     public auth: AuthService,
     private fb: FormBuilder,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Melde dich einfach auf all deinen Geräten mit deinem Konto an, um den digitalen Schulplaner des Franz-Haniel-Gymnasiums nutzen zu können.',
+      keywords:
+        'Login, Anmelden, Konto, Start, Franz-Haniel-Gymnasium, Schulplaner, FHG Online, FHG'
+    });
+  }
 
   ngOnInit() {
     this.showPassword = false;
@@ -43,13 +56,14 @@ export class LoginComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
-        'recaptcha-container',
-        { size: 'normal' }
-      );
-      window['recaptchaVerifier'] = this.recaptchaVerifier;
-    }, 0);
+    if (isPlatformBrowser(this.platformId))
+      setTimeout(() => {
+        this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+          'recaptcha-container',
+          { size: 'normal' }
+        );
+        window['recaptchaVerifier'] = this.recaptchaVerifier;
+      }, 0);
   }
 
   get email() {

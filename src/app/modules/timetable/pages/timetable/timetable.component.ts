@@ -21,6 +21,7 @@ import {
 } from '@angular/router';
 import { TimetableService } from '../../services/timetable.service';
 import { HelperService } from 'src/app/core/services/helper.service';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-timetable',
@@ -39,6 +40,8 @@ export class TimetableComponent implements OnInit {
   }
 
   constructor(
+    private seo: SeoService,
+    private route: ActivatedRoute,
     public helper: HelperService,
     private timetable: TimetableService,
     private dialog: MatDialog,
@@ -47,7 +50,16 @@ export class TimetableComponent implements OnInit {
     private renderer: Renderer2,
     private breakpointObserver: BreakpointObserver,
     @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Der digitale Stundenplan zeigt dir immer den aktuellen Stundenplan an, ohne dass du alles mühselig selbst eintragen musst.',
+      keywords:
+        'Stundenplan, Kurse, Plan, Organisation, Schulplaner, FHG Online, FHG'
+    });
+  }
 
   /* ##### TOOLBAR EXTENTION ##### */
 

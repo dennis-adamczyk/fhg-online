@@ -17,6 +17,7 @@ import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-ca
 import { isPlatformBrowser } from '@angular/common';
 import { UpdateService } from 'src/app/core/services/update.service';
 import { environment } from 'src/environments/environment';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 @Component({
   selector: 'app-settings',
@@ -35,6 +36,7 @@ export class SettingsComponent implements OnInit {
   @ViewChildren('numericSelect') numericSelect: QueryList<MatSelect>;
 
   constructor(
+    private seo: SeoService,
     public auth: AuthService,
     private route: ActivatedRoute,
     private router: Router,
@@ -43,7 +45,16 @@ export class SettingsComponent implements OnInit {
     private snackBar: MatSnackBar,
     private update: UpdateService,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Passe den digitalen Schulplaner deinen Wünschen an, indem du die vielfältigen Einstellungen der Web App schnell und in Echtzeit änderst.',
+      keywords:
+        'Einstellungen, Persönlich, Technisches, Konto, Design, Schulplaner, FHG Online, FHG'
+    });
+  }
 
   ngOnInit() {
     this.route.fragment.subscribe(fragment => {

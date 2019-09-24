@@ -15,7 +15,7 @@ import 'zone.js/dist/zone-node';
 import 'reflect-metadata';
 import { enableProdMode } from '@angular/core';
 // Express Engine
-import { ngExpressEngine } from '@nguniversal/express-engine';
+import { ngExpressEngine, RenderOptions } from '@nguniversal/express-engine';
 // Import module map for lazy loading
 import { provideModuleMap } from '@nguniversal/module-map-ngfactory-loader';
 

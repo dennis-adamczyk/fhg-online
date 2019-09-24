@@ -22,6 +22,7 @@ import { UserComponent } from './user/user.component';
 import { message } from 'src/configs/messages';
 import { userInfo } from 'os';
 import { registerUser } from 'functions/src';
+import { SeoService } from 'src/app/core/services/seo.service';
 
 export interface UserElement {
   uid: string;
@@ -51,6 +52,7 @@ export class UsersComponent implements OnInit {
   private storageKey = 'admin_users';
 
   constructor(
+    private seo: SeoService,
     private afFunc: AngularFireFunctions,
     private router: Router,
     private route: ActivatedRoute,
@@ -58,7 +60,16 @@ export class UsersComponent implements OnInit {
     private renderer: Renderer2,
     private location: Location,
     @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Passe Benutzer an und sanktioniere sie, damit für niemand gegen die Nutzungsbedingungen verstößt.',
+      keywords: 'Administration, Benutzer, Schulplaner, FHG Online, FHG',
+      robots: 'noindex, nofollow'
+    });
+  }
 
   /* ##### Toolbar Extention ##### */
 

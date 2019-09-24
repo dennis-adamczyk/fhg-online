@@ -130,7 +130,7 @@ service cloud.firestore {
           allow read: if isGuard() || (!hasInteractionSanction() && ((isAdmin() && userData().class in courseData().class) ||
                         (isTeacher() && courseData().teacher.last_name == userData().name.last_name) ||
                         (isLoggedIn() && userData().class in courseData().class) ||
-                        (isLoggedIn() && course in userData().course)));
+                        (isLoggedIn() && course in userData().course))) || !isLoggedIn();
           allow create: if isValidHomework() && (
                             isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isAdmin() && userData().class in courseData().class) ||
                             (!isIndex(homeworkId) && isTeacher() && courseData().teacher.last_name == userData().name.last_name) ||

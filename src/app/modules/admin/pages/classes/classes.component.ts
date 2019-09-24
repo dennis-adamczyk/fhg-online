@@ -11,6 +11,8 @@ import { map, switchMap, tap, take } from 'rxjs/operators';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { AddClassDialog } from './dialogs/add-class/add-class.component';
 import { HelperService } from 'src/app/core/services/helper.service';
+import { SeoService } from 'src/app/core/services/seo.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-classes',
@@ -21,13 +23,24 @@ export class ClassesComponent implements OnInit {
   classlist: string[];
 
   constructor(
+    private seo: SeoService,
+    private route: ActivatedRoute,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private db: FirestoreService,
     public helper: HelperService,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: string
-  ) {}
+  ) {
+    let title = this.route.snapshot.data['title'];
+    this.seo.generateTags({
+      title: title,
+      description:
+        'Hab den Überblick über alle Klassen und passe sie gegebenenfalls an.',
+      keywords: 'Administration, Klassen, Schulplaner, FHG Online, FHG',
+      robots: 'noindex, nofollow'
+    });
+  }
 
   /* ##### Toolbar Extention ##### */
 
@@ -37,11 +50,6 @@ export class ClassesComponent implements OnInit {
   scrollListener: any;
 
   ngOnInit() {
-    this.db
-      .doc$('years/--index--')
-      .pipe(tap(d => (this.classlist = d['classes'].sort())))
-      .subscribe();
-
     if (isPlatformBrowser(this.platformId)) {
       this.toolbar = document.querySelector('.main-toolbar');
       this.sidenavContent = document.querySelector('mat-sidenav-content');
@@ -62,6 +70,11 @@ export class ClassesComponent implements OnInit {
         'scroll',
         event => scrollHandler()
       );
+
+      this.db
+        .doc$('years/--index--')
+        .pipe(tap(d => (this.classlist = d['classes'].sort())))
+        .subscribe();
     }
   }
 
