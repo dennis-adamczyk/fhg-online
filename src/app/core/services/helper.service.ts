@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { constant } from 'src/configs/constants';
 import { AuthService } from './auth.service';
 import * as firebase from 'firebase/app';
-import { isPlatformServer } from '@angular/common';
+import { isPlatformServer, isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -114,7 +114,7 @@ export class HelperService {
    * @memberof HelperService
    */
   getYear(clazz?: string): string {
-    if (!clazz) clazz = this.auth.user.class;
+    if (!clazz && this.auth.user) clazz = this.auth.user.class;
     if (!clazz) return;
     if (clazz.charAt(0).match(/\d/)) {
       return clazz.charAt(0);
@@ -198,5 +198,15 @@ export class HelperService {
    */
   isServer(): boolean {
     return isPlatformServer(this.platformId);
+  }
+
+  /**
+   * Returns true if the platform is browser
+   *
+   * @returns {boolean}
+   * @memberof HelperService
+   */
+  isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
   }
 }

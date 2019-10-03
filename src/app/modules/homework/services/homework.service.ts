@@ -579,7 +579,11 @@ export class HomeworkService {
     if (!weekday) weekday = new Date().getDay();
     if (weekday > 5 || weekday == 0) return;
 
-    if (!localStorage.getItem(timetableKey)) return;
+    if (
+      !isPlatformBrowser(this.platformId) ||
+      !localStorage.getItem(timetableKey)
+    )
+      return;
     let courses = JSON.parse(localStorage.getItem(timetableKey)).courses;
     let max = 0;
     courses.forEach((course: Course) => {

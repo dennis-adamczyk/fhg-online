@@ -1,0 +1,226 @@
+@import ../../../../../../var
+
+::ng-deep div.classes
+    -webkit-transform: translate3d(0, 0, 0)
+
+.toolbar-extention
+    position: absolute
+    left: 0
+    top: 0
+    right: 0
+    height: 128px
+    background-color: mat-color($primary-light)
+    z-index: -1
+    +mat-elevation(2)
+
+.article
+    margin: 8px
+    padding: 0
+    height: auto
+    background-color: mat-color($background-light, card)
+    border-radius: 4px
+    overflow: visible
+    user-select: none
+    +mat-elevation(4)
+
+    header
+        display: flex
+        justify-content: space-between
+        align-items: center
+        height: 64px
+        width: 100%
+        border-bottom: 1px solid mat-color($foreground-light, divider)
+
+        .title
+            flex-grow: 1
+            margin: 0 0 0 16px
+            padding: 0
+            font-size: 20px
+            font-weight: 400
+
+            ::ng-deep .mat-form-field-underline
+                display: none
+
+            ::ng-deep .mat-form-field-wrapper
+                padding: 0
+
+            ::ng-deep .mat-form-field-infix
+                border: none
+
+            ::ng-deep .mat-form-field-flex
+                align-items: center
+
+            ::ng-deep .mat-form-field-prefix
+                height: 24px
+
+            &.mat-form-field-invalid
+                ::ng-deep .mat-form-field-prefix mat-icon
+                    color: mat-color($warn-light)
+
+            mat-icon
+                color: mat-color($foreground-light, icon)
+                margin: 0 12px 0 0
+                font-size: 24px
+                color: mat-color($primary-light)
+
+        .actions
+            flex-shrink: 1
+            margin: 0 16px 0 0
+
+            button, a
+                margin: 12px 8px 12px 0
+
+                &:last-child
+                    margin: 12px 0
+
+                mat-icon
+                    color: mat-color($foreground-light, icon)
+
+    .body
+        margin: 0
+        padding: 0
+        width: 100%
+        height: 100%
+        min-height: 200px
+        position: relative
+
+        .loading
+            position: absolute
+            top: 0
+            left: 0
+            bottom: 0
+            right: 0
+            background: mat-color($background-light, disabled-button)
+            z-index: 1
+            display: flex
+            align-items: center
+            justify-content: center
+
+        .editor
+            height: 100%
+            min-height: 200px
+
+            quill-editor
+                min-height: 200px
+
+                .toolbar
+                    min-height: 48px
+                    height: auto
+                    width: 100%
+                    border: none
+                    background-color: mat-color($background-light, card)
+                    border-bottom: 1px solid mat-color($foreground-light, divider)
+                    flex-wrap: wrap
+                    padding: 0 8px
+
+                    .ql-formats
+                        margin: 8px 4px 8px 0
+                        padding: 0 4px 0 0
+                        border-right: 1px solid mat-color($foreground-light, divider)
+
+                        &:last-child
+                            margin: 8px 0
+                            padding: 0
+                            border-right: none
+
+                        ::ng-deep button
+                            width: 24px
+                            height: 24px
+                            padding: 0
+                            margin: 0 2px 0 2px
+                            line-height: 24px
+                            border-radius: 4px
+                            display: flex
+                            justify-content: center
+                            align-items: center
+
+                            &.ql-active
+                                mat-icon, svg
+                                    color: mat-color($primary-light)
+
+                                    .ql-fill
+                                        fill: mat-color($primary-light)
+
+                            mat-icon, svg
+                                line-height: 24px
+                                font-size: 24px
+                                color: mat-color($foreground-light, icon)
+
+                                .ql-fill
+                                    fill: mat-color($foreground-light, icon)
+
+                            svg
+                                width: 20px
+                                height: 20px
+
+                            &:hover
+                                background-color: mat-color($background-light, hover)
+
+                ::ng-deep
+                    .ql-container
+                        border: none
+                        font-family: 'Roboto', sans-serif
+                        font-size: 14px
+
+                        .ql-tooltip
+                            &[data-mode=link]::before
+                                content: 'URL eingeben:'
+
+                            &::before
+                                content: 'URL aufrufen:'
+
+                            &.ql-editing
+                                a.ql-action::after
+                                    content: 'Speichern'
+
+                            a.ql-action::after
+                                content: 'Bearbeiten'
+
+                            a.ql-remove::before
+                                content: 'Entfernen'
+
+                        .ql-editor
+                            min-height: 200px
+                            max-height: calc(100vh - 144px)
+                            caret-color: mat-color($primary-light)
+
+                            h2
+                                font-size: 20px
+                                font-weight: 400
+
+                            h3
+                                font-size: 16px
+                                font-weight: 500
+
+                            strong
+                                font-weight: 600
+
+                            a
+                                text-decoration: none
+                                color: mat-color($primary-light)
+
+                                &:hover
+                                    text-decoration: underline
+
+        
+
+    
+@media not all and ($mat-xsmall)
+    .article
+        margin: 0 auto 24px auto
+        width: 576px
+
+        .header
+            .title
+                margin: 0 0 0 24px
+
+            .actions
+                margin: 0 24px 0 0
+
+        .body
+            .editor
+                quill-editor
+                    ::ng-deep 
+                        .ql-container
+                            .ql-editor
+                                max-height: calc(100vh - 136px)

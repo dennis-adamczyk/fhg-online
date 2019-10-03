@@ -12,6 +12,9 @@ import { CoursesComponent } from './pages/classes/class/courses/courses.componen
 import { CourseComponent } from './pages/classes/course/course.component';
 import { AddCourseComponent } from './pages/classes/course/add-course/add-course.component';
 import { TimetableComponent } from './pages/classes/class/timetable/timetable.component';
+import { HelpArticlesComponent } from './pages/help/help.component';
+import { HelpArticleComponent } from './pages/help/article/article.component';
+import { PendingChangesGuard } from 'src/app/core/guards/pending-changes.guard';
 
 const routes: Routes = [
   {
@@ -89,6 +92,23 @@ const routes: Routes = [
         component: CourseComponent
       }
     ]
+  },
+  {
+    path: 'help',
+    component: HelpArticlesComponent,
+    data: {
+      title: 'Administration',
+      iconFunction: 'back'
+    }
+  },
+  {
+    path: 'help/:article',
+    component: HelpArticleComponent,
+    data: {
+      title: 'Administration',
+      iconFunction: 'back'
+    },
+    canDeactivate: [PendingChangesGuard]
   }
 ];
 

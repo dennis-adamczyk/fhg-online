@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MaterialModule } from './material.module';
 import { DocPipe } from './pipes/doc.pipe';
 import { ColPipe } from './pipes/col.pipe';
@@ -18,6 +18,7 @@ import {
   HammerGestureConfig,
   HAMMER_GESTURE_CONFIG
 } from '@angular/platform-browser';
+import { QuillModule } from 'ngx-quill';
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = <any>{
@@ -42,7 +43,7 @@ export class MyHammerConfig extends HammerGestureConfig {
 
 @NgModule({
   declarations: [DocPipe, ColPipe, SpeedDialFabComponent, IntroComponent],
-  imports: [CommonModule, MaterialModule],
+  imports: [CommonModule, MaterialModule, QuillModule.forRoot()],
   exports: [
     CommonModule,
     MaterialModule,
@@ -51,7 +52,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     ReactiveFormsModule,
     NgxTrimDirectiveModule,
     SpeedDialFabComponent,
-    IntroComponent
+    IntroComponent,
+    QuillModule
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },

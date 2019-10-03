@@ -157,7 +157,7 @@ service cloud.firestore {
       allow delete: if isGuard();
     }
 
-    match /articles/{articleId} {
+    match /help/{articleId} {
       allow read;
       allow write: if isGuard();
     }

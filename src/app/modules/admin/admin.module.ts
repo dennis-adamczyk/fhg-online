@@ -20,6 +20,8 @@ import { TimetableComponent } from './pages/classes/class/timetable/timetable.co
 import { LessonDetailsDialog } from './pages/classes/class/timetable/dialogs/lesson-details/lesson-details.component';
 import { AddLessonDialog } from './pages/classes/class/timetable/dialogs/add-lesson/add-lesson.component';
 import { AddClassDialog } from './pages/classes/dialogs/add-class/add-class.component';
+import { HelpArticlesComponent } from './pages/help/help.component';
+import { HelpArticleComponent } from './pages/help/article/article.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,9 @@ import { AddClassDialog } from './pages/classes/dialogs/add-class/add-class.comp
     TimetableComponent,
     LessonDetailsDialog,
     AddLessonDialog,
-    AddClassDialog
+    AddClassDialog,
+    HelpArticlesComponent,
+    HelpArticleComponent
   ],
   imports: [
     CommonModule,

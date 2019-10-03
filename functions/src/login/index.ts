@@ -99,18 +99,20 @@ export const registerUser = functions.https.onCall(async (data, context) => {
       }
     });
 
-  await admin
-    .auth()
-    .getUserByEmail(email)
-    .then(userRecord => {
-      if (userRecord.uid) {
-        throw new HttpsError(
-          'already-exists',
-          'Die E-Mail ist bereits vergeben.'
-        );
-      }
-    })
-    .catch(error => {});
+  try {
+    await admin
+      .auth()
+      .getUserByEmail(email)
+      .then(userRecord => {
+        if (userRecord.uid) {
+          throw new HttpsError(
+            'already-exists',
+            'Die E-Mail ist bereits vergeben.'
+          );
+        }
+      })
+      .catch(error => {});
+  } catch (error) {}
 
   if (
     context.auth &&
