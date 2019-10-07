@@ -23,7 +23,6 @@ import { EditLessonsDialog } from './dialogs/edit-lessons/edit-lessons.component
 import { ColorPickerDialog } from './dialogs/color-picker/color-picker.component';
 import { SanctionDialog } from './dialogs/sanction/sanction.component';
 import { ShareSheet } from './bottomsheets/share/share.component';
-import { NgAisModule } from 'angular-instantsearch';
 
 // TODO: Add Angular Fire Performance
 
@@ -59,7 +58,6 @@ if (
     AngularFireStorageModule,
     AngularFirePerformanceModule,
     RouterModule,
-    NgAisModule,
     LayoutModule,
     SharedModule
   ],

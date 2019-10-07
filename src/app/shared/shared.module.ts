@@ -19,6 +19,7 @@ import {
   HAMMER_GESTURE_CONFIG
 } from '@angular/platform-browser';
 import { QuillModule } from 'ngx-quill';
+import { NgAisModule } from 'angular-instantsearch';
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = <any>{
@@ -43,7 +44,12 @@ export class MyHammerConfig extends HammerGestureConfig {
 
 @NgModule({
   declarations: [DocPipe, ColPipe, SpeedDialFabComponent, IntroComponent],
-  imports: [CommonModule, MaterialModule, QuillModule.forRoot()],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    QuillModule.forRoot(),
+    NgAisModule.forRoot()
+  ],
   exports: [
     CommonModule,
     MaterialModule,
@@ -53,7 +59,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     NgxTrimDirectiveModule,
     SpeedDialFabComponent,
     IntroComponent,
-    QuillModule
+    QuillModule,
+    NgAisModule
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
