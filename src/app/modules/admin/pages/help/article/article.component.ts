@@ -15,7 +15,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import Quill from 'quill';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { take } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-article',
@@ -25,8 +25,10 @@ import { Observable } from 'rxjs';
 export class HelpArticleComponent implements OnInit {
   articleId = this.route.snapshot.params['article'];
   articleForm: FormGroup;
+  data: any;
   loading = true;
   edited = false;
+  sub: Subscription;
 
   modules = {
     toolbar: {
@@ -52,6 +54,9 @@ export class HelpArticleComponent implements OnInit {
         undo: this.onUndo,
         redo: this.onRedo
       }
+    },
+    clipboard: {
+      matchVisual: false
     }
   };
   editor;
@@ -118,6 +123,7 @@ export class HelpArticleComponent implements OnInit {
       if (this.scrollListener) this.scrollListener();
       this.renderer.removeStyle(this.toolbar, 'box-shadow');
     }
+    if (this.sub) this.sub.unsubscribe();
   }
 
   /* ##### LOAD DATA ##### */
@@ -127,48 +133,53 @@ export class HelpArticleComponent implements OnInit {
       this.edited = false;
       this.loading = false;
       if (this.editor) this.editor.history.clear();
-    } else
-      this.db.doc$(`help/${this.articleId}`).subscribe((data: object) => {
-        if (!data) {
-          this.edited = false;
-          this.snackBar.open(
-            'Kein Hilfe-Artikel mit dieser ID gefunden',
-            null,
-            { duration: 4000 }
-          );
-          this.router.navigate(['/admin/help']);
-          return;
-        }
-        if (this.loading) {
-          this.articleForm.patchValue(data);
-          this.edited = false;
-          this.loading = false;
-          if (this.editor) this.editor.history.clear();
-        } else {
-          this.dialog
-            .open(AcceptCancelDialog, {
-              data: {
-                title: 'Neue Änderung',
-                content:
-                  'An dem aktuellen Hilfe-Artikel wurde von einem anderen Guard eine Änderung vorgenommen. Möchtest du die neue Änderung übernehmen (und deine Änderungen verwerfen)?',
-                accept: 'Ja'
-              }
-            })
-            .afterClosed()
-            .pipe(take(1))
-            .subscribe(accept => {
-              if (!accept)
-                return this.snackBar.open(
-                  'Achtung! Mit dem Speichern des Artikels werden fremde Änderungen überschrieben.',
-                  null,
-                  { duration: 4000 }
-                );
+    } else if (this.sub) this.sub.unsubscribe();
+    this.sub = this.db.doc$(`help/${this.articleId}`).subscribe((data: any) => {
+      if (!data) {
+        this.edited = false;
+        this.snackBar.open('Kein Hilfe-Artikel mit dieser ID gefunden', null, {
+          duration: 4000
+        });
+        this.router.navigate(['/admin/help']);
+        return;
+      }
+      data = {
+        title: data.title,
+        content: data.content
+      };
+      if (JSON.stringify(data) == JSON.stringify(this.data)) return;
+      if (this.loading) {
+        this.data = data;
+        this.articleForm.patchValue(data);
+        this.edited = false;
+        this.loading = false;
+        if (!this.articleForm.dirty && this.editor) this.editor.history.clear();
+      } else {
+        this.dialog
+          .open(AcceptCancelDialog, {
+            data: {
+              title: 'Neue Änderung',
+              content:
+                'An dem aktuellen Hilfe-Artikel wurde von einem anderen Guard eine Änderung vorgenommen. Möchtest du die neue Änderung übernehmen (und deine Änderungen verwerfen)?',
+              accept: 'Ja'
+            }
+          })
+          .afterClosed()
+          .pipe(take(1))
+          .subscribe(accept => {
+            if (!accept)
+              return this.snackBar.open(
+                'Achtung! Mit dem Speichern des Artikels werden fremde Änderungen überschrieben.',
+                null,
+                { duration: 4000 }
+              );
 
-              this.articleForm.patchValue(data);
-              this.edited = false;
-            });
-        }
-      });
+            this.articleForm.patchValue(data);
+            this.edited = false;
+          });
+      }
+    });
+
     this.articleForm = this.fb.group({
       title: ['', [Validators.required]],
       content: ['', [Validators.required]]
@@ -240,6 +251,8 @@ export class HelpArticleComponent implements OnInit {
           accept: 'Korrigieren'
         }
       });
+
+    this.data = this.articleForm.value;
 
     if (this.articleId == 'add')
       this.db

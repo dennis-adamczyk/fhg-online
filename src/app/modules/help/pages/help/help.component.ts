@@ -132,11 +132,6 @@ export class SearchBox extends BaseWidget {
 
   clear(event?) {
     this.state.clear();
-
     if (event) event.stopPropagation();
-  }
-
-  test(x) {
-    console.log(x);
   }
 }
