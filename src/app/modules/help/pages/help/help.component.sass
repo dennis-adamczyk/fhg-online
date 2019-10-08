@@ -48,7 +48,7 @@
                         color: mat-color($foreground-light, text)
                         +mat-elevation(4)
 
-                        div[matprefix]
+                        *[matprefix]
                             margin: 0 12px 0 0
 
                         .mat-icon-button
@@ -81,6 +81,28 @@
                         .mat-form-field-prefix
                             height: 24px
 
+            &.focus
+                position: absolute
+                top: 0
+                left: 0
+                right: 0
+                background-color: mat-color($background-light, background)
+                z-index: 1
+
+                ::ng-deep
+                    app-search-box
+                        margin: 0
+                        padding: 0
+
+                        mat-form-field
+                            padding: 4px 8px
+                            height: 56px
+                            background-color: transparent
+                            border-radius: 0
+                            border: none
+                            caret-color: mat-color($primary-light)
+                            color: mat-color($foreground-light, text)
+                            +mat-elevation(0)
 
             .actions
                 margin: 16px 0 4px 0
@@ -93,7 +115,7 @@
                         color: mat-color($foreground-light, icon)
 
             h2
-                margin: 16px 0 8px 0
+                margin: 16px 0 0 0
                 padding: 0 16px
                 font-size: 16px
                 font-weight: 400
@@ -106,7 +128,16 @@
                         mat-icon
                             color: mat-color($primary-light)
 
-@media not all and ($mat-xsmall)
+                    .question
+                        height: 32px
+
+                        h3
+                            font-size: 14px
+                            font-weight: 500
+                            color: mat-color($primary-light)
+                            text-transform: uppercase
+
+@media not all and ($mat-small)
     .help
         mat-toolbar
             background-color:  mat-color($background-light, card)
@@ -120,3 +151,60 @@
 
         .container
             height: calc(100% - 64px)
+            width: 576px
+            margin: 0 auto
+
+            ais-instantsearch
+                ::ng-deep
+                    app-search-box
+                        position: absolute
+                        top: 0
+                        left: 50%
+                        transform: translateX(-50%)
+                        width: 576px
+                        max-width: calc(100% - 480px)
+                        display: block
+                        margin: 8px 0
+                        padding: 0
+                        z-index: 1
+
+                        mat-form-field
+                            display: block
+                            padding: 0 16px
+                            height: 48px
+                            position: relative
+                            background-color: rgba(mat-color($background-dark, background), .06)
+                            border-radius: 8px
+                            border: none
+                            caret-color: mat-color($primary-light)
+                            color: mat-color($foreground-light, text)
+                            +mat-elevation(0)
+
+                &.focus
+                    position: static
+                    top: 0
+                    left: 0
+                    right: 0
+                    background-color: mat-color($background-light, background)
+                    z-index: 1
+
+                    ::ng-deep
+                        app-search-box
+                            margin: 8px 0
+                            padding: 0
+
+                            mat-form-field
+                                padding: 0 16px
+                                height: 48px
+                                background-color: rgba(mat-color($background-dark, background), .06)
+                                border-radius: 8px
+                                border: none
+                                caret-color: mat-color($primary-light)
+                                color: mat-color($foreground-light, text)
+                                +mat-elevation(0)
+
+                        mat-divider
+                            display: none
+
+                .actions
+                    margin: 8px 0 4px 0

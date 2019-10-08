@@ -5,14 +5,16 @@ import {
   Inject,
   Input,
   ViewChild,
-  EventEmitter
+  EventEmitter,
+  Output,
+  PLATFORM_ID
 } from '@angular/core';
-import { Location } from '@angular/common';
+import { Location, isPlatformBrowser } from '@angular/common';
 import { Observable } from 'rxjs';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
 import { SeoService } from 'src/app/core/services/seo.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import * as algoliasearch from 'algoliasearch/lite';
 
@@ -30,6 +32,7 @@ export class HelpComponent implements OnInit {
     indexName: 'help'
   };
 
+  focus: boolean = false;
   isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(map(result => result.matches));
@@ -38,7 +41,9 @@ export class HelpComponent implements OnInit {
     private seo: SeoService,
     private route: ActivatedRoute,
     public location: Location,
-    private breakpointObserver: BreakpointObserver
+    private router: Router,
+    private breakpointObserver: BreakpointObserver,
+    @Inject(PLATFORM_ID) private platformId: string
   ) {
     let title = this.route.snapshot.data['title'];
     this.seo.generateTags({
@@ -51,6 +56,13 @@ export class HelpComponent implements OnInit {
   }
 
   ngOnInit() {}
+
+  navigateBack() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (document.referrer.indexOf(window.location.host) !== -1)
+      this.location.back();
+    else this.router.navigate(['/'], { replaceUrl: true });
+  }
 }
 
 import { BaseWidget, NgAisInstantSearch } from 'angular-instantsearch';
@@ -64,36 +76,26 @@ import { connectSearchBox } from 'instantsearch.js/es/connectors';
         matInput
         #input
         placeholder="Problem beschreiben"
-        (keyup)="
-          this.state.refine(input.value);
-          !this.focused ? this.focused.emit(true) : null
-        "
+        (keyup)="this.state.refine(input.value)"
         [value]="this.state.query"
         (focus)="this.focus.emit(true)"
-        (focusout)="this.focus.emit(false)"
+        (focusout)="this.setFocus()"
       />
-      <div matPrefix>
-        <button
-          mat-icon-button
-          disableRipple
-          (click)="this.focused && this.handset ? this.clear($event) : null"
-        >
-          <mat-icon>{{
-            !(this.isHandset$ | async) || !this.focused
-              ? 'search'
-              : 'arrow_back'
-          }}</mat-icon>
-        </button>
-      </div>
+      <button
+        matPrefix
+        mat-icon-button
+        disableRipple
+        (click)="this.handset ? this.clear($event) : null"
+      >
+        <mat-icon>{{
+          !(this.isHandset$ | async) || !this.focused ? 'search' : 'arrow_back'
+        }}</mat-icon>
+      </button>
       <button
         mat-icon-button
         matSuffix
         disableRipple
-        *ngIf="
-          !(this.isHandset$ | async) &&
-          this.state.query &&
-          this.state.query.length
-        "
+        *ngIf="!(this.isHandset$ | async) && this.focused"
         (click)="this.clear($event)"
       >
         <mat-icon>clear</mat-icon>
@@ -109,7 +111,7 @@ export class SearchBox extends BaseWidget {
     isSearchStalled: boolean;
     widgetParams: object;
   };
-  focus = new EventEmitter<boolean>();
+  @Output() focus = new EventEmitter<boolean>();
   focused: boolean;
   @Input('handset$') public isHandset$: Observable<boolean>;
   @ViewChild('input', { static: true }) input: any;
@@ -125,13 +127,27 @@ export class SearchBox extends BaseWidget {
 
   ngOnInit() {
     this.focus.subscribe(x => setTimeout(() => (this.focused = x), 0));
-    this.createWidget(connectSearchBox, {});
+    this.createWidget(connectSearchBox, {
+      queryHook: (query, search) => {
+        this.state.query = query;
+        search(query);
+      }
+    });
     super.ngOnInit();
     this.isHandset$.subscribe(hand => (this.handset = hand));
   }
 
   clear(event?) {
+    this.focus.emit(false);
     this.state.clear();
+    this.input.nativeElement.blur();
     if (event) event.stopPropagation();
+  }
+
+  setFocus() {
+    setTimeout(() => {
+      if (!this.focused) return;
+      this.input.nativeElement.focus();
+    }, 100);
   }
 }

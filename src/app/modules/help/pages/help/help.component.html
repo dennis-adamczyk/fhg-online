@@ -5,18 +5,34 @@
       class="close-btn"
       aria-label="Close"
       mat-icon-button
-      (click)="location.back()"
+      (click)="navigateBack()"
       [disableRipple]="isHandset$ | async"
+      *ngIf="!focus"
     >
       <mat-icon aria-label="Close help icon">close</mat-icon>
+    </button>
+    <button
+      type="button"
+      class="close-btn"
+      aria-label="Close"
+      mat-icon-button
+      (click)="searchBox.clear()"
+      [disableRipple]="isHandset$ | async"
+      *ngIf="focus"
+    >
+      <mat-icon aria-label="Close search">arrow_back</mat-icon>
     </button>
     <span class="title">Hilfe & Feedback</span>
   </mat-toolbar>
   <div class="container">
-    <ais-instantsearch [config]="searchConfig">
-      <app-search-box [handset$]="isHandset$"></app-search-box>
+    <ais-instantsearch [config]="searchConfig" [class.focus]="focus">
+      <app-search-box
+        [handset$]="isHandset$"
+        (focus)="focus = $event"
+        #searchBox
+      ></app-search-box>
 
-      <mat-action-list class="actions">
+      <mat-action-list class="actions" *ngIf="!focus">
         <a mat-list-item routerLink="bug">
           <mat-icon matListIcon>bug_report</mat-icon>
           <h4 mat-line>Fehler melden</h4>
@@ -28,7 +44,7 @@
       </mat-action-list>
       <mat-divider></mat-divider>
 
-      <h2>Beliebte Artikel</h2>
+      <h2 *ngIf="!focus">Beliebte Artikel</h2>
       <ais-hits>
         <ng-template let-hits="hits">
           <mat-action-list>
@@ -41,10 +57,15 @@
               <h3 mat-line>
                 <ais-highlight attribute="title" [hit]="hit"></ais-highlight>
               </h3>
-              <!-- <p>
-                <ais-highlight attribute="content" [hit]="hit"></ais-highlight>
-              </p> -->
             </a>
+            <button
+              mat-list-item
+              [routerLink]="question"
+              class="question"
+              *ngIf="focus"
+            >
+              <h3 mat-line>Frage einreichen</h3>
+            </button>
           </mat-action-list>
         </ng-template>
       </ais-hits>
