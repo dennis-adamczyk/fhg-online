@@ -21,7 +21,7 @@ import { LessonDetailsDialog } from './pages/classes/class/timetable/dialogs/les
 import { AddLessonDialog } from './pages/classes/class/timetable/dialogs/add-lesson/add-lesson.component';
 import { AddClassDialog } from './pages/classes/dialogs/add-class/add-class.component';
 import { HelpArticlesComponent } from './pages/help/help.component';
-import { HelpArticleComponent } from './pages/help/article/article.component';
+import { HelpArticleEditComponent } from './pages/help/article/article.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +41,7 @@ import { HelpArticleComponent } from './pages/help/article/article.component';
     AddLessonDialog,
     AddClassDialog,
     HelpArticlesComponent,
-    HelpArticleComponent
+    HelpArticleEditComponent
   ],
   imports: [
     CommonModule,

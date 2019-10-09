@@ -12,11 +12,16 @@ import { isPlatformBrowser } from '@angular/common';
   styleUrls: ['./share.component.sass']
 })
 export class ShareSheet {
-  shareTypes = ['whatsapp', 'email', 'link'];
+  shareTypes = ['whatsapp', 'iserv', 'email', 'link'];
   shareDetails = {
     whatsapp: {
       text: 'WhatsApp',
       icon: `whatsapp`,
+      customIcon: true
+    },
+    iserv: {
+      text: 'IServ',
+      icon: `iserv`,
       customIcon: true
     },
     email: {
@@ -36,13 +41,22 @@ export class ShareSheet {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  shareVia(type: 'whatsapp' | 'email' | 'link') {
+  shareVia(type: 'whatsapp' | 'iserv' | 'email' | 'link') {
     if (!isPlatformBrowser(this.platformId)) return;
     let win: Window;
     switch (type) {
       case 'whatsapp':
         win = window.open(
           `https://wa.me/?text=${encodeURI(this.data.url)}`,
+          '_blank'
+        );
+        break;
+
+      case 'iserv':
+        win = window.open(
+          `https://franz-haniel-gymnasium.eu/iserv/mail/compose?text=${encodeURI(
+            this.data.url
+          )}`,
           '_blank'
         );
         break;

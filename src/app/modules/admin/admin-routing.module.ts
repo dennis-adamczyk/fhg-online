@@ -13,7 +13,7 @@ import { CourseComponent } from './pages/classes/course/course.component';
 import { AddCourseComponent } from './pages/classes/course/add-course/add-course.component';
 import { TimetableComponent } from './pages/classes/class/timetable/timetable.component';
 import { HelpArticlesComponent } from './pages/help/help.component';
-import { HelpArticleComponent } from './pages/help/article/article.component';
+import { HelpArticleEditComponent } from './pages/help/article/article.component';
 import { PendingChangesGuard } from 'src/app/core/guards/pending-changes.guard';
 
 const routes: Routes = [
@@ -103,7 +103,7 @@ const routes: Routes = [
   },
   {
     path: 'help/:article',
-    component: HelpArticleComponent,
+    component: HelpArticleEditComponent,
     data: {
       title: 'Administration',
       iconFunction: 'back'

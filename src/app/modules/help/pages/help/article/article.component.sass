@@ -1,0 +1,302 @@
+@import ../../../../../../var
+
+.help
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: mat-color($background-light, background)
+    z-index: 6
+
+    mat-toolbar
+        display: flex
+        align-items: center
+        justify-content: space-between
+        padding: 0 8px
+        background-color: mat-color($background-light, card)
+        border-bottom: 1px solid mat-color($foreground-light, divider)
+        transition: background 150ms $ease-in-out-curve-function, border 150ms $ease-in-out-curve-function
+
+        .close-btn
+            color: mat-color($foreground-light, icon)
+            margin: 0 24px 0 0
+            z-index: 1
+
+        .title
+            text-align: center
+
+        .actions
+            color: mat-color($foreground-light, icon)
+            margin: 0 0 0 24px
+            z-index: 1
+
+    .container
+        height: calc(100% - 56px)
+        position: relative
+        overflow: auto
+
+        .loading
+            position: absolute
+            top: 0
+            left: 0
+            bottom: 0
+            right: 0
+            background: mat-color($background-light, disabled-button)
+            z-index: 1
+            display: flex
+            align-items: center
+            justify-content: center
+
+        .article
+            padding: 0 16px
+
+            h1
+                margin: 16px 0
+                font-size: 24px
+                font-weight: 400
+
+            .content ::ng-deep
+                p
+                    margin: 12px 0
+
+                h2
+                    margin: 16px 0 12px 0
+                    font-size: 20px
+                    font-weight: 400
+
+                h3
+                    margin: 12px 0 8px 0
+                    font-size: 16px
+                    font-weight: 500
+
+                strong
+                    font-weight: 600
+
+                a
+                    text-decoration: none
+                    color: mat-color($primary-light)
+
+                    &:hover
+                        text-decoration: underline
+
+                ol, ul
+                    padding-left: 1.5em
+
+                    & > li
+                        list-style-type: none
+
+                    li
+                        &:not(.ql-direction-rtl)
+                            padding-left: 1.5em
+
+                        &.ql-direction-rtl
+                            padding-right: 1.5em
+                        
+                ol li
+                    counter-reset: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9
+                    counter-increment: list-0
+
+                    &:before
+                        content: counter(list-0, decimal) '. '
+
+                    &.ql-indent-1
+                        counter-increment: list-1
+                        counter-reset: list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9
+
+                        &:before
+                            content: counter(list-1, lower-alpha) '. '
+                            
+                    &.ql-indent-2
+                        counter-increment: list-2
+                        counter-reset: list-3 list-4 list-5 list-6 list-7 list-8 list-9
+
+                        &:before
+                            content: counter(list-2, lower-roman) '. '
+                            
+                    &.ql-indent-3
+                        counter-increment: list-3
+                        counter-reset: list-4 list-5 list-6 list-7 list-8 list-9
+
+                        &:before
+                            content: counter(list-3, decimal) '. '
+                            
+                    &.ql-indent-4
+                        counter-increment: list-4
+                        counter-reset: list-5 list-6 list-7 list-8 list-9
+
+                        &:before
+                            content: counter(list-4, lower-alpha) '. '
+                               
+                    &.ql-indent-5
+                        counter-increment: list-5
+                        counter-reset: list-6 list-7 list-8 list-9
+
+                        &:before
+                            content: counter(list-5, lower-roman) '. '
+                               
+                    &.ql-indent-6
+                        counter-increment: list-6
+                        counter-reset: list-7 list-8 list-9
+
+                        &:before
+                            content: counter(list-6, decimal) '. '
+                               
+                    &.ql-indent-7
+                        counter-increment: list-7
+                        counter-reset: list-8 list-9
+
+                        &:before
+                            content: counter(list-7, lower-alpha) '. '
+                               
+                    &.ql-indent-8
+                        counter-increment: list-8
+                        counter-reset: list-9
+
+                        &:before
+                            content: counter(list-8, lower-roman) '. '
+                               
+                    &.ql-indent-9
+                        counter-increment: list-9
+
+                        &:before
+                            content: counter(list-9, decimal) '. '
+
+                ul > li::before
+                    content: '\2022'
+
+                li::before
+                    display: inline-block
+                    white-space: nowrap
+                    width: 1.2em
+
+                li:not(.ql-direction-rtl)::before
+                    margin-left: -1.5em
+                    margin-right: 0.3em
+                    text-align: right
+
+                li.ql-direction-rtl::before
+                    margin-left: 0.3em
+                    margin-right: -1.5em
+
+                .ql-indent-1:not(.ql-direction-rtl)
+                    padding-left: 3em
+
+                li.ql-indent-1:not(.ql-direction-rtl) 
+                    padding-left: 4.5em
+                
+                .ql-indent-1.ql-direction-rtl.ql-align-right 
+                    padding-right: 3em
+                
+                li.ql-indent-1.ql-direction-rtl.ql-align-right 
+                    padding-right: 4.5em
+                
+                .ql-indent-2:not(.ql-direction-rtl) 
+                    padding-left: 6em
+                
+                li.ql-indent-2:not(.ql-direction-rtl) 
+                    padding-left: 7.5em
+                
+                .ql-indent-2.ql-direction-rtl.ql-align-right 
+                    padding-right: 6em
+                
+                li.ql-indent-2.ql-direction-rtl.ql-align-right 
+                    padding-right: 7.5em
+                
+                .ql-indent-3:not(.ql-direction-rtl) 
+                    padding-left: 9em
+                
+                li.ql-indent-3:not(.ql-direction-rtl) 
+                    padding-left: 10.5em
+                
+                .ql-indent-3.ql-direction-rtl.ql-align-right 
+                    padding-right: 9em
+                
+                li.ql-indent-3.ql-direction-rtl.ql-align-right 
+                    padding-right: 10.5em
+                
+                .ql-indent-4:not(.ql-direction-rtl) 
+                    padding-left: 12em
+                
+                li.ql-indent-4:not(.ql-direction-rtl) 
+                    padding-left: 13.5em
+                
+                .ql-indent-4.ql-direction-rtl.ql-align-right 
+                    padding-right: 12em
+                
+                li.ql-indent-4.ql-direction-rtl.ql-align-right 
+                    padding-right: 13.5em
+                
+                .ql-indent-5:not(.ql-direction-rtl) 
+                    padding-left: 15em
+                
+                li.ql-indent-5:not(.ql-direction-rtl) 
+                    padding-left: 16.5em
+                
+                .ql-indent-5.ql-direction-rtl.ql-align-right 
+                    padding-right: 15em
+                
+                li.ql-indent-5.ql-direction-rtl.ql-align-right 
+                    padding-right: 16.5em
+                
+                .ql-indent-6:not(.ql-direction-rtl) 
+                    padding-left: 18em
+                
+                li.ql-indent-6:not(.ql-direction-rtl) 
+                    padding-left: 19.5em
+                
+                .ql-indent-6.ql-direction-rtl.ql-align-right 
+                    padding-right: 18em
+                
+                li.ql-indent-6.ql-direction-rtl.ql-align-right 
+                    padding-right: 19.5em
+                
+                .ql-indent-7:not(.ql-direction-rtl) 
+                    padding-left: 21em
+                
+                li.ql-indent-7:not(.ql-direction-rtl) 
+                    padding-left: 22.5em
+                
+                .ql-indent-7.ql-direction-rtl.ql-align-right 
+                    padding-right: 21em
+                
+                li.ql-indent-7.ql-direction-rtl.ql-align-right 
+                    padding-right: 22.5em
+                
+                .ql-indent-8:not(.ql-direction-rtl) 
+                    padding-left: 24em
+                
+                li.ql-indent-8:not(.ql-direction-rtl) 
+                    padding-left: 25.5em
+                
+                .ql-indent-8.ql-direction-rtl.ql-align-right 
+                    padding-right: 24em
+                
+                li.ql-indent-8.ql-direction-rtl.ql-align-right 
+                    padding-right: 25.5em
+                
+                .ql-indent-9:not(.ql-direction-rtl) 
+                    padding-left: 27em
+                
+                li.ql-indent-9:not(.ql-direction-rtl) 
+                    padding-left: 28.5em
+                
+                .ql-indent-9.ql-direction-rtl.ql-align-right 
+                    padding-right: 27em
+                
+                li.ql-indent-9.ql-direction-rtl.ql-align-right 
+                    padding-right: 28.5em
+
+                img
+                    max-width: 100%
+                    height: auto
+                
+
+@media not all and ($mat-small)
+    .help
+        .container
+            height: calc(100% - 64px)
+
+            .article
+                width: 576px
+                margin: 0 auto

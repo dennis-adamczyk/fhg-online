@@ -209,4 +209,36 @@ export class HelperService {
   isBrowser(): boolean {
     return isPlatformBrowser(this.platformId);
   }
+
+  /**
+   * Returns a string shortened to a max length without cutting words
+   *
+   * @param {string} str
+   * @param {number} maxLen
+   * @param {string} [separator=' ']
+   * @returns {string}
+   * @memberof HelperService
+   */
+  shorten(str: string, maxLen: number, separator: string = ' '): string {
+    if (str.length <= maxLen) return str;
+    return str.substr(0, str.lastIndexOf(separator, maxLen));
+  }
+
+  /**
+   * Converts a HTML string to plain text (and eg. adds an colon after headlines and period after paragraphs)
+   *
+   * @param {string} text
+   * @returns {string}
+   * @memberof HelperService
+   */
+  htmlToText(html: string): string {
+    html = html.replace(/(\w)<\/h2[^>]*>+/gm, '$1: ');
+    html = html.replace(/(\w)<\/h3[^>]*>+/gm, '$1: ');
+    html = html.replace(/(\w)<\/p[^>]*>+/gm, '$1. ');
+    html = html.replace(/<\/p[^>]*>+/gm, ' ');
+    html = html.replace(/<\/[^>]*>?/gm, ' ');
+    html = html.replace(/<[^>]*>?/gm, '');
+    if (html.endsWith(' ')) html = html.substr(0, html.length - 1);
+    return html;
+  }
 }
