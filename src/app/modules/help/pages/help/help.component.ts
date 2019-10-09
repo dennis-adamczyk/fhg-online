@@ -59,7 +59,10 @@ export class HelpComponent implements OnInit {
 
   navigateBack() {
     if (!isPlatformBrowser(this.platformId)) return;
-    if (document.referrer.indexOf(window.location.host) !== -1)
+    if (
+      document.referrer.indexOf(window.location.host) != -1 &&
+      document.referrer != window.location.href
+    )
       this.location.back();
     else this.router.navigate(['/'], { replaceUrl: true });
   }

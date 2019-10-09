@@ -13,6 +13,15 @@
       <mat-icon matPrefix>assignment</mat-icon>
     </mat-form-field>
     <div class="actions">
+      <a
+        mat-icon-button
+        matTooltip="Vorschau"
+        [routerLink]="'/help/' + articleId"
+        target="_blank"
+        *ngIf="articleId !== 'add'"
+      >
+        <mat-icon>visibility</mat-icon>
+      </a>
       <button mat-icon-button matTooltip="Löschen" (click)="onDelete()">
         <mat-icon>delete</mat-icon>
       </button>

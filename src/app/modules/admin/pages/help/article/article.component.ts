@@ -133,52 +133,61 @@ export class HelpArticleEditComponent implements OnInit {
       this.edited = false;
       this.loading = false;
       if (this.editor) this.editor.history.clear();
-    } else if (this.sub) this.sub.unsubscribe();
-    this.sub = this.db.doc$(`help/${this.articleId}`).subscribe((data: any) => {
-      if (!data) {
-        this.edited = false;
-        this.snackBar.open('Kein Hilfe-Artikel mit dieser ID gefunden', null, {
-          duration: 4000
-        });
-        this.router.navigate(['/admin/help']);
-        return;
-      }
-      data = {
-        title: data.title,
-        content: data.content
-      };
-      if (JSON.stringify(data) == JSON.stringify(this.data)) return;
-      if (this.loading) {
-        this.data = data;
-        this.articleForm.patchValue(data);
-        this.edited = false;
-        this.loading = false;
-        if (!this.articleForm.dirty && this.editor) this.editor.history.clear();
-      } else {
-        this.dialog
-          .open(AcceptCancelDialog, {
-            data: {
-              title: 'Neue Änderung',
-              content:
-                'An dem aktuellen Hilfe-Artikel wurde von einem anderen Guard eine Änderung vorgenommen. Möchtest du die neue Änderung übernehmen (und deine Änderungen verwerfen)?',
-              accept: 'Ja'
-            }
-          })
-          .afterClosed()
-          .pipe(take(1))
-          .subscribe(accept => {
-            if (!accept)
-              return this.snackBar.open(
-                'Achtung! Mit dem Speichern des Artikels werden fremde Änderungen überschrieben.',
-                null,
-                { duration: 4000 }
-              );
-
+    } else {
+      if (this.sub) this.sub.unsubscribe();
+      this.sub = this.db
+        .doc$(`help/${this.articleId}`)
+        .subscribe((data: any) => {
+          if (!data) {
+            this.edited = false;
+            this.snackBar.open(
+              'Kein Hilfe-Artikel mit dieser ID gefunden',
+              null,
+              {
+                duration: 4000
+              }
+            );
+            this.router.navigate(['/admin/help']);
+            return;
+          }
+          data = {
+            title: data.title,
+            content: data.content
+          };
+          if (JSON.stringify(data) == JSON.stringify(this.data)) return;
+          if (this.loading) {
+            this.data = data;
             this.articleForm.patchValue(data);
             this.edited = false;
-          });
-      }
-    });
+            this.loading = false;
+            if (!this.articleForm.dirty && this.editor)
+              this.editor.history.clear();
+          } else {
+            this.dialog
+              .open(AcceptCancelDialog, {
+                data: {
+                  title: 'Neue Änderung',
+                  content:
+                    'An dem aktuellen Hilfe-Artikel wurde von einem anderen Guard eine Änderung vorgenommen. Möchtest du die neue Änderung übernehmen (und deine Änderungen verwerfen)?',
+                  accept: 'Ja'
+                }
+              })
+              .afterClosed()
+              .pipe(take(1))
+              .subscribe(accept => {
+                if (!accept)
+                  return this.snackBar.open(
+                    'Achtung! Mit dem Speichern des Artikels werden fremde Änderungen überschrieben.',
+                    null,
+                    { duration: 4000 }
+                  );
+
+                this.articleForm.patchValue(data);
+                this.edited = false;
+              });
+          }
+        });
+    }
 
     this.articleForm = this.fb.group({
       title: ['', [Validators.required]],

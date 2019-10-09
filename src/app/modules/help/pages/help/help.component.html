@@ -58,14 +58,14 @@
                 <ais-highlight attribute="title" [hit]="hit"></ais-highlight>
               </h3>
             </a>
-            <button
+            <a
               mat-list-item
-              [routerLink]="question"
+              routerLink="question"
               class="question"
               *ngIf="focus"
             >
               <h3 mat-line>Frage einreichen</h3>
-            </button>
+            </a>
           </mat-action-list>
         </ng-template>
       </ais-hits>

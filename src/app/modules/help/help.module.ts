@@ -8,13 +8,15 @@ import {
   HelpArticleComponent,
   NoSanitizePipe
 } from './pages/help/article/article.component';
+import { RequestComponent } from './pages/help/request/request.component';
 
 @NgModule({
   declarations: [
     HelpComponent,
     SearchBox,
     HelpArticleComponent,
-    NoSanitizePipe
+    NoSanitizePipe,
+    RequestComponent
   ],
   imports: [CommonModule, HelpRoutingModule, SharedModule]
 })
