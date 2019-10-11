@@ -318,7 +318,9 @@ export class HelpArticleEditComponent implements OnInit {
           title: 'Hilfe-Artikel löschen?',
           content: `Soll der Hilfe-Artikel "${
             this.articleForm.get('title').value
-          }" #${this.articleId} unwiderruflich gelöscht werden?`,
+          }" #${
+            this.articleId
+          } unwiderruflich gelöscht werden? Das kann ein paar Sekunden dauern.`,
           accept: 'Unwiderruflich löschen',
           defaultCancel: true
         }

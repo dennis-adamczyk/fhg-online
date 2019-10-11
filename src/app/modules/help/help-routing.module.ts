@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HelpComponent } from './pages/help/help.component';
 import { HelpArticleComponent } from './pages/help/article/article.component';
 import { RequestComponent } from './pages/help/request/request.component';
+import { PendingChangesGuard } from 'src/app/core/guards/pending-changes.guard';
 
 const routes: Routes = [
   {
@@ -13,17 +14,20 @@ const routes: Routes = [
   {
     path: 'bug',
     component: RequestComponent,
-    data: { title: 'Fehler melden', type: 'bug' }
+    data: { title: 'Fehler melden', type: 'bug' },
+    canDeactivate: [PendingChangesGuard]
   },
   {
     path: 'feedback',
     component: RequestComponent,
-    data: { title: 'Feedback senden', type: 'feedback' }
+    data: { title: 'Feedback senden', type: 'feedback' },
+    canDeactivate: [PendingChangesGuard]
   },
   {
     path: 'question',
     component: RequestComponent,
-    data: { title: 'Frage einreichen', type: 'question' }
+    data: { title: 'Frage einreichen', type: 'question' },
+    canDeactivate: [PendingChangesGuard]
   },
   {
     path: ':article',

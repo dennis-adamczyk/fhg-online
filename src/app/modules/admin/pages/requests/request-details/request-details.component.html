@@ -1,0 +1,220 @@
+<div class="toolbar-extention"></div>
+<div class="request-details">
+  <header>
+    <h1>
+      {{ !request ? 'Meldung' : '' }}
+      {{
+        request
+          ? request.type == 'bug'
+            ? 'Fehlermeldung'
+            : request.type == 'feedback'
+            ? 'Feedback'
+            : request.type == 'question'
+            ? 'Hilfe-Vorschlag'
+            : ''
+          : ''
+      }}
+    </h1>
+    <div class="actions">
+      <a mat-icon-button matTooltip="Antowrten" [href]="getReplyUrl()">
+        <mat-icon>reply</mat-icon>
+      </a>
+      <button mat-icon-button matTooltip="Löschen" (click)="onDelete()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </header>
+  <div class="body">
+    <div class="loading" *ngIf="!request">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <div class="request" *ngIf="request">
+      <div class="field by">
+        <p class="label">Von</p>
+        <p class="title">
+          {{ request.by.name.first_name }}
+          {{ request.by.name.last_name }}
+          <button mat-icon-button (click)="temp.by_details = !temp.by_details">
+            <mat-icon
+              [style.transform]="temp.by_details ? 'rotate(180deg)' : undefined"
+              >arrow_drop_down</mat-icon
+            >
+          </button>
+        </p>
+        <div class="details" *ngIf="temp.by_details">
+          <table>
+            <tr>
+              <th>ID</th>
+              <td>{{ request.by.id }}</td>
+            </tr>
+            <tr>
+              <th>Vorname</th>
+              <td>{{ request.by.name.first_name }}</td>
+            </tr>
+            <tr>
+              <th>Nachname</th>
+              <td>{{ request.by.name.last_name }}</td>
+            </tr>
+            <tr>
+              <th>E-Mail</th>
+              <td>{{ request.by.email }}</td>
+            </tr>
+            <tr>
+              <th>Rolle</th>
+              <td>{{ auth.getRoleName(request.by) }}</td>
+            </tr>
+            <tr>
+              <th>Gesendet</th>
+              <td>
+                {{
+                  helper.getDateOf(request.created_at)
+                    | date: 'dd.MM.yyyy, H:mm'
+                }}
+                Uhr
+              </td>
+            </tr>
+          </table>
+
+          <a
+            mat-button
+            color="primary"
+            [routerLink]="'/admin/users/' + request.by.id"
+          >
+            Zum Benutzer <mat-icon>chevron_right</mat-icon>
+          </a>
+        </div>
+      </div>
+      <div class="field message">
+        <p class="label">
+          {{
+            request.type == 'bug'
+              ? 'Problembeschreibung'
+              : request.type == 'feedback'
+              ? 'Rückmeldung'
+              : request.type == 'question'
+              ? 'Beschreibung'
+              : ''
+          }}
+        </p>
+        <p class="title">{{ request.message }}</p>
+      </div>
+      <mat-expansion-panel *ngIf="request.protocol">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Protokolle
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ helper.sizeOf(request.protocol) / 1000 | number: '1.0-1' }} MB
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="content">
+          <div class="protocol">
+            <table>
+              <tr *ngFor="let storage of helper.keysOf(request.protocol)">
+                <th>{{ storage }}</th>
+                <td>
+                  <p
+                    class="preview"
+                    *ngIf="!temp.open_protocol || !temp.open_protocol[storage]"
+                  >
+                    {{ previewJSON(request.protocol[storage]) }}
+                    <span
+                      class="more"
+                      (click)="
+                        temp.open_protocol[storage] = !temp.open_protocol[
+                          storage
+                        ]
+                      "
+                      >...</span
+                    >
+                    }
+                  </p>
+                  <pre
+                    class="json"
+                    *ngIf="temp.open_protocol && temp.open_protocol[storage]"
+                    [innerHTML]="getJSON(request.protocol[storage])"
+                  ></pre>
+                  <button
+                    mat-button
+                    color="primary"
+                    *ngIf="temp.open_protocol && temp.open_protocol[storage]"
+                    (click)="temp.open_protocol[storage] = false"
+                  >
+                    Weniger anzeigen
+                  </button>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </mat-expansion-panel>
+      <mat-expansion-panel *ngIf="request.screenshot.length">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Screenshots
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ request.screenshot.length }}
+            {{ request.screenshot.length != 1 ? 'Fotos' : 'Foto' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="content">
+          <div class="screenshots">
+            <img
+              [src]="screenshot"
+              [alt]="'Screenshot' + i"
+              (click)="openScreenshot(i)"
+              *ngFor="let screenshot of request.screenshot; let i = index"
+            />
+          </div>
+        </div>
+      </mat-expansion-panel>
+      <mat-expansion-panel *ngIf="request.agent">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            User Agent
+          </mat-panel-title>
+          <mat-panel-description>
+            Daten über den Webbrowser
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="content">
+          <div class="agent">
+            <table>
+              <tr>
+                <th>Browser</th>
+                <td>
+                  {{ request.agent['browser'] | titlecase }}
+                </td>
+              </tr>
+              <tr>
+                <th>Cookies aktiviert</th>
+                <td>
+                  {{ request.agent['cookies'] ? 'Ja' : 'Nein' }}
+                </td>
+              </tr>
+              <tr>
+                <th>Agent Header</th>
+                <td>
+                  {{ request.agent['header'] }}
+                </td>
+              </tr>
+              <tr>
+                <th>Sprache</th>
+                <td>
+                  {{ request.agent['language'] }}
+                </td>
+              </tr>
+              <tr>
+                <th>Plattform</th>
+                <td>
+                  {{ request.agent['platform'] }}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </div>
+  </div>
+</div>

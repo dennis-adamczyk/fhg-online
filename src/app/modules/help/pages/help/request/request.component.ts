@@ -3,7 +3,8 @@ import {
   OnInit,
   Renderer2,
   Inject,
-  PLATFORM_ID
+  PLATFORM_ID,
+  HostListener
 } from '@angular/core';
 import { isPlatformBrowser, Location } from '@angular/common';
 import { SeoService } from 'src/app/core/services/seo.service';
@@ -15,6 +16,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-request',
@@ -81,6 +83,17 @@ export class RequestComponent implements OnInit {
       if (this.scrollListener) this.scrollListener();
       this.renderer.removeStyle(this.toolbar, 'box-shadow');
     }
+  }
+
+  @HostListener('window:beforeunload')
+  canDeactivate(): Observable<boolean> | boolean | object {
+    return !this.submitted && this.requestForm.dirty
+      ? {
+          title: 'Änderungen verwerfen?',
+          content: 'Bist du sicher, dass du die Anfrage verwerfen willst?',
+          accept: 'Verwerfen'
+        }
+      : true;
   }
 
   /* ===== LOADING DATA ===== */
@@ -192,6 +205,7 @@ export class RequestComponent implements OnInit {
     this.db.add('requests', data).then(doc => {
       this.loading = false;
       this.submitted = true;
+      this.requestForm.markAsPending();
     });
   }
 }

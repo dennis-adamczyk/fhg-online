@@ -28,3 +28,6 @@ export const onChangePersonalHomework = homework.onChangePersonalHomework;
 export const onCreateHelp = help.onCreateHelp;
 export const onDeleteHelp = help.onDeleteHelp;
 export const onUpdateHelp = help.onUpdateHelp;
+export const onCreateRequest = help.onCreateRequest;
+export const onDeleteRequest = help.onDeleteRequest;
+export const onUpdateRequest = help.onUpdateRequest;

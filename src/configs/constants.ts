@@ -16,11 +16,11 @@ export const constant = {
     5: 'Freitag'
   },
   weekDayShort: {
-    1: 'MO',
-    2: 'DI',
-    3: 'MI',
-    4: 'DO',
-    5: 'FR'
+    1: 'Mo',
+    2: 'Di',
+    3: 'Mi',
+    4: 'Do',
+    5: 'Fr'
   },
   maxLessons: 7,
   lessonLength: 70,

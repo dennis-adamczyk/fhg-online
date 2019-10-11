@@ -37,6 +37,7 @@ export interface User {
   };
   settings_changed?: firebase.firestore.Timestamp;
   homework_updated?: firebase.firestore.Timestamp;
+  newAdminRequest?: boolean;
   created_at?: firebase.firestore.Timestamp;
   updated_at?: firebase.firestore.Timestamp;
 }

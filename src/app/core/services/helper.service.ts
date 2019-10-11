@@ -275,4 +275,16 @@ export class HelperService {
         return 'other';
     }
   }
+
+  /**
+   * Returns the bytes the parameter is large
+   *
+   * @param {*} data
+   * @returns {number}
+   * @memberof HelperService
+   */
+  sizeOf(data: any): number {
+    data = JSON.stringify(data);
+    return new Blob([data]).size;
+  }
 }

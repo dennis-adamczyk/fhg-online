@@ -1,5 +1,9 @@
 import { NgModule } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import {
+  CommonModule,
+  isPlatformBrowser,
+  registerLocaleData
+} from '@angular/common';
 import { MaterialModule } from './material.module';
 import { DocPipe } from './pipes/doc.pipe';
 import { ColPipe } from './pipes/col.pipe';
@@ -20,6 +24,7 @@ import {
 } from '@angular/platform-browser';
 import { QuillModule } from 'ngx-quill';
 import { NgAisModule } from 'angular-instantsearch';
+import { LightboxModule } from 'ngx-lightbox';
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = <any>{
@@ -48,7 +53,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     CommonModule,
     MaterialModule,
     QuillModule.forRoot(),
-    NgAisModule.forRoot()
+    NgAisModule.forRoot(),
+    LightboxModule
   ],
   exports: [
     CommonModule,
@@ -60,7 +66,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     SpeedDialFabComponent,
     IntroComponent,
     QuillModule,
-    NgAisModule
+    NgAisModule,
+    LightboxModule
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },
