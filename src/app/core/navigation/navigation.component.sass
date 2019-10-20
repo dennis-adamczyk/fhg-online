@@ -172,7 +172,20 @@
                 [mat-list-icon]
                     padding: 0
                     margin-left: 8px
-                    opacity: 0.54
+                    color: mat-color($foreground-light, icon)
+                    position: relative
+
+                    &.badge::after
+                        content: ''
+                        display: block
+                        position: absolute
+                        width: 8px
+                        height: 8px
+                        background-color: mat-color($primary-light)
+                        border-radius: 50%
+                        top: -2px
+                        right: -2px
+                        +mat-elevation(2)
 
                 p
                     margin-left: 8px
@@ -203,6 +216,19 @@
 
     .menu-btn, .back-btn
         margin: 0 24px 0 0
+        position: relative
+
+        &.badge::after
+            content: ''
+            display: block
+            position: absolute
+            width: 8px
+            height: 8px
+            background-color: #FF9800
+            border-radius: 50%
+            top: 9px
+            right: 7px
+            +mat-elevation(2)
 
     .loader
         position: absolute

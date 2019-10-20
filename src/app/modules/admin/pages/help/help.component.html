@@ -1,0 +1,30 @@
+<div class="toolbar-extention"></div>
+<div class="help">
+  <header>
+    <h1>Hilfe-Artikel</h1>
+    <div class="actions">
+      <button mat-icon-button matTooltip="Hinzufügen" routerLink="add">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </header>
+  <div class="body">
+    <div class="loading" *ngIf="!articles">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <mat-action-list class="list">
+      <button
+        mat-list-item
+        [routerLink]="'/admin/help/' + article.id"
+        *ngFor="let article of articles"
+      >
+        <mat-icon matListIcon>
+          assignment
+        </mat-icon>
+        <p mat-line>
+          {{ article.title }}
+        </p>
+      </button>
+    </mat-action-list>
+  </div>
+</div>

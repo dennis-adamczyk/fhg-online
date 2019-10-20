@@ -15,6 +15,19 @@
 
             mat-icon
                 color: mat-color($foreground-light, icon)
+                position: relative
+
+                &.badge::after
+                    content: ''
+                    display: block
+                    position: absolute
+                    width: 8px
+                    height: 8px
+                    background-color: mat-color($primary-light)
+                    border-radius: 50%
+                    top: 0
+                    right: 0
+                    +mat-elevation(2)
 
 @media not all and ($mat-xsmall)
     .admin

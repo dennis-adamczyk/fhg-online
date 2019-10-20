@@ -2,7 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { constant } from 'src/configs/constants';
 import { AuthService } from './auth.service';
 import * as firebase from 'firebase/app';
-import { isPlatformServer } from '@angular/common';
+import { isPlatformServer, isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -114,7 +114,7 @@ export class HelperService {
    * @memberof HelperService
    */
   getYear(clazz?: string): string {
-    if (!clazz) clazz = this.auth.user.class;
+    if (!clazz && this.auth.user) clazz = this.auth.user.class;
     if (!clazz) return;
     if (clazz.charAt(0).match(/\d/)) {
       return clazz.charAt(0);
@@ -166,6 +166,19 @@ export class HelperService {
   }
 
   /**
+   * Returns the week day name of a date.
+   *
+   * @param {Date} date
+   * @returns {string}
+   * @memberof HelperService
+   */
+  getWeekDayName(date: Date, length?: number): string {
+    const formatter = new Intl.DateTimeFormat('de', { weekday: 'long' });
+    let output = formatter.format(date);
+    return length ? output.substr(0, length) : output;
+  }
+
+  /**
    * Returns the a array of keys of a object
    *
    * @param {object} obj
@@ -198,5 +211,93 @@ export class HelperService {
    */
   isServer(): boolean {
     return isPlatformServer(this.platformId);
+  }
+
+  /**
+   * Returns true if the platform is browser
+   *
+   * @returns {boolean}
+   * @memberof HelperService
+   */
+  isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
+  /**
+   * Returns a string shortened to a max length without cutting words
+   *
+   * @param {string} str
+   * @param {number} maxLen
+   * @param {string} [separator=' ']
+   * @returns {string}
+   * @memberof HelperService
+   */
+  shorten(str: string, maxLen: number, separator: string = ' '): string {
+    if (str.length <= maxLen) return str;
+    return str.substr(0, str.lastIndexOf(separator, maxLen));
+  }
+
+  /**
+   * Converts a HTML string to plain text (and eg. adds an colon after headlines and period after paragraphs)
+   *
+   * @param {string} text
+   * @returns {string}
+   * @memberof HelperService
+   */
+  htmlToText(html: string): string {
+    html = html.replace(/(\w)<\/h2[^>]*>+/gm, '$1: ');
+    html = html.replace(/(\w)<\/h3[^>]*>+/gm, '$1: ');
+    html = html.replace(/(\w)<\/p[^>]*>+/gm, '$1. ');
+    html = html.replace(/<\/p[^>]*>+/gm, ' ');
+    html = html.replace(/<\/[^>]*>?/gm, ' ');
+    html = html.replace(/<[^>]*>?/gm, '');
+    if (html.endsWith(' ')) html = html.substr(0, html.length - 1);
+    return html;
+  }
+
+  /**
+   * Returns the name of the currently used browser
+   *
+   * @returns {('edge' | 'opera' | 'chrome' | 'ie' | 'firefox' | 'safari' | 'other')}
+   * @memberof HelperService
+   */
+  getBrowserName():
+    | 'edge'
+    | 'opera'
+    | 'chrome'
+    | 'ie'
+    | 'firefox'
+    | 'safari'
+    | 'other' {
+    if (!isPlatformBrowser(this.platformId) || !window) return;
+    const agent = window.navigator.userAgent.toLowerCase();
+    switch (true) {
+      case agent.indexOf('edge') > -1:
+        return 'edge';
+      case agent.indexOf('opr') > -1 && !!(<any>window).opr:
+        return 'opera';
+      case agent.indexOf('chrome') > -1 && !!(<any>window).chrome:
+        return 'chrome';
+      case agent.indexOf('trident') > -1:
+        return 'ie';
+      case agent.indexOf('firefox') > -1:
+        return 'firefox';
+      case agent.indexOf('safari') > -1:
+        return 'safari';
+      default:
+        return 'other';
+    }
+  }
+
+  /**
+   * Returns the bytes the parameter is large
+   *
+   * @param {*} data
+   * @returns {number}
+   * @memberof HelperService
+   */
+  sizeOf(data: any): number {
+    data = JSON.stringify(data);
+    return new Blob([data]).size;
   }
 }

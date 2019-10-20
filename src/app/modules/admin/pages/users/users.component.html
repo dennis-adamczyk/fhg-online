@@ -29,6 +29,7 @@
           type="text"
           class="field"
           (keyup)="applyFilter($event.target.value)"
+          (keydown.esc)="search = false; applyFilter('')"
           autocomplete="off"
           autofocus
           placeholder="Benutzer durchsuchen"

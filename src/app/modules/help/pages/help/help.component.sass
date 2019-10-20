@@ -11,6 +11,7 @@
 
     mat-toolbar
         padding: 0 8px
+        background-color: transparent
 
         .close-btn
             color: mat-color($foreground-light, icon)
@@ -25,38 +26,119 @@
 
     .container
         display: flex
-        justify-content: center
-        align-items: center
+        flex-flow: column
         height: calc(100% - 56px)
 
-        .coming-soon
-            margin: 0
-            padding: 0 24px
+        ais-instantsearch
+            ::ng-deep
+                app-search-box
+                    display: block
+                    margin: 16px 0
+                    padding: 0 8px
 
-            h3
-                margin: 0
-                padding: 0
-                font-size: 16px
-                font-weight: 500
-                color: mat-color($foreground-light, text)
-                text-align: center
+                    mat-form-field
+                        display: block
+                        padding: 4px 16px
+                        height: 48px
+                        position: relative
+                        background-color: mat-color($foreground-light, card)
+                        border-radius: 8px
+                        border: none
+                        caret-color: mat-color($primary-light)
+                        color: mat-color($foreground-light, text)
+                        +mat-elevation(4)
 
-            p
-                margin: 8px 0 0 0
+                        *[matprefix]
+                            margin: 0 12px 0 0
+
+                        .mat-icon-button
+                            color: mat-color($foreground-light, icon)
+
+                            mat-icon
+                                width: 24px
+                                height: 24px
+                                font-size: 24px
+                                line-height: 24px
+
+                        .mat-form-field-label span
+                            color: mat-color($foreground-light, text)
+                            opacity: .32
+
+                        .mat-form-field-underline
+                            display: none
+
+                        .mat-form-field-wrapper
+                            height: 100%
+                            padding: 0
+
+                        .mat-form-field-infix
+                            border: none
+
+                        .mat-form-field-flex
+                            height: 100%
+                            align-items: center
+
+                        .mat-form-field-prefix
+                            height: 24px
+
+            &.focus
+                position: fixed
+                top: 0
+                left: 0
+                right: 0
+                bottom: 0
+                background-color: mat-color($background-light, background)
+                z-index: 1
+
+                ::ng-deep
+                    app-search-box
+                        margin: 0
+                        padding: 0
+
+                        mat-form-field
+                            padding: 0 16px
+                            height: 56px
+                            background-color: transparent
+                            border-radius: 0
+                            border: none
+                            caret-color: mat-color($primary-light)
+                            color: mat-color($foreground-light, text)
+                            +mat-elevation(0)
+
+            .actions
+                margin: 16px 0 4px 0
                 padding: 0
-                font-size: 14px
-                font-weight: 400
-                color: mat-color($foreground-light, text)
-                text-align: center
 
                 a
-                    color: mat-color($primary-light)
                     text-decoration: none
 
-                    &:hover
-                        text-decoration: underline
+                    mat-icon
+                        color: mat-color($foreground-light, icon)
 
-@media not all and ($mat-xsmall)
+            h2
+                margin: 16px 0 0 0
+                padding: 0 16px
+                font-size: 16px
+                font-weight: 400
+
+            ais-hits
+                mat-action-list
+                    a
+                        text-decoration: none
+
+                        mat-icon
+                            color: mat-color($primary-light)
+
+                    .question
+                        height: 32px
+
+                        h3
+                            font-size: 14px
+                            font-weight: 500
+                            color: mat-color($primary-light)
+                            text-transform: uppercase
+
+@media not all and ($mat-small)
     .help
         mat-toolbar
             background-color:  mat-color($background-light, card)
@@ -70,3 +152,60 @@
 
         .container
             height: calc(100% - 64px)
+            width: 576px
+            margin: 0 auto
+
+            ais-instantsearch
+                ::ng-deep
+                    app-search-box
+                        position: absolute
+                        top: 0
+                        left: 50%
+                        transform: translateX(-50%)
+                        width: 576px
+                        max-width: calc(100% - 480px)
+                        display: block
+                        margin: 8px 0
+                        padding: 0
+                        z-index: 1
+
+                        mat-form-field
+                            display: block
+                            padding: 0 16px
+                            height: 48px
+                            position: relative
+                            background-color: rgba(mat-color($background-dark, background), .06)
+                            border-radius: 8px
+                            border: none
+                            caret-color: mat-color($primary-light)
+                            color: mat-color($foreground-light, text)
+                            +mat-elevation(0)
+
+                &.focus
+                    position: static
+                    top: 0
+                    left: 0
+                    right: 0
+                    background-color: mat-color($background-light, background)
+                    z-index: 1
+
+                    ::ng-deep
+                        app-search-box
+                            margin: 8px 0
+                            padding: 0
+
+                            mat-form-field
+                                padding: 0 16px
+                                height: 48px
+                                background-color: rgba(mat-color($background-dark, background), .06)
+                                border-radius: 8px
+                                border: none
+                                caret-color: mat-color($primary-light)
+                                color: mat-color($foreground-light, text)
+                                +mat-elevation(0)
+
+                        mat-divider
+                            display: none
+
+                .actions
+                    margin: 8px 0 4px 0

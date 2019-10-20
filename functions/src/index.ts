@@ -12,6 +12,7 @@ import * as settings from './settings';
 import * as admin_users from './admin/users';
 import * as timetable from './timetable';
 import * as homework from './homework';
+import * as help from './help';
 
 export const ssr = rendering.ssr;
 export const registerUser = login.registerUser;
@@ -24,3 +25,9 @@ export const deleteUsers = admin_users.deleteUsers;
 export const onChangeCourse = timetable.onChangeCourse;
 export const onChangeHomework = homework.onChangeHomework;
 export const onChangePersonalHomework = homework.onChangePersonalHomework;
+export const onCreateHelp = help.onCreateHelp;
+export const onDeleteHelp = help.onDeleteHelp;
+export const onUpdateHelp = help.onUpdateHelp;
+export const onCreateRequest = help.onCreateRequest;
+export const onDeleteRequest = help.onDeleteRequest;
+export const onUpdateRequest = help.onUpdateRequest;

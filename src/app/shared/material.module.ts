@@ -28,7 +28,8 @@ import {
   MatDatepickerModule,
   MatNativeDateModule,
   MatBottomSheetModule,
-  MatButtonToggleModule
+  MatButtonToggleModule,
+  MatMenuModule
 } from '@angular/material';
 import { CdkStepperModule } from '@angular/cdk/stepper';
 import { OverlayModule } from '@angular/cdk/overlay';
@@ -70,7 +71,8 @@ const materialComponents = [
   TextFieldModule,
   A11yModule,
   MatBottomSheetModule,
-  MatButtonToggleModule
+  MatButtonToggleModule,
+  MatMenuModule
 ];
 
 @NgModule({

@@ -1,0 +1,29 @@
+<div class="help">
+  <mat-toolbar>
+    <button
+      type="button"
+      class="close-btn"
+      aria-label="Close"
+      mat-icon-button
+      (click)="navigateBack()"
+      [disableRipple]="isHandset$ | async"
+    >
+      <mat-icon aria-label="Close help article icon">arrow_back</mat-icon>
+    </button>
+    <span class="title">Hilfe</span>
+    <div class="actions">
+      <button mat-icon-button (click)="onShare()">
+        <mat-icon>share</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+  <div class="container">
+    <div class="loading" *ngIf="loading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <div class="article" *ngIf="!loading">
+      <h1>{{ data.title }}</h1>
+      <div class="content" [innerHTML]="data.content | noSanitize"></div>
+    </div>
+  </div>
+</div>

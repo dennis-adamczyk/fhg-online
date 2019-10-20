@@ -1,0 +1,294 @@
+@import ../../../../../../var
+
+.request
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    background-color: mat-color($background-light, background)
+    z-index: 6
+
+    mat-toolbar
+        display: flex
+        align-items: center
+        justify-content: space-between
+        padding: 0 8px
+        background-color: mat-color($background-light, card)
+        border-bottom: 1px solid mat-color($foreground-light, divider)
+        transition: background 150ms $ease-in-out-curve-function, border 150ms $ease-in-out-curve-function
+
+        .close-btn
+            color: mat-color($foreground-light, icon)
+            margin: 0 24px 0 0
+            z-index: 1
+
+        .title
+            flex-grow: 1
+            text-align: left
+
+        .actions
+            color: mat-color($foreground-light, icon)
+            margin: 0 0 0 24px
+            z-index: 1
+
+            .send
+                color: mat-color($primary-light)
+
+    .container
+        height: calc(100% - 56px)
+        position: relative
+        overflow: auto
+
+        .loading
+            position: absolute
+            top: 0
+            left: 0
+            bottom: 0
+            right: 0
+            background: mat-color($background-light, disabled-button)
+            z-index: 1
+            display: flex
+            align-items: center
+            justify-content: center
+
+        .form
+            margin: 8px 0
+            padding: 0
+
+            & > *:last-of-type .field
+                border-bottom: none
+
+            .field
+                display: flex
+                justify-content: space-between
+                align-items: center
+                margin: 0
+                padding: 4px 16px
+                min-height: 56px
+                border-bottom: 1px solid mat-color($foreground-light, divider)
+
+                mat-icon.prefix
+                    color: mat-color($foreground-light, icon)
+                    margin: 0 12px 0 0
+
+                .action
+                    color: mat-color($foreground-light, icon)
+                    margin: 0 0 0 12px
+
+                .hidden
+                    display: none
+
+                p.label
+                    flex-grow: 1
+                    font-size: 16px
+                    font-weight: 400
+                    color: mat-color($foreground-light, secondary-text)
+
+                mat-slide-toggle
+                    width: 100%
+                    height: 100%
+
+                    ::ng-deep
+                        .mat-slide-toggle-content
+                            display: flex
+                            justify-content: space-between
+                            align-items: center
+
+                        .mat-slide-toggle-label
+                            justify-content: space-between
+
+                    &.mat-disabled
+                        ::ng-deep .mat-slide-toggle-content mat-icon
+                            color: mat-color($foreground-light, text)
+
+                &.datepicker,
+                .datepicker
+                    cursor: pointer
+
+
+                &.multi-line
+                    flex-wrap: wrap
+
+                    & > *
+                        height: 32px
+
+                        &:first-child
+                            height: 56px
+
+                    .line
+                        width: 100%
+                        display: flex
+                        justify-content: center
+                        align-items: center
+
+                .suggestions
+                    width: 100%
+                    padding: 4px 0
+                    overflow-x: auto
+                    overflow-y: hidden
+
+                    &.disabled
+                        opacity: .38
+                        
+                        mat-chip
+                            cursor: default
+
+
+                    mat-chip
+                        // color: mat-color($foreground-light, secondary-text)
+                        min-width: fit-content
+                        cursor: pointer
+
+                    &::ng-deep .mat-chip-list-wrapper
+                        flex-wrap: nowrap
+                        justify-content: center
+                        width: max-content
+                        min-width: 100%
+
+                mat-form-field
+                    width: 100%
+                    font-size: 16px
+                    font-weight: 400
+
+                    ::ng-deep .mat-form-field-underline
+                        display: none
+
+                    ::ng-deep .mat-form-field-wrapper
+                        padding: 0
+
+                    ::ng-deep .mat-form-field-infix
+                        border: none
+
+                    &.mat-form-field-can-float.mat-form-field-should-float
+                        ::ng-deep .mat-form-field-label
+                            transform: translateY(-1em) scale(0.75) perspective(100px) translateZ(0.001px)
+
+                    ::ng-deep .mat-form-field-flex
+                        align-items: center
+
+                    ::ng-deep .mat-select-arrow-wrapper
+                        // opacity: 0
+                        .mat-select-arrow
+                            color: mat-color($foreground-light, icon)
+
+                    ::ng-deep .mat-form-field-suffix
+                        display: flex
+                        align-items: center
+
+                        .mat-datepicker-toggle
+                            margin: 0 0 0 12px
+
+                    &.mat-focused,
+                    &:not(.mat-form-field-invalid)
+                        ::ng-deep .mat-form-field-label
+                            color: mat-color($foreground-light, secondary-text)
+
+                    &.mat-form-field-invalid
+                        ::ng-deep .mat-form-field-prefix mat-icon
+                            color: mat-color($warn-light)
+
+                    &.mat-form-field-disabled
+                        cursor: default
+
+                        ::ng-deep .mat-form-field-label,
+                        ::ng-deep .mat-form-field-prefix mat-icon,
+                        ::ng-deep .mat-select-arrow-wrapper .mat-select-arrow,
+                        ::ng-deep .mat-form-field-suffix p,
+                        ::ng-deep .mat-form-field-suffix .mat-datepicker-toggle
+                            color: mat-color($foreground-light, disabled)
+
+                        ::ng-deep .mat-form-field-prefix .icon
+                            opacity: .38
+
+                        ::ng-deep .mat-form-field-suffix .mat-datepicker-toggle button
+                            cursor: default
+
+
+                    // textarea
+                    //     padding: 0
+                    //     margin: 0
+
+                    mat-icon
+                        color: mat-color($foreground-light, icon)
+                        margin: 0 12px 0 0
+
+            .screenshots
+                .preview
+                    padding: 8px 0
+                    overflow-x: auto
+
+                    .pics
+                        padding: 0 8px
+                        display: flex
+                        align-items: center
+                        width: max-content
+
+                        .image
+                            margin: 0 8px
+                            position: relative
+                            height: 128px
+                            border-radius: 4px
+                            overflow: hidden
+                            +mat-elevation(4)
+
+                            img
+                                width: auto
+                                height: 128px
+
+                            button
+                                position: absolute
+                                top: 0
+                                right: 0
+                                color: #ffffff
+
+                                mat-icon
+                                    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2), 0px 4px 5px rgba(0, 0, 0, 0.14), 0px 1px 10px rgba(0, 0, 0, 0.12)
+
+        .submitted
+            padding: 0 48px
+            height: 100%
+            display: flex
+            flex-flow: column
+            align-items: center
+            justify-content: center
+            max-width: 576px
+            margin: -56px auto 0 auto
+
+            img
+                display: block
+                margin: 0 auto
+                width: 80%
+                max-width: 384px
+                height: auto
+
+            p
+                &.title
+                    margin: 32px 0 12px 0
+                    font-size: 16px
+                    font-weight: 500
+                    text-align: center
+
+                &.description
+                    margin: 0
+                    padding: 0
+                    font-size: 16px
+                    font-weight: 300
+                    text-align: center
+
+@media not all and ($mat-small)
+    .request
+        .container
+            height: calc(100% - 64px)
+
+            .form
+                width: 576px
+                margin: 4px auto
+
+                .field
+                    border-bottom: none
+
+            .submitted
+                p
+                    &.description
+                        margin: 0 48px

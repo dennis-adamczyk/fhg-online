@@ -1,0 +1,138 @@
+<div class="request">
+  <mat-toolbar>
+    <button
+      type="button"
+      class="close-btn"
+      aria-label="Close"
+      mat-icon-button
+      (click)="navigateBack()"
+      [disableRipple]="isHandset$ | async"
+    >
+      <mat-icon aria-label="Close request form icon">arrow_back</mat-icon>
+    </button>
+    <span class="title">{{ title }}</span>
+    <div class="actions" *ngIf="!submitted">
+      <button
+        mat-icon-button
+        color="primary"
+        [disabled]="requestForm.invalid"
+        (click)="onSubmit()"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+  <div class="container">
+    <div class="loading" *ngIf="loading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <form
+      class="form"
+      [formGroup]="requestForm"
+      [ngSwitch]="type"
+      *ngIf="!submitted"
+    >
+      <div class="field">
+        <mat-form-field floatLabel="never">
+          <input matInput type="email" formControlName="email" />
+          <mat-icon matPrefix>
+            email
+          </mat-icon>
+          <mat-label>E-Mail</mat-label>
+        </mat-form-field>
+      </div>
+      <div class="field">
+        <mat-form-field floatLabel="never">
+          <textarea
+            matInput
+            formControlName="message"
+            cdkTextareaAutosize
+            cdkAutosizeMinRows="1"
+          ></textarea>
+          <mat-icon matPrefix>
+            subject
+          </mat-icon>
+          <mat-label>{{
+            type == 'bug'
+              ? 'Problem beschreiben'
+              : type == 'feedback'
+              ? 'Feedback eingeben'
+              : 'Frage eingeben'
+          }}</mat-label>
+        </mat-form-field>
+      </div>
+      <div class="field" *ngIf="type == 'bug'">
+        <mat-slide-toggle
+          color="primary"
+          formControlName="protocol"
+          labelPosition="before"
+        >
+          <mat-icon class="prefix">
+            data_usage
+          </mat-icon>
+          <p class="label">
+            Protokolle hinzufügen
+          </p>
+        </mat-slide-toggle>
+      </div>
+      <div class="screenshots">
+        <div class="field" (click)="openFileBrowser()">
+          <mat-icon class="prefix">
+            photo
+          </mat-icon>
+          <p class="label">
+            Screenshot hinzufügen
+          </p>
+          <input
+            type="file"
+            accept=".png, .jpg, .jpeg"
+            multiple
+            (change)="addScreenshot($event)"
+            id="screenshotUpload"
+            class="hidden"
+          />
+          <button mat-icon-button class="action" type="button">
+            <mat-icon>
+              add
+            </mat-icon>
+          </button>
+        </div>
+        <div class="preview">
+          <div class="pics">
+            <div
+              class="image"
+              *ngFor="let screenshot of screenshots.value; let i = index"
+            >
+              <img [src]="screenshot" [alt]="'Screenshot ' + (i + 1)" />
+              <button
+                mat-icon-button
+                disableRipple
+                (click)="deleteScreenshot(i)"
+              >
+                <mat-icon>
+                  clear
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="submitted" *ngIf="submitted">
+      <img src="/assets/undraw/message_sent.svg" alt="Erfolgreich gesendet" />
+      <p class="title">
+        {{
+          type == 'bug'
+            ? 'Fehler gemeldet'
+            : type == 'feedback'
+            ? 'Feedback gesendet'
+            : 'Frage eingereicht'
+        }}
+      </p>
+      <p class="description">
+        Vielen Dank! Behalte dein Postfach im Auge. Wir senden dir in den
+        nächsten Tagen eine Antwort per E-Mail.
+      </p>
+    </div>
+  </div>
+</div>

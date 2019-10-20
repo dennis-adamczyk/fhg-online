@@ -1,0 +1,176 @@
+<div class="toolbar-extention"></div>
+<form class="article" [formGroup]="articleForm">
+  <header>
+    <mat-form-field class="title" floatLabel="never">
+      <input
+        matInput
+        formControlName="title"
+        [readonly]="loading"
+        tabindex="1"
+        autofocus
+      />
+      <mat-label>Titel</mat-label>
+      <mat-icon matPrefix>assignment</mat-icon>
+    </mat-form-field>
+    <div class="actions">
+      <a
+        mat-icon-button
+        matTooltip="Vorschau"
+        [routerLink]="'/help/' + articleId"
+        target="_blank"
+        *ngIf="articleId !== 'add'"
+      >
+        <mat-icon>visibility</mat-icon>
+      </a>
+      <button mat-icon-button matTooltip="Löschen" (click)="onDelete()">
+        <mat-icon>delete</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        matTooltip="Speichern"
+        (click)="onSave()"
+        *ngIf="edited"
+      >
+        <mat-icon>save</mat-icon>
+      </button>
+    </div>
+  </header>
+  <div class="body">
+    <div class="loading" *ngIf="loading">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <div class="editor">
+      <quill-editor
+        formControlName="content"
+        [modules]="modules"
+        (onEditorCreated)="editor = $event"
+        placeholder="Text einfügen"
+      >
+        <mat-toolbar class="toolbar" quill-editor-toolbar tabindex="-1">
+          <span class="ql-formats">
+            <button
+              mat-icon-button
+              disableRipple
+              class="undo"
+              matTooltip="Rückgängig machen"
+              (click)="onUndo()"
+            >
+              <mat-icon>
+                undo
+              </mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              disableRipple
+              class="redo"
+              matTooltip="Wiederholen"
+              (click)="onRedo()"
+            >
+              <mat-icon>
+                redo
+              </mat-icon>
+            </button>
+          </span>
+          <span class="ql-formats">
+            <button
+              mat-icon-button
+              class="ql-header"
+              value="2"
+              matTooltip="Überschift 2"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-header"
+              value="3"
+              matTooltip="Überschift 3"
+            ></button>
+          </span>
+          <span class="ql-formats">
+            <button mat-icon-button class="ql-bold" matTooltip="Fett"></button>
+            <button
+              mat-icon-button
+              class="ql-italic"
+              matTooltip="Kursiv"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-underline"
+              matTooltip="Unterstrichen"
+            ></button>
+          </span>
+          <span class="ql-formats">
+            <button
+              mat-icon-button
+              class="ql-link"
+              matTooltip="Link einfügen"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-image"
+              matTooltip="Bild einfügen"
+            ></button>
+          </span>
+          <span class="ql-formats">
+            <button
+              mat-icon-button
+              class="ql-align"
+              value=""
+              matTooltip="Linksbündig"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-align"
+              value="center"
+              matTooltip="Zentriert"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-align"
+              value="right"
+              matTooltip="Rechtsbündig"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-align"
+              value="justify"
+              matTooltip="Blocksatz"
+            ></button>
+          </span>
+          <span class="ql-formats">
+            <button
+              mat-icon-button
+              class="ql-list"
+              value="ordered"
+              matTooltip="Nummerierte Liste"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-list"
+              value="bullet"
+              matTooltip="Aufzählungsliste"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-indent"
+              value="+1"
+              matTooltip="Einzug verringern"
+            ></button>
+            <button
+              mat-icon-button
+              class="ql-indent"
+              value="-1"
+              matTooltip="Einzug vergrößern"
+            ></button>
+          </span>
+          <span class="ql-formats">
+            <button
+              mat-icon-button
+              class="ql-clean"
+              matTooltip="Formatierung entfernen"
+            ></button>
+          </span>
+        </mat-toolbar>
+      </quill-editor>
+    </div>
+  </div>
+</form>
