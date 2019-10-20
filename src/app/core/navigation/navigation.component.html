@@ -87,7 +87,9 @@
             routerLinkActive="active"
             *ngIf="auth.user.roles.guard || auth.user.roles.admin"
           >
-            <mat-icon mat-list-icon [class.badge]="auth.user.newAdminRequest"
+            <mat-icon
+              mat-list-icon
+              [class.badge]="auth.user && auth.user.newAdminRequest"
               >settings_applications</mat-icon
             >
             <p mat-line>Administration</p>
@@ -183,7 +185,7 @@
           <button
             type="button"
             class="menu-btn"
-            [class.badge]="auth.user.newAdminRequest"
+            [class.badge]="auth.user && auth.user.newAdminRequest"
             aria-label="Toggle sidenav"
             mat-icon-button
             (click)="drawer.toggle()"

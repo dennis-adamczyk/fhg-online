@@ -8,7 +8,7 @@ import {
 import { isPlatformBrowser, Location } from '@angular/common';
 import { SeoService } from 'src/app/core/services/seo.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { MatSnackBar, MatBottomSheet } from '@angular/material';
 
@@ -21,6 +21,10 @@ export class HelpArticleComponent implements OnInit {
   articleId = this.route.snapshot.params['article'];
   data: any;
   loading = true;
+
+  isHandset$: Observable<boolean> = this.breakpointObserver
+    .observe(Breakpoints.Handset)
+    .pipe(map(result => result.matches));
 
   constructor(
     private seo: SeoService,
@@ -139,6 +143,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml, Title } from '@angular/platform-browser';
 import { HelperService } from 'src/app/core/services/helper.service';
 import { ShareSheet } from 'src/app/core/bottomsheets/share/share.component';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Pipe({ name: 'noSanitize' })
 export class NoSanitizePipe implements PipeTransform {

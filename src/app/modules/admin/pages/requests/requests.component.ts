@@ -194,6 +194,7 @@ export class RequestsComponent implements OnInit {
         id: id,
         value: filterValue.trim().toLowerCase()
       });
+    console.log(old);
     this.data.filter = JSON.stringify(old);
 
     if (this.data.paginator) this.data.paginator.firstPage();

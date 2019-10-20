@@ -166,6 +166,19 @@ export class HelperService {
   }
 
   /**
+   * Returns the week day name of a date.
+   *
+   * @param {Date} date
+   * @returns {string}
+   * @memberof HelperService
+   */
+  getWeekDayName(date: Date, length?: number): string {
+    const formatter = new Intl.DateTimeFormat('de', { weekday: 'long' });
+    let output = formatter.format(date);
+    return length ? output.substr(0, length) : output;
+  }
+
+  /**
    * Returns the a array of keys of a object
    *
    * @param {object} obj

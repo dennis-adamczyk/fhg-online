@@ -13,10 +13,11 @@ import { Title } from '@angular/platform-browser';
 import { MatBottomSheet, MatSnackBar } from '@angular/material';
 import { HelperService } from 'src/app/core/services/helper.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-request',
@@ -29,6 +30,10 @@ export class RequestComponent implements OnInit {
   requestForm: FormGroup;
   loading: boolean = false;
   submitted: boolean = false;
+
+  isHandset$: Observable<boolean> = this.breakpointObserver
+    .observe(Breakpoints.Handset)
+    .pipe(map(result => result.matches));
 
   constructor(
     private seo: SeoService,
