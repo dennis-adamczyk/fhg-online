@@ -48,6 +48,11 @@ export class HomeworkService {
     this.loadData();
   }
 
+  updateData(data?) {
+    if (!data) data = JSON.parse(localStorage.getItem(homeworkKey)).homework;
+    this.data = this.convertToDateList(data);
+  }
+
   private loadData() {
     if (!isPlatformBrowser(this.platformId)) return;
     try {
@@ -118,15 +123,17 @@ export class HomeworkService {
 
   updateHomework(noShared?) {
     this.subs.forEach(sub => sub.unsubscribe());
+    // console.log('= UPDATE HOMEWORK (', noShared, ')');
     if (!noShared)
       this.subs.push(
         this.db
-          .doc$(`years/${this.helper.getYear(this.auth.user.class as string)}`)
+          .doc$(`years/${this.helper.getYear(this.auth.user.class)}`)
           .subscribe(
             (year: {
               classes: string[];
               homework_updated: { [key: string]: firebase.firestore.Timestamp };
             }) => {
+              // console.log('== YEARS UPDATE: ', year);
               if (!year || !year.homework_updated) return;
               this.checkCourseNames().then(go => {
                 if (!go) return;
@@ -142,13 +149,20 @@ export class HomeworkService {
                       year.homework_updated[courseName].toMillis() >
                       localyUpdated
                     ) {
+                      // console.log('=== COURSE UPDATE: ', courseName);
                       this.db
-                        .doc$(
+                        .doc(
                           `years/${this.helper.getYear(this.auth.user
                             .class as string)}/courses/${courseName}/homework/--index--`
                         )
+                        .get({ source: 'server' })
                         .pipe(take(1))
-                        .subscribe((index: { homework: Homework[] }) => {
+                        .subscribe(snap => {
+                          // console.log(
+                          //   '=== COURSE DATA FROM CACHE: ',
+                          //   snap.metadata.fromCache
+                          // );
+                          let index = snap.data() as { homework: Homework[] };
                           let courseDetails = JSON.parse(
                             localStorage.getItem(timetableKey)
                           ).courses.filter(
@@ -189,6 +203,7 @@ export class HomeworkService {
                                 }
                               );
                           });
+                          // console.log('==== NEW HOMEWORK: ', newHomework);
                           localStorage.setItem(
                             homeworkKey,
                             JSON.stringify({
@@ -207,6 +222,7 @@ export class HomeworkService {
       );
     this.subs.push(
       this.auth.user$.subscribe(user => {
+        // console.log('== USER UPDATE: ', user);
         if (!user) return;
         if (!user.homework_updated) return;
         this.checkCourseNames().then(go => {
@@ -216,9 +232,16 @@ export class HomeworkService {
             : 0;
           if (user.homework_updated.toMillis() > localyUpdated) {
             this.db
-              .doc$(`users/${user.id}/personalHomework/--index--`)
+              .doc(`users/${user.id}/personalHomework/--index--`)
+              .get()
               .pipe(take(1))
-              .subscribe((index: { homework: Homework[] }) => {
+              .subscribe(snap => {
+                let index = snap.data() as { homework: Homework[] };
+                // console.log('=== PERSONAL HOMEWORK: ', index);
+                // console.log(
+                //   '=== PERSONAL HOMEWORK FROM CACHE: ',
+                //   snap.metadata.fromCache
+                // );
                 let newHomework = JSON.parse(localStorage.getItem(homeworkKey))
                   .homework;
                 newHomework = Array.isArray(newHomework)
@@ -237,6 +260,7 @@ export class HomeworkService {
                   homework.personal = true;
                   newHomework.push(homework);
                 });
+                // console.log('==== NEW HOMEWORK: ', newHomework);
                 localStorage.setItem(
                   homeworkKey,
                   JSON.stringify({
@@ -296,10 +320,18 @@ export class HomeworkService {
 
       this.subs.forEach(sub => sub.unsubscribe());
 
+      // console.log('= DOWNLOAD HOMEWORK (', noShared, ')');
+
       this.db
-        .doc$(`users/${this.auth.user.id}/personalHomework/--index--`)
+        .doc(`users/${this.auth.user.id}/personalHomework/--index--`)
+        .get({ source: 'server' })
         .pipe(take(1))
-        .subscribe((index: { homework: Homework[] }) => {
+        .subscribe(indexSnap => {
+          // console.log(
+          //   '== DOWNLOAD PERSONAL HOMEWORK FROM: ',
+          //   indexSnap.metadata.fromCache
+          // );
+          let index = indexSnap.data() as { homework: Homework[] };
           if (index && index.homework && index.homework.length) {
             index.homework.forEach(homework => {
               let courseDetails = JSON.parse(
@@ -313,12 +345,14 @@ export class HomeworkService {
                   color: courseDetails.color
                 };
               homework.personal = true;
+              // console.log('== DOWNLOAD PERSONAL HOMEWORK: ', homework);
               homeworkList.push(homework);
             });
           }
         });
 
       if (!courses.length) {
+        // console.log('=== SET DOWNLOAD HOMEWORK: ', homeworkList);
         this.data = this.convertToDateList(homeworkList);
         localStorage.setItem(
           homeworkKey,
@@ -334,9 +368,12 @@ export class HomeworkService {
             localStorage.getItem(timetableKey)
           ).courses.filter(c => c.id == course)[0] as Course;
           this.db
-            .doc$(`years/${year}/courses/${course}/homework/--index--`)
+            .doc(`years/${year}/courses/${course}/homework/--index--`)
+            .get({ source: 'server' })
             .pipe(take(1))
-            .subscribe((index: { homework: Homework[] }) => {
+            .subscribe(snap => {
+              // console.log('=== HOMEWORK FROM CACHE: ', snap.metadata.fromCache);
+              let index = snap.data() as { homework: Homework[] };
               if (index && index.homework && index.homework.length) {
                 index.homework.forEach(homework => {
                   homeworkList.push({
@@ -351,6 +388,7 @@ export class HomeworkService {
                 });
               }
               if (i == courses.length - 1) {
+                // console.log('=== SET DOWNLOAD HOMEWORK: ', homeworkList);
                 this.data = this.convertToDateList(homeworkList);
                 localStorage.setItem(
                   homeworkKey,

@@ -15,9 +15,10 @@
   </div>
 </header>
 <div class="body">
-  <div class="loading" *ngIf="isLoading">
+  <div class="loading" *ngIf="isLoading && !offline">
     <mat-spinner diameter="32"></mat-spinner>
   </div>
+  <app-offline *ngIf="offline"></app-offline>
   <div
     class="add"
     *ngIf="!single.data.length && !multi.data.length && !isLoading"
@@ -28,7 +29,7 @@
       <span>Hinzufügen</span>
     </button>
   </div>
-  <section class="single" [class.hidden]="!single.data.length">
+  <section class="single" [class.hidden]="!single.data.length" *ngIf="!offline">
     <h4>Einzelkurse</h4>
     <table
       mat-table
@@ -71,7 +72,7 @@
       [pageSizeOptions]="[5, 10, 25, 50]"
     ></mat-paginator>
   </section>
-  <section class="multi" [class.hidden]="!multi.data.length">
+  <section class="multi" [class.hidden]="!multi.data.length" *ngIf="!offline">
     <h4>Multikurse</h4>
     <table
       mat-table

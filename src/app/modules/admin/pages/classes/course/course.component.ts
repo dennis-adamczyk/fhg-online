@@ -17,6 +17,7 @@ import { constant } from 'src/configs/constants';
 import { EditLessonsDialog } from 'src/app/core/dialogs/edit-lessons/edit-lessons.component';
 import { ColorPickerDialog } from 'src/app/core/dialogs/color-picker/color-picker.component';
 import { Course } from 'src/app/modules/timetable/models/timetable.model';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 @Component({
   selector: 'app-course',
@@ -31,7 +32,10 @@ export class CourseComponent implements OnInit {
   courseForm: FormGroup;
   classes: string[] = [];
 
+  offline = false;
+
   constructor(
+    private helper: HelperService,
     private db: FirestoreService,
     private location: Location,
     private route: ActivatedRoute,
@@ -146,6 +150,10 @@ export class CourseComponent implements OnInit {
         .pipe(take(1))
         .subscribe((result: Course) => {
           if (result == undefined) {
+            if (!this.helper.onLine) {
+              this.offline = true;
+              return;
+            }
             this.snackBar
               .open('Kein Kurs mit diesem Namen gefunden', 'Zurück', {
                 duration: 4000
@@ -154,6 +162,7 @@ export class CourseComponent implements OnInit {
               .subscribe(() => this.location.back());
             return;
           }
+          this.offline = false;
           this.courseForm.patchValue({
             subject: result.subject,
             short: result.short,

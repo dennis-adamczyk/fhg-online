@@ -12,7 +12,6 @@ import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { HelperService } from 'src/app/core/services/helper.service';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { Lightbox } from 'ngx-lightbox';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { take } from 'rxjs/operators';
 import { adminRequestsKey } from '../requests.component';
@@ -30,12 +29,13 @@ export class RequestDetailsComponent implements OnInit {
     open_protocol: {}
   };
 
+  offline = false;
+
   constructor(
     private seo: SeoService,
     private route: ActivatedRoute,
     private router: Router,
     private snackBar: MatSnackBar,
-    private lightbox: Lightbox,
     public auth: AuthService,
     private dialog: MatDialog,
     private db: FirestoreService,
@@ -97,13 +97,19 @@ export class RequestDetailsComponent implements OnInit {
 
   loadData() {
     this.db.doc$(`requests/${this.requestId}`).subscribe(data => {
+      console.log(data);
       if (!data) {
+        if (!this.helper.onLine) {
+          this.offline = true;
+          return;
+        }
         this.snackBar.open('Keine Meldung mit dieser ID gefunden', null, {
           duration: 4000
         });
         this.router.navigate(['/admin/requests']);
         return;
       }
+      this.offline = false;
       this.request = data;
       if (!this.hasSeen(this.requestId)) {
         let storage: string[] = JSON.parse(
@@ -146,17 +152,6 @@ export class RequestDetailsComponent implements OnInit {
     setContents();
 
     setTimeout(() => setContents, 0);
-    return;
-    this.lightbox.open(
-      this.request.screenshot.map(screenshot => {
-        return {
-          src: screenshot,
-          caption: '',
-          thumb: screenshot
-        };
-      }),
-      index
-    );
   }
 
   onDelete() {
@@ -242,9 +237,9 @@ Gesendet: ${this.helper
           .toLocaleDateString()}, ${this.helper
           .getDateOf(this.request.created_at)
           .toLocaleTimeString()} Uhr
-Von: ${this.request.by.name.first_name} ${this.request.by.name.last_name} (${
+Von: ${this.request.by.name.first_name} ${this.request.by.name.last_name} <${
           this.request.by.email
-        })
+        }>
 ID: ${this.requestId}
 Screenshots: ${this.request.screenshot.length}
 

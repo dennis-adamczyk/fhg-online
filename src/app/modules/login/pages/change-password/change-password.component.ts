@@ -194,9 +194,7 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   forgotPassword() {
-    this.auth
-      .logout()
-      .then(() => this.router.navigate(['/login/forgotPassword']));
+    this.auth.logout('/login/forgotPassword');
   }
 
   navigateBack() {

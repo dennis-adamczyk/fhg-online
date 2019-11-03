@@ -22,6 +22,8 @@ import { ActivatedRoute } from '@angular/router';
 export class ClassesComponent implements OnInit {
   classlist: string[];
 
+  offline = false;
+
   constructor(
     private seo: SeoService,
     private route: ActivatedRoute,
@@ -73,7 +75,16 @@ export class ClassesComponent implements OnInit {
 
       this.db
         .doc$('years/--index--')
-        .pipe(tap(d => (this.classlist = d['classes'].sort())))
+        .pipe(
+          tap(d => {
+            if (!d && !this.helper.onLine) {
+              this.offline = true;
+              return;
+            }
+            this.offline = false;
+            this.classlist = d['classes'].sort();
+          })
+        )
         .subscribe();
     }
   }

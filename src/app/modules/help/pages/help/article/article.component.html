@@ -18,10 +18,11 @@
     </div>
   </mat-toolbar>
   <div class="container">
-    <div class="loading" *ngIf="loading">
+    <div class="loading" *ngIf="loading && !offline">
       <mat-spinner diameter="32"></mat-spinner>
     </div>
-    <div class="article" *ngIf="!loading">
+    <app-offline *ngIf="offline"></app-offline>
+    <div class="article" *ngIf="!loading && !offline">
       <h1>{{ data.title }}</h1>
       <div class="content" [innerHTML]="data.content | noSanitize"></div>
     </div>

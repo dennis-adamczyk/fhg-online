@@ -18,6 +18,10 @@ type DocPredicate<T> = string | AngularFirestoreDocument<T>;
 export class FirestoreService {
   constructor(private db: AngularFirestore) {}
 
+  get firestore(): AngularFirestore {
+    return this.db;
+  }
+
   // Get a Reference
 
   public col<T>(
@@ -100,6 +104,10 @@ export class FirestoreService {
           return { id, ...data };
         })
       );
+  }
+
+  generateId(): string {
+    return this.db.createId();
   }
 
   // Write Data

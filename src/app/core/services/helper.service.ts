@@ -3,15 +3,36 @@ import { constant } from 'src/configs/constants';
 import { AuthService } from './auth.service';
 import * as firebase from 'firebase/app';
 import { isPlatformServer, isPlatformBrowser } from '@angular/common';
+import { Observable, fromEvent, merge } from 'rxjs';
+import { mapTo, startWith } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HelperService {
+  /**
+   * Returns the online status of the app
+   *
+   * @readonly
+   * @type {Observable<boolean>}
+   * @memberof HelperService
+   */
+  onlineStatus$: Observable<boolean>;
+
+  onLine: boolean;
+
   constructor(
     private auth: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.onlineStatus$ = merge(
+        fromEvent(window, 'online').pipe(mapTo(true)),
+        fromEvent(window, 'offline').pipe(mapTo(false))
+      ).pipe(startWith(navigator.onLine));
+      this.onlineStatus$.subscribe(online => (this.onLine = online));
+    }
+  }
 
   /**
    * Returns the flatten out array

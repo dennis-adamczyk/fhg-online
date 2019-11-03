@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { take } from 'rxjs/operators';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 export interface CourseElement {
   name: string;
@@ -30,7 +31,9 @@ export class CoursesComponent implements OnInit {
   @ViewChild('singlePaginator', { static: true }) singlePaginator: MatPaginator;
   @ViewChild('multiPaginator', { static: true }) multiPaginator: MatPaginator;
 
-  constructor(private db: FirestoreService) {}
+  offline = false;
+
+  constructor(private helper: HelperService, private db: FirestoreService) {}
 
   ngOnInit() {}
 
@@ -52,6 +55,11 @@ export class CoursesComponent implements OnInit {
       .pipe(take(1))
       .toPromise()
       .then(result => {
+        if (!result && !this.helper.onLine) {
+          this.offline = true;
+          return;
+        }
+        this.offline = false;
         this.singleCourses = result;
       });
     let loadMulti = this.db
@@ -63,6 +71,11 @@ export class CoursesComponent implements OnInit {
       .pipe(take(1))
       .toPromise()
       .then(result => {
+        if (!result && !this.helper.onLine) {
+          this.offline = true;
+          return;
+        }
+        this.offline = false;
         this.multiCourses = result;
       });
 

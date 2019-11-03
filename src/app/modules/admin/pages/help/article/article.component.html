@@ -12,7 +12,7 @@
       <mat-label>Titel</mat-label>
       <mat-icon matPrefix>assignment</mat-icon>
     </mat-form-field>
-    <div class="actions">
+    <div class="actions" *ngIf="!offline">
       <a
         mat-icon-button
         matTooltip="Vorschau"
@@ -36,10 +36,11 @@
     </div>
   </header>
   <div class="body">
-    <div class="loading" *ngIf="loading">
+    <div class="loading" *ngIf="loading && !offline">
       <mat-spinner diameter="32"></mat-spinner>
     </div>
-    <div class="editor">
+    <app-offline *ngIf="offline"></app-offline>
+    <div class="editor" *ngIf="!offline">
       <quill-editor
         formControlName="content"
         [modules]="modules"

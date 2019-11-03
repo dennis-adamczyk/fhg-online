@@ -24,7 +24,7 @@ import {
 } from '@angular/platform-browser';
 import { QuillModule } from 'ngx-quill';
 import { NgAisModule } from 'angular-instantsearch';
-import { LightboxModule } from 'ngx-lightbox';
+import { OfflineComponent } from './components/offline/offline.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = <any>{
@@ -48,13 +48,18 @@ export class MyHammerConfig extends HammerGestureConfig {
 }
 
 @NgModule({
-  declarations: [DocPipe, ColPipe, SpeedDialFabComponent, IntroComponent],
+  declarations: [
+    DocPipe,
+    ColPipe,
+    SpeedDialFabComponent,
+    IntroComponent,
+    OfflineComponent
+  ],
   imports: [
     CommonModule,
     MaterialModule,
     QuillModule.forRoot(),
-    NgAisModule.forRoot(),
-    LightboxModule
+    NgAisModule.forRoot()
   ],
   exports: [
     CommonModule,
@@ -67,7 +72,7 @@ export class MyHammerConfig extends HammerGestureConfig {
     IntroComponent,
     QuillModule,
     NgAisModule,
-    LightboxModule
+    OfflineComponent
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'de-DE' },

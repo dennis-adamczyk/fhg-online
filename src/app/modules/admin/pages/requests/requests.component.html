@@ -83,9 +83,10 @@
     </header>
   </ng-container>
   <div class="body">
-    <div class="loading" *ngIf="loading">
+    <div class="loading" *ngIf="loading && !offline">
       <mat-spinner diameter="32"></mat-spinner>
     </div>
+    <app-offline *ngIf="offline"></app-offline>
     <table
       mat-table
       [dataSource]="data"
@@ -93,6 +94,7 @@
       matSortActive="created_at"
       matSortDisableClear
       matSortDirection="desc"
+      *ngIf="!offline"
     >
       <!-- Type Column -->
       <ng-container matColumnDef="type">
@@ -155,6 +157,7 @@
       [length]="resultsLength"
       [pageSize]="10"
       [pageSizeOptions]="[5, 10, 25, 50, 100]"
+      *ngIf="!offline"
     ></mat-paginator>
   </div>
 </div>

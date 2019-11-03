@@ -13,7 +13,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { take, map } from 'rxjs/operators';
-import { constant } from 'src/configs/constants';
+import { constant, homeworkKey, timetableKey } from 'src/configs/constants';
 import { MatSnackBar, MatDialog, MatInput } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
 import { Observable } from 'rxjs';
@@ -23,6 +23,9 @@ import { HomeworkFormComponent } from '../../../components/homework-form/homewor
 import { HelperService } from 'src/app/core/services/helper.service';
 import { Course } from 'src/app/modules/timetable/models/timetable.model';
 import { Homework } from '../../../models/homework.model';
+import * as firebase from 'firebase/app';
+import { AngularFirestoreDocument } from '@angular/fire/firestore';
+import { HomeworkService } from '../../../services/homework.service';
 
 @Component({
   selector: 'app-add-homework',
@@ -34,6 +37,7 @@ export class AddHomeworkComponent {
   homeworkFormComponent: HomeworkFormComponent;
 
   constructor(
+    private homework: HomeworkService,
     private helper: HelperService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
@@ -143,7 +147,7 @@ export class AddHomeworkComponent {
     };
 
     let getExistingUntilShared = this.db
-      .colWithIds$(
+      .colWithIds(
         `years/${this.helper.getYear()}/courses/${
           this.homeworkForm.get('course').value
         }/homework`,
@@ -159,7 +163,7 @@ export class AddHomeworkComponent {
         existing.until.shared = [...existing.until.shared, ...existingHomework];
       });
     let getExistingEnteredShared = this.db
-      .colWithIds$(
+      .colWithIds(
         `years/${this.helper.getYear()}/courses/${
           this.homeworkForm.get('course').value
         }/homework`,
@@ -178,7 +182,7 @@ export class AddHomeworkComponent {
         ];
       });
     let getExistingUntilPersonal = this.db
-      .colWithIds$(`users/${this.auth.user.id}/personalHomework`, ref =>
+      .colWithIds(`users/${this.auth.user.id}/personalHomework`, ref =>
         ref
           .where('until.date', '>=', until)
           .where('until.date', '<=', untilMax)
@@ -194,7 +198,7 @@ export class AddHomeworkComponent {
         ];
       });
     let getExistingEnteredPersonal = this.db
-      .colWithIds$(`users/${this.auth.user.id}/personalHomework`, ref =>
+      .colWithIds(`users/${this.auth.user.id}/personalHomework`, ref =>
         ref
           .where('entered.date', '>=', entered)
           .where('entered.date', '<=', enteredMax)
@@ -237,40 +241,98 @@ export class AddHomeworkComponent {
           }
         };
         let operation: Promise<any>;
+        let courseName = this.homeworkForm.get('course').value;
+        let newRef: AngularFirestoreDocument<unknown>;
         if (share) {
-          operation = this.db.add(
-            `years/${this.helper.getYear()}/courses/${
-              this.homeworkForm.get('course').value
-            }/homework`,
-            data
-          );
+          newRef = this.db
+            .col(
+              `years/${this.helper.getYear()}/courses/${courseName}/homework`
+            )
+            .doc(this.db.generateId());
         } else {
+          newRef = this.db
+            .col(`users/${this.auth.user.id}/personalHomework`)
+            .doc(this.db.generateId());
           data['course'] = course.id;
           delete data.by;
-          operation = this.db.add(
-            `users/${this.auth.user.id}/personalHomework`,
-            data
-          );
         }
-        operation
-          .then(() => {
-            this.homeworkForm.markAsPristine();
-            this.homeworkFormComponent.isLoading = false;
-            this.navigateBack();
-            this.snackBar.open('Neue Hausaufgabe erstellt', null, {
+        operation = newRef.set(data);
+        operation.catch(error => {
+          this.homeworkFormComponent.isLoading = false;
+          this.snackBar.open(
+            `Fehler beim Erstellen der Hausaufgabe aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
+            null,
+            {
               duration: 4000
-            });
-          })
-          .catch(error => {
-            this.homeworkFormComponent.isLoading = false;
-            this.snackBar.open(
-              `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
-              null,
-              {
-                duration: 4000
-              }
-            );
+            }
+          );
+        });
+
+        let courseDetails = JSON.parse(
+          localStorage.getItem(timetableKey)
+        ).courses.filter(c => c.id == courseName)[0] as Course;
+
+        let newHomework = JSON.parse(localStorage.getItem(homeworkKey))
+          .homework;
+        if (share)
+          newHomework.push({
+            blocked: false,
+            corrected: [],
+            course: {
+              id: courseName,
+              subject: courseDetails.subject,
+              short: courseDetails.short,
+              color: courseDetails.color
+            },
+            entered: {
+              date: firebase.firestore.Timestamp.fromDate(entered),
+              lesson: this.getLesson(entered)
+            },
+            id: newRef.ref.id,
+            title: title,
+            until: {
+              date: firebase.firestore.Timestamp.fromDate(until),
+              lesson: this.getLesson(until)
+            },
+            unsynced: true
           });
+        else
+          newHomework.push({
+            course: {
+              id: courseName,
+              subject: courseDetails.subject,
+              short: courseDetails.short,
+              color: courseDetails.color
+            },
+            entered: {
+              date: firebase.firestore.Timestamp.fromDate(entered),
+              lesson: this.getLesson(entered)
+            },
+            id: newRef.ref.id,
+            title: title,
+            until: {
+              date: firebase.firestore.Timestamp.fromDate(until),
+              lesson: this.getLesson(until)
+            },
+            personal: true,
+            unsynced: true
+          });
+
+        localStorage.setItem(
+          homeworkKey,
+          JSON.stringify({
+            homework: newHomework,
+            updated: JSON.parse(localStorage.getItem(homeworkKey)).updated
+          })
+        );
+        this.homework.updateData(newHomework);
+
+        this.homeworkForm.markAsPristine();
+        this.homeworkFormComponent.isLoading = false;
+        this.navigateBack();
+        this.snackBar.open('Neue Hausaufgabe erstellt', null, {
+          duration: 4000
+        });
       };
 
       let arrayUnique = array => {

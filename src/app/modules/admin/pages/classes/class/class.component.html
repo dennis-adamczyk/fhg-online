@@ -10,10 +10,11 @@
       </div>
     </header>
     <div class="body">
-      <div class="loading" *ngIf="isLoading">
+      <div class="loading" *ngIf="isLoading && !offline">
         <mat-spinner diameter="32"></mat-spinner>
       </div>
-      <mat-action-list class="list">
+      <app-offline *ngIf="offline"></app-offline>
+      <mat-action-list class="list" *ngIf="!offline">
         <button mat-list-item routerLink="members">
           <p mat-line>
             Mitglieder <span class="amount">({{ members.length }})</span>

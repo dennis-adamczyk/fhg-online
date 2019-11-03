@@ -20,6 +20,8 @@ import { MatSidenav } from '@angular/material/sidenav';
 import * as Hammer from 'hammerjs';
 import { AuthService } from '../services/auth.service';
 import { Location, isPlatformBrowser } from '@angular/common';
+import { HelperService } from '../services/helper.service';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-navigation',
@@ -42,7 +44,11 @@ export class NavigationComponent {
   extended: boolean = false;
   loading = true;
 
+  private offlineHelpArticleId = 'uHbNn2XxMhdBM38UxoLn';
+
   constructor(
+    public helper: HelperService,
+    private snackBar: MatSnackBar,
     private breakpointObserver: BreakpointObserver,
     public toolbarService: AppToolbarService,
     private router: Router,
@@ -59,6 +65,28 @@ export class NavigationComponent {
       .subscribe(() => this.drawer.close());
 
     if (isPlatformBrowser(this.platformId)) {
+      let oldOnline;
+      this.helper.onlineStatus$.subscribe(online => {
+        if (online != oldOnline && oldOnline !== undefined) {
+          if (online == false) {
+            this.snackBar
+              .open('Du bist nun offline', 'Mehr Infos', {
+                duration: 4000
+              })
+              .onAction()
+              .subscribe(() =>
+                this.router.navigate(['/help/' + this.offlineHelpArticleId])
+              );
+          }
+          if (online == true) {
+            this.snackBar.open('Du bist nun wieder online', null, {
+              duration: 4000
+            });
+          }
+        }
+        oldOnline = online;
+      });
+
       var isSafari = !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/);
       var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 

@@ -190,6 +190,25 @@ $correction: #FF9800
                             text-align: left
                             white-space: pre-line
 
+                        .upload
+                            margin: 0 8px 0 0
+                            padding: 8px
+                            color: mat-color($foreground-light, icon)
+                            cursor: pointer
+
+                            &.process
+                                animation: process 1.5s ease-in-out infinite
+
+                                @keyframes process
+                                    0%
+                                        opacity: 1
+
+                                    50%
+                                        opacity: .5
+
+                                    100%
+                                        opacity: 1
+
                         mat-checkbox
                             &.mat-checkbox-checked,
                             &:active

@@ -3,6 +3,7 @@ import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { merge } from 'rxjs';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 interface UserElement {
   uid: string;
@@ -27,7 +28,13 @@ export class AdminsComponent implements OnInit {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
-  constructor(private auth: AuthService, private db: FirestoreService) {}
+  offline = false;
+
+  constructor(
+    private helper: HelperService,
+    private auth: AuthService,
+    private db: FirestoreService
+  ) {}
 
   ngOnInit() {}
 
@@ -95,6 +102,11 @@ export class AdminsComponent implements OnInit {
       this.isLoading = false;
       if (res.length == 0) return;
       res.forEach(res => {
+        if (!res && !this.helper.onLine) {
+          this.offline = true;
+          return;
+        }
+        this.offline = false;
         if (!this.admins.includes(res)) this.admins.push(res);
       });
       callback();

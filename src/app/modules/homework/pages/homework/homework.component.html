@@ -36,7 +36,11 @@
               [class.corrected]="homework.isCorrected(item)"
               *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
-                item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
+                item.unsynced
+                  ? undefined
+                  : item.personal
+                  ? 'p/' + item.id
+                  : item.course.id + '/' + item.id
               "
             >
               <div
@@ -48,6 +52,18 @@
                 </p>
               </div>
               <p class="title">{{ item.title }}</p>
+              <mat-icon
+                class="upload"
+                *ngIf="item.unsynced"
+                [matTooltip]="
+                  helper.onLine
+                    ? 'Aufgabe wird hochgeladen'
+                    : 'Aufgabe nicht synchronisiert'
+                "
+                [class.process]="helper.onLine"
+              >
+                {{ helper.onLine ? 'cloud_upload' : 'sync_disabled' }}
+              </mat-icon>
               <mat-checkbox
                 [checked]="type == 'done'"
                 (change)="onChangeItemCheck($event, item.id)"
@@ -131,14 +147,16 @@
               <a
                 class="item"
                 [class.corrected]="homework.isCorrected(item)"
-                [class.deleted]="isDisplayCorrDeleted(item)"
+                [class.deleted]="isDisplayCorrDeleted(item) || item.deleted"
                 *ngIf="
                   (isHandset$ | async) ||
                   (!details && !detailsAnimating) ||
                   detailsId !== item.id
                 "
                 [routerLink]="
-                  item.personal
+                  item.unsynced
+                    ? undefined
+                    : item.personal
                     ? 'p/' + item.id
                     : item.course.id + '/' + item.id
                 "
@@ -152,6 +170,18 @@
                   </p>
                 </div>
                 <p class="title">{{ getDisplayCorrTitle(item) }}</p>
+                <mat-icon
+                  class="upload"
+                  *ngIf="item.unsynced"
+                  [matTooltip]="
+                    helper.onLine
+                      ? 'Aufgabe wird hochgeladen'
+                      : 'Aufgabe nicht synchronisiert'
+                  "
+                  [class.process]="helper.onLine"
+                >
+                  {{ helper.onLine ? 'cloud_upload' : 'sync_disabled' }}
+                </mat-icon>
                 <mat-checkbox
                   [checked]="type == 'done'"
                   (change)="onChangeItemCheck($event, item.id)"
@@ -236,7 +266,11 @@
               [class.corrected]="homework.isCorrected(item)"
               *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
-                item.personal ? 'p/' + item.id : item.course.id + '/' + item.id
+                item.unsynced
+                  ? undefined
+                  : item.personal
+                  ? 'p/' + item.id
+                  : item.course.id + '/' + item.id
               "
             >
               <div
@@ -248,6 +282,18 @@
                 </p>
               </div>
               <p class="title">{{ item.title }}</p>
+              <mat-icon
+                class="upload"
+                *ngIf="item.unsynced"
+                [matTooltip]="
+                  helper.onLine
+                    ? 'Aufgabe wird hochgeladen'
+                    : 'Aufgabe nicht synchronisiert'
+                "
+                [class.process]="helper.onLine"
+              >
+                {{ helper.onLine ? 'cloud_upload' : 'sync_disabled' }}
+              </mat-icon>
               <mat-checkbox
                 [checked]="type == 'done'"
                 (change)="onChangeItemCheck($event, item.id)"
@@ -367,14 +413,16 @@
               <a
                 class="item"
                 [class.corrected]="homework.isCorrected(item)"
-                [class.deleted]="isDisplayCorrDeleted(item)"
+                [class.deleted]="isDisplayCorrDeleted(item) || item.deleted"
                 *ngIf="
                   (isHandset$ | async) ||
                   (!details && !detailsAnimating) ||
                   detailsId !== item.id
                 "
                 [routerLink]="
-                  item.personal
+                  item.unsynced
+                    ? undefined
+                    : item.personal
                     ? 'p/' + item.id
                     : item.course.id + '/' + item.id
                 "
@@ -388,6 +436,18 @@
                   </p>
                 </div>
                 <p class="title">{{ getDisplayCorrTitle(item) }}</p>
+                <mat-icon
+                  class="upload"
+                  *ngIf="item.unsynced"
+                  [matTooltip]="
+                    helper.onLine
+                      ? 'Aufgabe wird hochgeladen'
+                      : 'Aufgabe nicht synchronisiert'
+                  "
+                  [class.process]="helper.onLine"
+                >
+                  {{ helper.onLine ? 'cloud_upload' : 'sync_disabled' }}
+                </mat-icon>
                 <mat-checkbox
                   [checked]="type == 'done'"
                   (change)="onChangeItemCheck($event, item.id)"

@@ -23,6 +23,7 @@ import { message } from 'src/configs/messages';
 import { userInfo } from 'os';
 import { registerUser } from 'functions/src';
 import { SeoService } from 'src/app/core/services/seo.service';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 export interface UserElement {
   uid: string;
@@ -49,9 +50,12 @@ export class UsersComponent implements OnInit {
   isLoadingResults = true;
   search = false;
 
+  offline = false;
+
   private storageKey = 'admin_users';
 
   constructor(
+    private helper: HelperService,
     private seo: SeoService,
     private afFunc: AngularFireFunctions,
     private router: Router,
@@ -309,6 +313,11 @@ export class UsersComponent implements OnInit {
     let getUsers = this.afFunc.functions.httpsCallable('getUsers');
     return getUsers({})
       .then(result => {
+        if (!result && !this.helper.onLine) {
+          this.offline = true;
+          return;
+        }
+        this.offline = false;
         return { data: result.data, cached: false };
       })
       .catch(error => {

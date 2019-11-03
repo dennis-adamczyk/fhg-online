@@ -198,6 +198,10 @@
 
       <span>{{ toolbarService.title$ | async }}</span>
 
+      <div class="offline" *ngIf="(helper.onlineStatus$ | async) == false">
+        OFFLINE
+      </div>
+
       <mat-progress-bar
         mode="indeterminate"
         color="secondary"

@@ -2,7 +2,7 @@
 <div class="course">
   <header>
     <h1>Kurs {{ course }}</h1>
-    <div class="actions">
+    <div class="actions" *ngIf="!offline">
       <button
         mat-icon-button
         matTooltip="Änderungen verwerfen"
@@ -25,9 +25,10 @@
     </div>
   </header>
   <div class="body">
-    <div class="loading" *ngIf="isLoading">
+    <div class="loading" *ngIf="isLoading && !offline">
       <mat-spinner diameter="32"></mat-spinner>
     </div>
+    <app-offline *ngIf="offline"></app-offline>
     <form [formGroup]="courseForm" *ngIf="!isLoading">
       <section class="subject">
         <mat-form-field>

@@ -1,9 +1,18 @@
-import { NgModule, Optional, SkipSelf } from '@angular/core';
+import {
+  NgModule,
+  Optional,
+  SkipSelf,
+  Inject,
+  PLATFORM_ID
+} from '@angular/core';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirePerformanceModule } from '@angular/fire/performance';
 import { AngularFireAuthModule } from '@angular/fire/auth';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
+import {
+  AngularFirestoreModule,
+  AngularFirestore
+} from '@angular/fire/firestore';
 import {
   AngularFireFunctionsModule,
   FUNCTIONS_ORIGIN
@@ -23,6 +32,7 @@ import { EditLessonsDialog } from './dialogs/edit-lessons/edit-lessons.component
 import { ColorPickerDialog } from './dialogs/color-picker/color-picker.component';
 import { SanctionDialog } from './dialogs/sanction/sanction.component';
 import { ShareSheet } from './bottomsheets/share/share.component';
+import { isPlatformBrowser } from '@angular/common';
 
 // TODO: Add Angular Fire Performance
 
@@ -48,8 +58,9 @@ if (
     ShareSheet
   ],
   imports: [
-    ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: environment.production
+    ServiceWorkerModule.register('/ngsw-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerWhenStable'
     }),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
@@ -72,7 +83,19 @@ if (
   providers: [...providerscoll]
 })
 export class CoreModule {
-  constructor(@Optional() @SkipSelf() parentModule: CoreModule) {
+  constructor(
+    @Optional() @SkipSelf() parentModule: CoreModule,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    afs: AngularFirestore
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      afs.firestore.settings({
+        cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+      });
+      afs.firestore.enablePersistence({
+        synchronizeTabs: true
+      });
+    }
     if (parentModule) {
       throw new Error(
         'CoreModule has already been loaded. You should only import Core modules in the AppModule only.'

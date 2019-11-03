@@ -24,7 +24,8 @@ import { HomeworkFormComponent } from '../../../components/homework-form/homewor
 import { HelperService } from 'src/app/core/services/helper.service';
 import { Homework } from '../../../models/homework.model';
 import { Course } from 'src/app/modules/timetable/models/timetable.model';
-import { timetableKey } from 'src/configs/constants';
+import { timetableKey, homeworkKey } from 'src/configs/constants';
+import { HomeworkService } from '../../../services/homework.service';
 
 @Component({
   selector: 'app-edit-homework',
@@ -40,6 +41,7 @@ export class EditHomeworkComponent {
   startRoute: ActivatedRouteSnapshot;
 
   constructor(
+    private homework: HomeworkService,
     private helper: HelperService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
@@ -250,6 +252,25 @@ export class EditHomeworkComponent {
       else
         homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.loadedData.id}`;
 
+      // let newHomework = JSON.parse(localStorage.getItem(homeworkKey))
+      //   .homework as Homework[];
+      // let current = newHomework.find(
+      //   h =>
+      //     h.id == this.loadedData.id && h.personal == this.loadedData.personal
+      // );
+      // current.title = title;
+      // current.details = details;
+      // current.unsynced = true;
+      // newHomework = newHomework.filter(h => h.id !== this.loadedData.id);
+      // localStorage.setItem(
+      //   homeworkKey,
+      //   JSON.stringify({
+      //     homework: newHomework,
+      //     updated: JSON.parse(localStorage.getItem(homeworkKey)).updated
+      //   })
+      // );
+      // this.homework.updateData(newHomework);
+
       return this.db.update(homeworkRef, data).then(() => {
         this.snackBar.open('Änderungen an der Hausaufgabe gespeichert', null, {
           duration: 4000
@@ -291,30 +312,28 @@ export class EditHomeworkComponent {
         delete this.loadedData.corrections[oldId];
         this.loadedData.corrections[correctionId] = data;
 
-        return this.db
-          .update(homeworkRef, {
-            corrections: this.loadedData.corrections
+        let corrData = {
+          id: correctionId
+        };
+        if (data.title || data.details) {
+          corrData['title'] = data.title;
+          corrData['details'] = data.details;
+        }
+        this.db
+          .update(`users/${this.auth.user.id}/singles/homework`, {
+            [`correction.${this.loadedData.id}`]: corrData
           })
           .then(() => {
-            let corrData = {
-              id: correctionId
-            };
-            if (data.title || data.details) {
-              corrData['title'] = data.title;
-              corrData['details'] = data.details;
-            }
-            this.db
-              .update(`users/${this.auth.user.id}/singles/homework`, {
-                [`correction.${this.loadedData.id}`]: corrData
-              })
-              .then(() => {
-                this.snackBar.open(
-                  'Bearbeitungsvorschlag zur Hausaufgabe bearbeitet',
-                  null,
-                  { duration: 4000 }
-                );
-              });
+            this.snackBar.open(
+              'Bearbeitungsvorschlag zur Hausaufgabe bearbeitet',
+              null,
+              { duration: 4000 }
+            );
           });
+
+        return this.db.update(homeworkRef, {
+          corrections: this.loadedData.corrections
+        });
       } else {
         let correctionId = this.helper.generateId();
         while (
@@ -337,30 +356,28 @@ export class EditHomeworkComponent {
           this.loadedData.course.id
         )}/courses/${this.loadedData.course.id}/homework/${this.loadedData.id}`;
 
-        return this.db
-          .update(homeworkRef, {
-            [`corrections.${correctionId}`]: data
+        let corrData = {
+          id: correctionId
+        };
+        if (data.title || data.details) {
+          corrData['title'] = data.title;
+          corrData['details'] = data.details;
+        }
+        this.db
+          .update(`users/${this.auth.user.id}/singles/homework`, {
+            [`correction.${this.loadedData.id}`]: corrData
           })
           .then(() => {
-            let corrData = {
-              id: correctionId
-            };
-            if (data.title || data.details) {
-              corrData['title'] = data.title;
-              corrData['details'] = data.details;
-            }
-            this.db
-              .update(`users/${this.auth.user.id}/singles/homework`, {
-                [`correction.${this.loadedData.id}`]: corrData
-              })
-              .then(() => {
-                this.snackBar.open(
-                  'Bearbeitungsvorschlag zur Hausaufgabe hinzugefügt',
-                  null,
-                  { duration: 4000 }
-                );
-              });
+            this.snackBar.open(
+              'Bearbeitungsvorschlag zur Hausaufgabe hinzugefügt',
+              null,
+              { duration: 4000 }
+            );
           });
+
+        return this.db.update(homeworkRef, {
+          [`corrections.${correctionId}`]: data
+        });
       }
     };
 
@@ -380,21 +397,19 @@ export class EditHomeworkComponent {
       operation = addCorrection();
     }
 
-    operation
-      .then(() => {
-        this.homeworkForm.markAsPristine();
-        this.navigateBack();
-        this.isLoading = false;
-      })
-      .catch(error => {
-        this.isLoading = false;
-        this.snackBar.open(
-          `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
-          null,
-          {
-            duration: 4000
-          }
-        );
-      });
+    this.homeworkForm.markAsPristine();
+    this.navigateBack();
+    this.isLoading = false;
+
+    operation.catch(error => {
+      this.isLoading = false;
+      this.snackBar.open(
+        `Fehler aufgetreten (${error.code}: ${error.message}). Bitte versuche es später erneut`,
+        null,
+        {
+          duration: 4000
+        }
+      );
+    });
   }
 }

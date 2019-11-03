@@ -25,10 +25,12 @@
     "firebase-functions": "^3.2.0",
     "firebase-tools": "^7.0.1",
     "fs-extra": "^8.0.1",
+    "nodemailer": "^6.3.1",
     "webpack": "^4.33.0"
   },
   "devDependencies": {
     "@types/algoliasearch": "^3.34.2",
+    "@types/nodemailer": "^6.2.1",
     "firebase-functions-test": "^0.1.6",
     "ts-loader": "^6.0.2",
     "typescript": "^3.2.2",

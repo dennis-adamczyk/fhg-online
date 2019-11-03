@@ -139,13 +139,13 @@ service cloud.firestore {
                           );
           allow update: if isValidHomework() && (
                             isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isTeacher() && courseData().teacher.last_name == userData().name.last_name) ||
-                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == courseData().by.id) ||
+                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == resource.data.by.id) ||
                             (!isIndex(homeworkId) && isLoggedIn() && onlyCorrect() &&
                               ((userData().class in courseData().class && courseData().multi == false)
                                 || (course in userData().course && courseData().multi == true)))))
                           );
           allow delete: if isGuard() || (!hasInteractionSanction() && ((!isIndex(homeworkId) && isTeacher() && courseData().teacher.last_name == userData().name.last_name) ||
-                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == courseData().by.id)));
+                            (!isIndex(homeworkId) && isLoggedIn() && request.auth.uid == resource.data.by.id)));
         }
       }
     }

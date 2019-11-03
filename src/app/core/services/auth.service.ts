@@ -163,10 +163,12 @@ export class AuthService {
       });
   }
 
-  logout() {
+  logout(redirectLink?: string) {
     return this.afAuth.auth
       .signOut()
-      .then(_ => this.router.navigate(['/start']));
+      .then(() =>
+        this.router.navigate([redirectLink ? redirectLink : '/start'])
+      );
   }
 
   delete(): Promise<void> {

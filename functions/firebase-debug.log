@@ -1,0 +1,271 @@
+[debug] [2019-10-22T13:07:12.819Z] ----------------------------------------------------------------------
+[debug] [2019-10-22T13:07:12.820Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\denni\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js serve
+[debug] [2019-10-22T13:07:12.821Z] CLI Version:   7.6.1
+[debug] [2019-10-22T13:07:12.821Z] Platform:      win32
+[debug] [2019-10-22T13:07:12.821Z] Node Version:  v10.15.1
+[debug] [2019-10-22T13:07:12.822Z] Time:          Tue Oct 22 2019 15:07:12 GMT+0200 (GMT+02:00)
+[debug] [2019-10-22T13:07:12.822Z] ----------------------------------------------------------------------
+[debug] [2019-10-22T13:07:12.822Z] 
+[debug] [2019-10-22T13:07:12.832Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-10-22T13:07:12.833Z] > authorizing via signed-in user
+[debug] [2019-10-22T13:07:12.833Z] [iam] checking project fhg-online for permissions ["firebase.projects.get"]
+[debug] [2019-10-22T13:07:12.835Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/fhg-online:testIamPermissions  
+
+[debug] [2019-10-22T13:07:13.706Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-22T13:07:13.707Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/fhg-online  
+ 
+[debug] [2019-10-22T13:07:14.045Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'D:\Bibliotheken\Documents\FHG Online\fhg-online'...
+[info] 
+[debug] [2019-10-22T13:07:14.050Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/fhg-online/webApps/-/config  
+ 
+[debug] [2019-10-22T13:07:14.609Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: dist
+[info] +  hosting: Local server: http://localhost:5000
+[warn] !  Your requested "node" version "8" doesn't match your global version "10"
+[info] +  functions: Emulator started at http://localhost:5001
+[info] i  functions: Watching "D:\Bibliotheken\Documents\FHG Online\fhg-online\functions" for Cloud Functions...
+[info] [hosting] Rewriting / to http://localhost:5001/fhg-online/us-central1/ssr for local Function ssr
+[debug] [2019-10-22T13:07:15.772Z] Accepted request GET /fhg-online/us-central1/ssr/ --> ssr
+[debug] [2019-10-22T13:07:15.980Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[debug] [2019-10-22T13:07:15.980Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:07:15.982Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:07:15.983Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:07:15.984Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:07:16.169Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[info] i  functions: Beginning execution of "ssr"
+[debug] [2019-10-22T13:07:16.170Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:07:16.173Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:07:16.174Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:07:16.175Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[info] [hosting] Rewriting /favicon.ico to http://localhost:5001/fhg-online/us-central1/ssr for local Function ssr
+[debug] [2019-10-22T13:08:16.058Z] Accepted request GET /fhg-online/us-central1/ssr/favicon.ico --> ssr
+[debug] [2019-10-22T13:08:16.425Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[info] i  functions: Beginning execution of "ssr"
+[debug] [2019-10-22T13:08:16.425Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:08:16.427Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:08:16.429Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:08:16.429Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[debug] [2019-10-22T13:23:17.740Z] ----------------------------------------------------------------------
+[debug] [2019-10-22T13:23:17.742Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\denni\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js serve
+[debug] [2019-10-22T13:23:17.742Z] CLI Version:   7.6.1
+[debug] [2019-10-22T13:23:17.742Z] Platform:      win32
+[debug] [2019-10-22T13:23:17.742Z] Node Version:  v10.15.1
+[debug] [2019-10-22T13:23:17.743Z] Time:          Tue Oct 22 2019 15:23:17 GMT+0200 (GMT+02:00)
+[debug] [2019-10-22T13:23:17.743Z] ----------------------------------------------------------------------
+[debug] [2019-10-22T13:23:17.743Z] 
+[debug] [2019-10-22T13:23:17.752Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-10-22T13:23:17.753Z] > authorizing via signed-in user
+[debug] [2019-10-22T13:23:17.753Z] [iam] checking project fhg-online for permissions ["firebase.projects.get"]
+[debug] [2019-10-22T13:23:17.754Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/fhg-online:testIamPermissions  
+
+[debug] [2019-10-22T13:23:18.042Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-22T13:23:18.043Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/fhg-online  
+ 
+[debug] [2019-10-22T13:23:18.352Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'D:\Bibliotheken\Documents\FHG Online\fhg-online'...
+[info] 
+[debug] [2019-10-22T13:23:18.356Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/fhg-online/webApps/-/config  
+ 
+[debug] [2019-10-22T13:23:19.030Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: dist
+[info] +  hosting: Local server: http://localhost:5000
+[warn] !  Your requested "node" version "8" doesn't match your global version "10"
+[info] [hosting] Rewriting / to https://us-central1-fhg-online.cloudfunctions.net/ssr for local Function ssr
+[info] +  functions: Emulator started at http://localhost:5001
+[info] i  functions: Watching "D:\Bibliotheken\Documents\FHG Online\fhg-online\functions" for Cloud Functions...
+[debug] [2019-10-22T13:23:20.257Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[debug] [2019-10-22T13:23:20.257Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:23:20.259Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:23:20.260Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:20.261Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[info] [hosting] Rewriting /styles.f21aa9a529cb2df698b0.css to http://localhost:5001/fhg-online/us-central1/ssr for local Function ssr
+[debug] [2019-10-22T13:23:20.475Z] Accepted request GET /fhg-online/us-central1/ssr/styles.f21aa9a529cb2df698b0.css --> ssr
+[debug] [2019-10-22T13:23:20.854Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[info] i  functions: Beginning execution of "ssr"
+[debug] [2019-10-22T13:23:20.854Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:23:20.857Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:23:20.858Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:20.859Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[info] [hosting] Rewriting /assets/logo_white.svg to http://localhost:5001/fhg-online/us-central1/ssr for local Function ssr
+[debug] [2019-10-22T13:23:21.004Z] Accepted request GET /fhg-online/us-central1/ssr/assets/logo_white.svg --> ssr
+[info] [hosting] Rewriting /polyfills-es2015.0eb971bcd31dbed0ec6d.js to http://localhost:5001/fhg-online/us-central1/ssr for local Function ssr
+[info] [hosting] Rewriting /runtime-es2015.c8b2e29bf0bc66781e9a.js to http://localhost:5001/fhg-online/us-central1/ssr for local Function ssr
+[info] [hosting] Rewriting /main-es2015.3fc8dd5eb4c2c6327ba0.js to http://localhost:5001/fhg-online/us-central1/ssr for local Function ssr
+[info] [hosting] Rewriting /scripts.b4f65a4d21d23fe87145.js to http://localhost:5001/fhg-online/us-central1/ssr for local Function ssr
+[debug] [2019-10-22T13:23:21.309Z] Accepted request GET /fhg-online/us-central1/ssr/polyfills-es2015.0eb971bcd31dbed0ec6d.js --> ssr
+[debug] [2019-10-22T13:23:21.328Z] Accepted request GET /fhg-online/us-central1/ssr/runtime-es2015.c8b2e29bf0bc66781e9a.js --> ssr
+[debug] [2019-10-22T13:23:21.339Z] Accepted request GET /fhg-online/us-central1/ssr/main-es2015.3fc8dd5eb4c2c6327ba0.js --> ssr
+[debug] [2019-10-22T13:23:21.350Z] Accepted request GET /fhg-online/us-central1/ssr/scripts.b4f65a4d21d23fe87145.js --> ssr
+[debug] [2019-10-22T13:23:21.643Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[info] i  functions: Beginning execution of "ssr"
+[debug] [2019-10-22T13:23:21.650Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:23:21.650Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.650Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.650Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[debug] [2019-10-22T13:23:21.888Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[info] i  functions: Beginning execution of "ssr"
+[debug] [2019-10-22T13:23:21.896Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:23:21.896Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.896Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.896Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.920Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[info] i  functions: Beginning execution of "ssr"
+[debug] [2019-10-22T13:23:21.922Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:23:21.924Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.925Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.926Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.936Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[info] i  functions: Beginning execution of "ssr"
+[debug] [2019-10-22T13:23:21.943Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:23:21.943Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.943Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.943Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.984Z] [runtime-status] Functions runtime initialized. {"cwd":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions","node_version":"10.15.1"}
+[info] i  functions: Beginning execution of "ssr"
+[debug] [2019-10-22T13:23:21.986Z] [runtime-status] Disabled runtime features: {"functions_config_helper":true,"network_filtering":true,"timeout":true,"memory_limiting":true,"admin_stubs":true} {}
+[debug] [2019-10-22T13:23:21.988Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.6.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.990Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-10-22T13:23:21.990Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"D:\\Bibliotheken\\Documents\\FHG Online\\fhg-online\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.
+[warn] !  TypeError: Cannot read property 'appid' of undefined
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:865:42)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:106:14)
+    at __webpack_require__ (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:20:30)
+    at Object.defineProperty.value (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:84:18)
+    at Object.<anonymous> (D:\Bibliotheken\Documents\FHG Online\fhg-online\functions\lib\index.js:87:10)
+    at Module._compile (internal/modules/cjs/loader.js:689:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:700:10)
+    at Module.load (internal/modules/cjs/loader.js:599:32)
+    at tryModuleLoad (internal/modules/cjs/loader.js:538:12)
+[warn] !  We were unable to load your functions code. (see above)
+   - It appears your code is written in Typescript, which must be compiled before emulation.
+   - You may be able to run "npm run build" in your functions directory to resolve this.

@@ -26,6 +26,8 @@ export class HelpArticleComponent implements OnInit {
     .observe(Breakpoints.Handset)
     .pipe(map(result => result.matches));
 
+  offline = false;
+
   constructor(
     private seo: SeoService,
     private db: FirestoreService,
@@ -86,12 +88,17 @@ export class HelpArticleComponent implements OnInit {
   loadData() {
     this.db.doc$(`help/${this.articleId}`).subscribe((data: any) => {
       if (!data) {
+        if (!this.helper.onLine) {
+          this.offline = true;
+          return;
+        }
         this.snackBar.open('Kein Hilfe-Artikel mit dieser ID gefunden', null, {
           duration: 4000
         });
         this.navigateBack();
         return;
       }
+      this.offline = false;
       data = {
         title: data.title,
         content: data.content

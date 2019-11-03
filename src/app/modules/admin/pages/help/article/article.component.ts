@@ -61,6 +61,8 @@ export class HelpArticleEditComponent implements OnInit {
   };
   editor;
 
+  offline = false;
+
   @HostListener('window:beforeunload')
   canDeactivate(): Observable<boolean> | boolean | object {
     return this.edited
@@ -139,6 +141,10 @@ export class HelpArticleEditComponent implements OnInit {
         .doc$(`help/${this.articleId}`)
         .subscribe((data: any) => {
           if (!data) {
+            if (!this.helper.onLine) {
+              this.offline = true;
+              return;
+            }
             this.edited = false;
             this.snackBar.open(
               'Kein Hilfe-Artikel mit dieser ID gefunden',
@@ -150,6 +156,7 @@ export class HelpArticleEditComponent implements OnInit {
             this.router.navigate(['/admin/help']);
             return;
           }
+          this.offline = false;
           data = {
             title: data.title,
             content: data.content

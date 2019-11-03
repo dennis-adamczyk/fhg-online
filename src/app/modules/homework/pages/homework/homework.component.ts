@@ -230,11 +230,18 @@ export class HomeworkComponent implements OnInit {
         this.isLoading = false;
         if (!homework || Object.keys(homework).length <= 1) {
           this.router.navigate(['/homework'], { replaceUrl: true });
-          return this.snackBar.open(
-            'Diese Hausaufgabe wurde nicht gefunden',
-            null,
-            { duration: 4000 }
-          );
+          if (this.helper.onLine)
+            return this.snackBar.open(
+              'Diese Hausaufgabe wurde nicht gefunden',
+              null,
+              { duration: 4000 }
+            );
+          else
+            return this.snackBar.open(
+              'Neue Daten können nur online geladen werden',
+              null,
+              { duration: 4000 }
+            );
         }
         if (homework.blocked) {
           this.router.navigate(['/homework'], { replaceUrl: true });

@@ -38,6 +38,8 @@ export class ClassComponent implements OnInit {
 
   sub: boolean = !!this.route.children.length;
 
+  offline = false;
+
   constructor(
     private seo: SeoService,
     private dialog: MatDialog,
@@ -119,6 +121,10 @@ export class ClassComponent implements OnInit {
           .pipe(take(1))
           .subscribe((result: { classes: string[] }) => {
             if (!result || !result.classes.includes(this.class)) {
+              if (!this.helper.onLine) {
+                this.offline = true;
+                return;
+              }
               this.snackBar.open(
                 `Die ${this.helper.isClass() ? 'Klasse' : 'Stufe'} ${
                   this.class
@@ -128,6 +134,7 @@ export class ClassComponent implements OnInit {
               );
               this.router.navigate(['/admin/classes']);
             }
+            this.offline = false;
           });
       } else {
         this.db
@@ -145,6 +152,11 @@ export class ClassComponent implements OnInit {
               );
               this.router.navigate(['/admin/classes']);
             }
+            if (!docSnapshot.data() && !this.helper.onLine) {
+              this.offline = true;
+              return;
+            }
+            this.offline = false;
           });
       }
 

@@ -14,6 +14,7 @@ import { take } from 'rxjs/operators';
 import { FirebaseFunctions } from '@angular/fire';
 import { AngularFireFunctions } from '@angular/fire/functions';
 import * as firebase from 'firebase/app';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 @Component({
   selector: 'app-user',
@@ -40,7 +41,10 @@ export class UserComponent {
 
   constant = constant;
 
+  offline = false;
+
   constructor(
+    private helper: HelperService,
     private db: FirestoreService,
     private afFunc: AngularFireFunctions,
     private route: ActivatedRoute,
@@ -144,6 +148,10 @@ export class UserComponent {
   getData(uid: string) {
     this.isLoading = true;
     this.db.docWithId$<User>(`users/${uid}`).subscribe((result: User) => {
+      if (!result && !this.helper.onLine) {
+        this.offline = true;
+        return;
+      }
       if (result.email == undefined) {
         this.snackBar
           .open('Kein Benutzer mit dieser ID gefunden', 'Zurück', {
@@ -153,6 +161,7 @@ export class UserComponent {
           .subscribe(() => this.location.back());
         return;
       }
+      this.offline = false;
       this.data = result;
       this.isLoading = false;
       this.userForm.patchValue({

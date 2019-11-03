@@ -8,6 +8,7 @@ import { LessonDetailsDialog } from './dialogs/lesson-details/lesson-details.com
 import { AddLessonDialog } from './dialogs/add-lesson/add-lesson.component';
 import * as firebase from 'firebase/app';
 import { Course } from 'src/app/modules/timetable/models/timetable.model';
+import { HelperService } from 'src/app/core/services/helper.service';
 
 @Component({
   selector: 'app-timetable',
@@ -25,7 +26,10 @@ export class TimetableComponent implements OnInit {
   courses: Course[] = [];
   timetable: object;
 
+  offline = false;
+
   constructor(
+    private helper: HelperService,
     private dialog: MatDialog,
     public settings: SettingsService,
     private db: FirestoreService
@@ -45,6 +49,11 @@ export class TimetableComponent implements OnInit {
       )
       .pipe(take(1))
       .subscribe((result: Course[]) => {
+        if (!result && !this.helper.onLine) {
+          this.offline = true;
+          return;
+        }
+        this.offline = false;
         this.courses = result;
         this.timetable = this.convertToTimetable(result);
         this.isLoading = false;

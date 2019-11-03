@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirestoreService } from 'src/app/core/services/firestore.service';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { constant } from 'src/configs/constants';
+import { constant, homeworkKey } from 'src/configs/constants';
 import { Observable } from 'rxjs';
 import { MatDialog, MatSnackBar, MatBottomSheet } from '@angular/material';
 import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
@@ -12,6 +12,7 @@ import { Title } from '@angular/platform-browser';
 import { isPlatformBrowser, Location } from '@angular/common';
 import { HelperService } from 'src/app/core/services/helper.service';
 import { Homework } from '../../../models/homework.model';
+import { HomeworkService } from '../../../services/homework.service';
 
 @Component({
   selector: 'app-homework-details',
@@ -24,6 +25,7 @@ export class HomeworkDetailsComponent implements OnInit {
   @Input() done?: boolean;
 
   constructor(
+    private homework: HomeworkService,
     public helper: HelperService,
     private router: Router,
     private db: FirestoreService,
@@ -185,11 +187,28 @@ export class HomeworkDetailsComponent implements OnInit {
           else
             homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.data.id}`;
 
-          return this.db.delete(homeworkRef).then(() => {
+          this.db.delete(homeworkRef).then(() => {
             this.snackBar.open('Hausaufgabe unwiderruflich gelöscht', null, {
               duration: 4000
             });
           });
+
+          let newHomework = JSON.parse(localStorage.getItem(homeworkKey))
+            .homework as Homework[];
+          let current = newHomework.find(h => h.id == this.data.id);
+          current.unsynced = true;
+          current.deleted = true;
+          newHomework = newHomework.filter(h => h.id !== this.data.id);
+          newHomework.push(current);
+          localStorage.setItem(
+            homeworkKey,
+            JSON.stringify({
+              homework: newHomework,
+              updated: JSON.parse(localStorage.getItem(homeworkKey)).updated
+            })
+          );
+          this.homework.updateData(newHomework);
+          return;
         } else {
           let homeworkRef = `years/${this.helper.getYearOfCourse(
             this.data.course.id

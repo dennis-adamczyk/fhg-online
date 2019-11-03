@@ -131,71 +131,108 @@ export const onChangeHomework = functions.firestore
       (getDate(newValue.entered.date).getTime() >= min.getTime() ||
         getDate(newValue.until.date).getTime() >= min.getTime());
 
-    return admin
+    let indexRef = admin
       .firestore()
-      .doc(`years/${year}/courses/${courseId}/homework/--index--`)
-      .get()
-      .then(
-        (indexSnap): Promise<any> => {
-          if (indexSnap.exists) {
-            let index = indexSnap.data() as { homework: Homework[] };
-            if (Array.isArray(index.homework))
-              index.homework = index.homework.filter(
+      .doc(`years/${year}/courses/${courseId}/homework/--index--`);
+
+    return admin.firestore().runTransaction(t => {
+      return t.get(indexRef).then(indexSnap => {
+        let index: { homework: Homework[]; index: true };
+        if (indexSnap.exists) {
+          index = indexSnap.data() as { homework: Homework[]; index: true };
+          index.homework = Array.isArray(index.homework)
+            ? index.homework.filter(
                 h =>
                   (getDate(h.entered.date).getTime() >= min.getTime() ||
                     getDate(h.until.date).getTime() >= min.getTime()) &&
                   h.id !== homeworkId
-              );
-            else index.homework = [];
-            if (addCurrent)
-              index.homework.push({
-                id: homeworkId,
-                title: newValue.title,
-                entered: newValue.entered,
-                until: newValue.until,
-                corrected: getCorrected(),
-                blocked: blocked
-              });
-            return admin
-              .firestore()
-              .doc(indexSnap.ref.path)
-              .update(index)
-              .then(() => {
-                return admin
-                  .firestore()
-                  .doc(`years/${year}`)
-                  .update({
-                    [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
-                  });
-              });
-          } else if (addCurrent) {
-            return admin
-              .firestore()
-              .doc(indexSnap.ref.path)
-              .set({
-                homework: [
-                  {
-                    id: homeworkId,
-                    title: newValue.title,
-                    entered: newValue.entered,
-                    until: newValue.until,
-                    corrected: getCorrected(),
-                    blocked: blocked
-                  }
-                ],
-                index: true
-              })
-              .then(() => {
-                return admin
-                  .firestore()
-                  .doc(`years/${year}`)
-                  .update({
-                    [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
-                  });
-              });
-          }
-        }
-      );
+              )
+            : [];
+        } else index = { homework: [], index: true };
+
+        if (addCurrent)
+          index.homework.push({
+            id: homeworkId,
+            title: newValue.title,
+            entered: newValue.entered,
+            until: newValue.until,
+            corrected: getCorrected(),
+            blocked: blocked
+          });
+
+        if (indexSnap.exists) t.update(indexRef, { homework: index.homework });
+        else t.set(indexRef, { homework: index.homework });
+        t.update(admin.firestore().doc(`years/${year}`), {
+          [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    });
+
+    // return admin
+    //   .firestore()
+    //   .doc(`years/${year}/courses/${courseId}/homework/--index--`)
+    //   .get()
+    //   .then(
+    //     (indexSnap): Promise<any> => {
+    //       if (indexSnap.exists) {
+    //         let index = indexSnap.data() as { homework: Homework[] };
+    //         if (Array.isArray(index.homework))
+    //           index.homework = index.homework.filter(
+    //             h =>
+    //               (getDate(h.entered.date).getTime() >= min.getTime() ||
+    //                 getDate(h.until.date).getTime() >= min.getTime()) &&
+    //               h.id !== homeworkId
+    //           );
+    //         else index.homework = [];
+    //         if (addCurrent)
+    //           index.homework.push({
+    //             id: homeworkId,
+    //             title: newValue.title,
+    //             entered: newValue.entered,
+    //             until: newValue.until,
+    //             corrected: getCorrected(),
+    //             blocked: blocked
+    //           });
+    //         return admin
+    //           .firestore()
+    //           .doc(indexSnap.ref.path)
+    //           .update(index)
+    //           .then(() => {
+    //             return admin
+    //               .firestore()
+    //               .doc(`years/${year}`)
+    //               .update({
+    //                 [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
+    //               });
+    //           });
+    //       } else if (addCurrent) {
+    //         return admin
+    //           .firestore()
+    //           .doc(indexSnap.ref.path)
+    //           .set({
+    //             homework: [
+    //               {
+    //                 id: homeworkId,
+    //                 title: newValue.title,
+    //                 entered: newValue.entered,
+    //                 until: newValue.until,
+    //                 corrected: getCorrected(),
+    //                 blocked: blocked
+    //               }
+    //             ],
+    //             index: true
+    //           })
+    //           .then(() => {
+    //             return admin
+    //               .firestore()
+    //               .doc(`years/${year}`)
+    //               .update({
+    //                 [`homework_updated.${courseId}`]: admin.firestore.FieldValue.serverTimestamp()
+    //               });
+    //           });
+    //       }
+    //     }
+    //   );
   });
 
 export const onChangePersonalHomework = functions.firestore
@@ -235,64 +272,100 @@ export const onChangePersonalHomework = functions.firestore
       newValue.until &&
       (getDate(newValue.entered.date).getTime() >= min.getTime() ||
         getDate(newValue.until.date).getTime() >= min.getTime());
-    return admin
+
+    let indexRef = admin
       .firestore()
-      .doc(`users/${userId}/personalHomework/--index--`)
-      .get()
-      .then((indexSnap): any => {
+      .doc(`users/${userId}/personalHomework/--index--`);
+
+    return admin.firestore().runTransaction(t => {
+      return t.get(indexRef).then(indexSnap => {
+        let index: { homework: Homework[]; index: true };
         if (indexSnap.exists) {
-          let index = indexSnap.data() as { homework: Homework[] };
-          if (Array.isArray(index.homework))
-            index.homework = index.homework.filter(
-              h =>
-                getDate(h.entered.date).getTime() >= min.getTime() &&
-                h.id !== homeworkId
-            );
-          else index.homework = [];
-          if (addCurrent)
-            index.homework.push({
-              id: homeworkId,
-              title: newValue.title,
-              entered: newValue.entered,
-              until: newValue.until,
-              course: newValue.course
-            });
-          return admin
-            .firestore()
-            .doc(indexSnap.ref.path)
-            .update(index)
-            .then(() => {
-              return admin
-                .firestore()
-                .doc(`users/${userId}`)
-                .update({
-                  homework_updated: admin.firestore.FieldValue.serverTimestamp()
-                });
-            });
-        } else if (addCurrent) {
-          return admin
-            .firestore()
-            .doc(indexSnap.ref.path)
-            .set({
-              homework: [
-                {
-                  id: homeworkId,
-                  title: newValue.title,
-                  entered: newValue.entered,
-                  until: newValue.until,
-                  course: newValue.course
-                }
-              ],
-              index: true
-            })
-            .then(() => {
-              return admin
-                .firestore()
-                .doc(`users/${userId}`)
-                .update({
-                  homework_updated: admin.firestore.FieldValue.serverTimestamp()
-                });
-            });
-        }
+          index = indexSnap.data() as { homework: Homework[]; index: true };
+          index.homework = Array.isArray(index.homework)
+            ? index.homework.filter(
+                h =>
+                  getDate(h.entered.date).getTime() >= min.getTime() &&
+                  h.id !== homeworkId
+              )
+            : [];
+        } else index = { homework: [], index: true };
+
+        if (addCurrent)
+          index.homework.push({
+            id: homeworkId,
+            title: newValue.title,
+            entered: newValue.entered,
+            until: newValue.until,
+            course: newValue.course
+          });
+
+        if (indexSnap.exists) t.update(indexRef, { homework: index.homework });
+        else t.set(indexRef, { homework: index.homework });
+        t.update(admin.firestore().doc(`users/${userId}`), {
+          homework_updated: admin.firestore.FieldValue.serverTimestamp()
+        });
       });
+    });
+
+    // return admin
+    //   .firestore()
+    //   .doc(`users/${userId}/personalHomework/--index--`)
+    //   .get()
+    //   .then((indexSnap): any => {
+    //     if (indexSnap.exists) {
+    //       let index = indexSnap.data() as { homework: Homework[] };
+    //       if (Array.isArray(index.homework))
+    //         index.homework = index.homework.filter(
+    //           h =>
+    //             getDate(h.entered.date).getTime() >= min.getTime() &&
+    //             h.id !== homeworkId
+    //         );
+    //       else index.homework = [];
+    //       if (addCurrent)
+    //         index.homework.push({
+    //           id: homeworkId,
+    //           title: newValue.title,
+    //           entered: newValue.entered,
+    //           until: newValue.until,
+    //           course: newValue.course
+    //         });
+    //       return admin
+    //         .firestore()
+    //         .doc(indexSnap.ref.path)
+    //         .update(index)
+    //         .then(() => {
+    //           return admin
+    //             .firestore()
+    //             .doc(`users/${userId}`)
+    //             .update({
+    //               homework_updated: admin.firestore.FieldValue.serverTimestamp()
+    //             });
+    //         });
+    //     } else if (addCurrent) {
+    //       return admin
+    //         .firestore()
+    //         .doc(indexSnap.ref.path)
+    //         .set({
+    //           homework: [
+    //             {
+    //               id: homeworkId,
+    //               title: newValue.title,
+    //               entered: newValue.entered,
+    //               until: newValue.until,
+    //               course: newValue.course
+    //             }
+    //           ],
+    //           index: true
+    //         })
+    //         .then(() => {
+    //           return admin
+    //             .firestore()
+    //             .doc(`users/${userId}`)
+    //             .update({
+    //               homework_updated: admin.firestore.FieldValue.serverTimestamp()
+    //             });
+    //         });
+    //     }
+    //   });
   });

@@ -41,10 +41,11 @@
   </div>
 </header>
 <div class="body">
-  <div class="loading" *ngIf="isLoading">
+  <div class="loading" *ngIf="isLoading && !offline">
     <mat-spinner diameter="32"></mat-spinner>
   </div>
-  <form [formGroup]="userForm" *ngIf="!isLoading">
+  <app-offline *ngIf="offline"></app-offline>
+  <form [formGroup]="userForm" *ngIf="!isLoading && !offline">
     <section formGroupName="name" class="name">
       <mat-form-field>
         <mat-label>Vorname</mat-label>

@@ -9,9 +9,10 @@
     </div>
   </header>
   <div class="body">
-    <div class="loading" *ngIf="!classlist">
+    <div class="loading" *ngIf="!classlist && !offline">
       <mat-spinner diameter="32"></mat-spinner>
     </div>
+    <app-offline *ngIf="offline"></app-offline>
     <mat-action-list class="list">
       <button
         mat-list-item

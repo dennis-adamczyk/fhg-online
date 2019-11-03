@@ -54,4 +54,6 @@ export interface Homework {
   selectedCorrection?: object;
   reporter?: string[];
   blocked?: boolean;
+  unsynced?: boolean;
+  deleted?: boolean;
 }

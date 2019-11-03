@@ -25,9 +25,10 @@
     </div>
   </header>
   <div class="body">
-    <div class="loading" *ngIf="!request">
+    <div class="loading" *ngIf="!request && !offline">
       <mat-spinner diameter="32"></mat-spinner>
     </div>
+    <app-offline *ngIf="offline"></app-offline>
     <div class="request" *ngIf="request">
       <div class="field by">
         <p class="label">Von</p>

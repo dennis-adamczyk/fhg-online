@@ -69,9 +69,10 @@
     </ng-container>
 
     <div class="body">
-      <div class="loading" *ngIf="isLoadingResults">
+      <div class="loading" *ngIf="isLoadingResults && !offline">
         <mat-spinner diameter="32"></mat-spinner>
       </div>
+      <app-offline *ngIf="offline"></app-offline>
       <table
         mat-table
         [dataSource]="data"
@@ -79,6 +80,7 @@
         matSortActive="name"
         matSortDisableClear
         matSortDirection="asc"
+        *ngIf="!offline"
       >
         <!-- Checkbox Column -->
         <ng-container matColumnDef="select">

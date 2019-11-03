@@ -6,9 +6,10 @@
   </h1>
 </header>
 <div class="body">
-  <div class="loading" *ngIf="isLoading">
+  <div class="loading" *ngIf="isLoading && !offline">
     <mat-spinner diameter="32"></mat-spinner>
   </div>
+  <app-offline *ngIf="offline"></app-offline>
   <table
     mat-table
     [dataSource]="data"
@@ -16,6 +17,7 @@
     matSortActive="name"
     matSortDisableClear
     matSortDirection="asc"
+    *ngIf="!offline"
   >
     <!-- Name Column -->
     <ng-container matColumnDef="name">

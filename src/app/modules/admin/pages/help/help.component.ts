@@ -21,6 +21,8 @@ import { tap } from 'rxjs/operators';
 export class HelpArticlesComponent implements OnInit {
   articles: object[];
 
+  offline = false;
+
   constructor(
     private seo: SeoService,
     private route: ActivatedRoute,
@@ -71,7 +73,12 @@ export class HelpArticlesComponent implements OnInit {
       );
 
       this.db.doc$('help/--index--').subscribe((d: any) => {
+        if (!d && !this.helper.onLine) {
+          this.offline = true;
+          return;
+        }
         if (d && d.articles) {
+          this.offline = false;
           this.articles = d.articles.sort();
           this.snackBar.dismiss();
         }

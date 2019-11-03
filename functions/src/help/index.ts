@@ -1,13 +1,33 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as algoliasearch from 'algoliasearch';
+import * as nodemailer from 'nodemailer';
 
 const indexId = '--index--';
 
-const env = functions.config().algolia;
+const env = functions.config();
 
-const client = algoliasearch(env.appid, env.apikey);
+/* ===== ALGOLIA ===== */
+
+const client = algoliasearch(env.algolia.appid, env.algolia.apikey);
 const index = client.initIndex('help');
+
+/* ===== NODEMAILER ===== */
+
+const supportMail = 'team@fhg-online.de';
+
+const transport = nodemailer.createTransport({
+  host: 'mailserver.fhg-online.de',
+  port: 465,
+  secure: true,
+  auth: {
+    user: env.email.user,
+    pass: env.email.pass
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
 
 export const onCreateHelp = functions
   .runWith({
@@ -154,6 +174,56 @@ export const onCreateRequest = functions
         });
         batch.commit();
       });
+
+    let mailOptions: any = {
+      from: `${data.by.name.first_name} ${data.by.name.last_name} <${data.by.email}>`,
+      replyTo: data.by.email,
+      to: supportMail
+    };
+
+    if (data.type == 'bug') mailOptions.subject = 'Fehlermeldung';
+    if (data.type == 'feedback') mailOptions.subject = 'Feedback';
+    if (data.type == 'question') mailOptions.subject = 'Hilfe-Vorschlag';
+
+    mailOptions.subject += ' ◂ FHG Online';
+
+    mailOptions.text = `Gesendet: ${new Date().toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: 'numeric'
+    })}
+Von: ${data.by.name.first_name} ${data.by.name.last_name} <${data.by.email}>
+ID: ${data.by.id}
+Screenshots: ${data.screenshot.length}
+
+${data.message}
+
+Details: https://beta.fhg-online.de/admin/requests/${requestId}
+`;
+
+    mailOptions.html = `
+    <p><b>Gesendet:</b> ${new Date().toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: 'numeric'
+    })}<br/>
+    <b>Von:</b> <a href="https://beta.fhg-online.de/admin/users/${
+      data.by.id
+    }">${data.by.name.first_name} ${data.by.name.last_name}</a> &lt;${
+      data.by.email
+    }	&gt;<br/>
+    <b>Screenshots:</b> ${data.screenshot.length}</p>
+    <p style="white-space: pre-line;">${data.message.replace(
+      new RegExp('\r?\n', 'g'),
+      '<br />'
+    )}</p>
+    <p><a href="https://beta.fhg-online.de/admin/requests/${requestId}">Im Admin-Bereich ansehen</a></p>`;
+
+    transport.sendMail(mailOptions);
 
     return admin.firestore().runTransaction(t => {
       let indexRef = admin.firestore().doc(`requests/${indexId}`);
