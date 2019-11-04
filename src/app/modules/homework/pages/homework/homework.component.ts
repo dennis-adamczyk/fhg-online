@@ -228,6 +228,22 @@ export class HomeworkComponent implements OnInit {
     this.detailsChanges.push(
       this.db.docWithId$(homeworkRef).subscribe((homework: Homework) => {
         this.isLoading = false;
+
+        if (isPlatformBrowser(this.platformId)) {
+          let localHomework = JSON.parse(localStorage.getItem(homeworkKey)) as {
+            homework: Homework[];
+          };
+          let current = localHomework.homework.filter(
+            h => h.id == this.detailsId && !!h.personal == this.detailsPersonal
+          );
+          if (current.length == 1) {
+            if (current[0].unsynced == true && !current[0].deleted) {
+              homework = { ...homework, ...current[0] };
+              homework.course = homework.course.id as any;
+            }
+          }
+        }
+
         if (!homework || Object.keys(homework).length <= 1) {
           this.router.navigate(['/homework'], { replaceUrl: true });
           if (this.helper.onLine)

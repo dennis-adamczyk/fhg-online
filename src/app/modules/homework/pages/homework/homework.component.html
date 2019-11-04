@@ -36,7 +36,7 @@
               [class.corrected]="homework.isCorrected(item)"
               *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
-                item.unsynced
+                item.unsynced && item.deleted
                   ? undefined
                   : item.personal
                   ? 'p/' + item.id
@@ -154,7 +154,7 @@
                   detailsId !== item.id
                 "
                 [routerLink]="
-                  item.unsynced
+                  item.unsynced && item.deleted
                     ? undefined
                     : item.personal
                     ? 'p/' + item.id
@@ -266,7 +266,7 @@
               [class.corrected]="homework.isCorrected(item)"
               *ngIf="(isHandset$ | async) || (!details && !detailsAnimating)"
               [routerLink]="
-                item.unsynced
+                item.unsynced && item.deleted
                   ? undefined
                   : item.personal
                   ? 'p/' + item.id
@@ -420,7 +420,7 @@
                   detailsId !== item.id
                 "
                 [routerLink]="
-                  item.unsynced
+                  item.unsynced && item.deleted
                     ? undefined
                     : item.personal
                     ? 'p/' + item.id

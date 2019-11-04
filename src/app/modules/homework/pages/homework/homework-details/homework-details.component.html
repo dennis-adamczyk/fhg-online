@@ -10,6 +10,21 @@
       <mat-icon aria-label="Close homework icon">close</mat-icon>
     </button>
     <div class="actions">
+      <a
+        class="unsynced"
+        mat-icon-button
+        href="/help/uHbNn2XxMhdBM38UxoLn"
+        [matTooltip]="
+          helper.onLine
+            ? 'Daten werden hochgeladen'
+            : 'Daten nicht synchronisiert'
+        "
+        *ngIf="data.unsynced"
+      >
+        <mat-icon>{{
+          helper.onLine ? 'cloud_upload' : 'sync_disabled'
+        }}</mat-icon>
+      </a>
       <button
         type="button"
         class="share"

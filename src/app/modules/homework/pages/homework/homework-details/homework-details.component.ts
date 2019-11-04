@@ -188,9 +188,13 @@ export class HomeworkDetailsComponent implements OnInit {
             homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.data.id}`;
 
           this.db.delete(homeworkRef).then(() => {
-            this.snackBar.open('Hausaufgabe unwiderruflich gelöscht', null, {
-              duration: 4000
-            });
+            this.snackBar.open(
+              'Hausaufgabe wird unwiderruflich gelöscht',
+              null,
+              {
+                duration: 4000
+              }
+            );
           });
 
           let newHomework = JSON.parse(localStorage.getItem(homeworkKey))
@@ -463,9 +467,7 @@ export class HomeworkDetailsComponent implements OnInit {
       day: 'numeric',
       month: 'long'
     });
-    let date = formatter.format(
-      lesson.date instanceof Date ? lesson.date : lesson.date.toDate()
-    );
+    let date = formatter.format(this.helper.getDateOf(lesson.date));
     let period = `${lesson.lesson}. Stunde (${constant.times[lesson.lesson].start} - ${constant.times[lesson.lesson].end})`;
     return date + '\n' + period;
   }

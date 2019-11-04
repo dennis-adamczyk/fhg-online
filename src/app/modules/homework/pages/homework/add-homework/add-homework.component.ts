@@ -277,6 +277,11 @@ export class AddHomeworkComponent {
         if (share)
           newHomework.push({
             blocked: false,
+            by: {
+              id: this.auth.user.id,
+              name: this.auth.user.name,
+              roles: this.auth.user.roles
+            },
             corrected: [],
             course: {
               id: courseName,
@@ -284,6 +289,7 @@ export class AddHomeworkComponent {
               short: courseDetails.short,
               color: courseDetails.color
             },
+            details: details,
             entered: {
               date: firebase.firestore.Timestamp.fromDate(entered),
               lesson: this.getLesson(entered)
@@ -298,12 +304,18 @@ export class AddHomeworkComponent {
           });
         else
           newHomework.push({
+            by: {
+              id: this.auth.user.id,
+              name: this.auth.user.name,
+              roles: this.auth.user.roles
+            },
             course: {
               id: courseName,
               subject: courseDetails.subject,
               short: courseDetails.short,
               color: courseDetails.color
             },
+            details: details,
             entered: {
               date: firebase.firestore.Timestamp.fromDate(entered),
               lesson: this.getLesson(entered)

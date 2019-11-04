@@ -252,29 +252,34 @@ export class EditHomeworkComponent {
       else
         homeworkRef = `users/${this.auth.user.id}/personalHomework/${this.loadedData.id}`;
 
-      // let newHomework = JSON.parse(localStorage.getItem(homeworkKey))
-      //   .homework as Homework[];
-      // let current = newHomework.find(
-      //   h =>
-      //     h.id == this.loadedData.id && h.personal == this.loadedData.personal
-      // );
-      // current.title = title;
-      // current.details = details;
-      // current.unsynced = true;
-      // newHomework = newHomework.filter(h => h.id !== this.loadedData.id);
-      // localStorage.setItem(
-      //   homeworkKey,
-      //   JSON.stringify({
-      //     homework: newHomework,
-      //     updated: JSON.parse(localStorage.getItem(homeworkKey)).updated
-      //   })
-      // );
-      // this.homework.updateData(newHomework);
+      let newHomework = JSON.parse(localStorage.getItem(homeworkKey))
+        .homework as Homework[];
+      let current = newHomework.find(
+        h =>
+          h.id == this.loadedData.id && h.personal == this.loadedData.personal
+      );
+      current.title = title;
+      current.details = details;
+      current.by = this.loadedData.by;
+      current.unsynced = true;
+      newHomework = newHomework.filter(h => h.id !== this.loadedData.id);
+      localStorage.setItem(
+        homeworkKey,
+        JSON.stringify({
+          homework: newHomework,
+          updated: JSON.parse(localStorage.getItem(homeworkKey)).updated
+        })
+      );
+      this.homework.updateData(newHomework);
 
       return this.db.update(homeworkRef, data).then(() => {
-        this.snackBar.open('Änderungen an der Hausaufgabe gespeichert', null, {
-          duration: 4000
-        });
+        this.snackBar.open(
+          'Änderungen an der Hausaufgabe werden gespeichert',
+          null,
+          {
+            duration: 4000
+          }
+        );
       });
     };
 
@@ -325,7 +330,7 @@ export class EditHomeworkComponent {
           })
           .then(() => {
             this.snackBar.open(
-              'Bearbeitungsvorschlag zur Hausaufgabe bearbeitet',
+              'Bearbeitungsvorschlag der Hausaufgabe wird bearbeitet',
               null,
               { duration: 4000 }
             );
@@ -369,7 +374,7 @@ export class EditHomeworkComponent {
           })
           .then(() => {
             this.snackBar.open(
-              'Bearbeitungsvorschlag zur Hausaufgabe hinzugefügt',
+              'Bearbeitungsvorschlag wird zur Hausaufgabe hinzugefügt',
               null,
               { duration: 4000 }
             );
