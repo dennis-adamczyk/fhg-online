@@ -49,7 +49,7 @@ export const onChangeHomework = functions.firestore
     const newValue = change.after.data()! as Homework;
     const previousValue = change.before.data()! as Homework;
     const year = context.params.year;
-    const courseId = context.params.courseId as string;
+    const courseId = context.params.courseId! as string;
     const homeworkId = context.params.homeworkId as string;
 
     if (newValue) {
@@ -64,6 +64,15 @@ export const onChangeHomework = functions.firestore
       newDate.setMinutes(0);
       newDate.setSeconds(0);
       newDate.setMilliseconds(0);
+      return newDate;
+    };
+
+    let getMaxDate = (date: firebase.firestore.Timestamp): Date => {
+      let newDate = date.toDate();
+      newDate.setHours(23);
+      newDate.setMinutes(59);
+      newDate.setSeconds(59);
+      newDate.setMilliseconds(999);
       return newDate;
     };
 
@@ -90,7 +99,7 @@ export const onChangeHomework = functions.firestore
       let amount = newValue.reporter.length;
       const ratio = 0.25;
 
-      let clazz = courseId.match(/^(\d[^\-])/)[0];
+      let clazz = courseId.match(/^(\d[^\-])/)![0];
       if (clazz) {
         return admin
           .firestore()
@@ -130,6 +139,40 @@ export const onChangeHomework = functions.firestore
       newValue.until &&
       (getDate(newValue.entered.date).getTime() >= min.getTime() ||
         getDate(newValue.until.date).getTime() >= min.getTime());
+
+    if (!previousValue && addCurrent) {
+      let existingEntered = await admin
+        .firestore()
+        .collection(`years/${year}/courses/${courseId}/homework`)
+        .where('entered.date', '>=', getDate(newValue.entered.date))
+        .where('entered.date', '<=', getMaxDate(newValue.entered.date))
+        .where('entered.lesson', '==', newValue.entered.lesson)
+        .get();
+      let existingUntil = await admin
+        .firestore()
+        .collection(`years/${year}/courses/${courseId}/homework`)
+        .where('until.date', '>=', getDate(newValue.until.date))
+        .where('until.date', '<=', getMaxDate(newValue.until.date))
+        .where('until.lesson', '==', newValue.until.lesson)
+        .get();
+      if (
+        existingEntered.docs.length &&
+        existingUntil.docs.length &&
+        !(
+          existingEntered.docs.length == 1 &&
+          existingEntered.docs[0].id == change.after.id
+        ) &&
+        !(
+          existingUntil.docs.length == 1 &&
+          existingUntil.docs[0].id == change.after.id
+        ) &&
+        existingEntered.docs.filter(d =>
+          existingUntil.docs.map(m => m.id).includes(d.id)
+        ).length
+      ) {
+        return change.after.ref.delete();
+      }
+    }
 
     let indexRef = admin
       .firestore()
