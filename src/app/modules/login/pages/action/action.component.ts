@@ -169,6 +169,7 @@ export class ActionComponent implements OnInit {
   // FORM
 
   get email() {
+    if(!this.actionForm) return;
     return this.actionForm.get('email');
   }
 
