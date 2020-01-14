@@ -1,131 +1,149 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { AdminComponent } from './pages/admin/admin.component';
-import { ClassesComponent } from './pages/classes/classes.component';
-import { UsersComponent } from './pages/users/users.component';
-import { UserComponent } from './pages/users/user/user.component';
-import { ClassComponent } from './pages/classes/class/class.component';
-import { MembersComponent } from './pages/classes/class/members/members.component';
-import { AdminsComponent } from './pages/classes/class/admins/admins.component';
-import { AddUserComponent } from './pages/users/add-user/add-user.component';
-import { CoursesComponent } from './pages/classes/class/courses/courses.component';
-import { CourseComponent } from './pages/classes/course/course.component';
-import { AddCourseComponent } from './pages/classes/course/add-course/add-course.component';
-import { TimetableComponent } from './pages/classes/class/timetable/timetable.component';
-import { HelpArticlesComponent } from './pages/help/help.component';
-import { HelpArticleEditComponent } from './pages/help/article/article.component';
-import { PendingChangesGuard } from 'src/app/core/guards/pending-changes.guard';
-import { RequestsComponent } from './pages/requests/requests.component';
-import { RequestDetailsComponent } from './pages/requests/request-details/request-details.component';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { AdminComponent } from "./pages/admin/admin.component";
+import { ClassesComponent } from "./pages/classes/classes.component";
+import { UsersComponent } from "./pages/users/users.component";
+import { UserComponent } from "./pages/users/user/user.component";
+import { ClassComponent } from "./pages/classes/class/class.component";
+import { MembersComponent } from "./pages/classes/class/members/members.component";
+import { AdminsComponent } from "./pages/classes/class/admins/admins.component";
+import { AddUserComponent } from "./pages/users/add-user/add-user.component";
+import { CoursesComponent } from "./pages/classes/class/courses/courses.component";
+import { CourseComponent } from "./pages/classes/course/course.component";
+import { AddCourseComponent } from "./pages/classes/course/add-course/add-course.component";
+import { TimetableComponent } from "./pages/classes/class/timetable/timetable.component";
+import { HelpArticlesComponent } from "./pages/help/help.component";
+import { HelpArticleEditComponent } from "./pages/help/article/article.component";
+import { PendingChangesGuard } from "src/app/core/guards/pending-changes.guard";
+import { RequestsComponent } from "./pages/requests/requests.component";
+import { RequestDetailsComponent } from "./pages/requests/request-details/request-details.component";
+import { TeachersComponent } from "./pages/users/teachers/teachers.component";
+import { SubjectsComponent } from "./pages/subjects/subjects.component";
 
 const routes: Routes = [
   {
-    path: '',
+    path: "",
     component: AdminComponent,
     data: {
-      title: 'Administration'
+      title: "Administration"
     }
   },
   {
-    path: 'users',
+    path: "users/teachers",
+    component: TeachersComponent,
+    data: {
+      title: "Administration",
+      iconFunction: "back"
+    }
+  },
+  {
+    path: "users",
     component: UsersComponent,
     data: {
-      title: 'Administration',
-      iconFunction: 'back'
+      title: "Administration",
+      iconFunction: "back"
     },
     children: [
       {
-        path: 'add',
+        path: "add",
         component: AddUserComponent
       },
       {
-        path: ':uid',
+        path: ":uid",
         component: UserComponent
       }
     ]
   },
   {
-    path: 'classes',
+    path: "classes",
     component: ClassesComponent,
     data: {
-      title: 'Administration',
-      iconFunction: 'back'
+      title: "Administration",
+      iconFunction: "back"
     }
   },
   {
-    path: 'classes/:class',
+    path: "classes/:class",
     component: ClassComponent,
     data: {
-      title: 'Administration',
-      iconFunction: 'back'
+      title: "Administration",
+      iconFunction: "back"
     },
     children: [
       {
-        path: 'members',
+        path: "members",
         component: MembersComponent
       },
       {
-        path: 'admins',
+        path: "admins",
         component: AdminsComponent
       },
       {
-        path: 'courses',
+        path: "courses",
         component: CoursesComponent
       },
       {
-        path: 'timetable',
+        path: "timetable",
         component: TimetableComponent
       }
     ]
   },
   {
-    path: 'course',
+    path: "course",
     data: {
-      title: 'Administration',
-      iconFunction: 'back'
+      title: "Administration",
+      iconFunction: "back"
     },
     children: [
       {
-        path: 'add',
+        path: "add",
         component: AddCourseComponent
       },
       {
-        path: ':course',
+        path: ":course",
         component: CourseComponent
       }
     ]
   },
   {
-    path: 'help',
-    component: HelpArticlesComponent,
+    path: "subjects",
+    component: SubjectsComponent,
     data: {
-      title: 'Administration',
-      iconFunction: 'back'
+      title: "Administration",
+      iconFunction: "back"
     }
   },
   {
-    path: 'help/:article',
+    path: "help",
+    component: HelpArticlesComponent,
+    data: {
+      title: "Administration",
+      iconFunction: "back"
+    }
+  },
+  {
+    path: "help/:article",
     component: HelpArticleEditComponent,
     data: {
-      title: 'Administration',
-      iconFunction: 'back'
+      title: "Administration",
+      iconFunction: "back"
     },
     canDeactivate: [PendingChangesGuard]
   },
   {
-    path: 'requests',
+    path: "requests",
     component: RequestsComponent,
     data: {
-      title: 'Administration',
-      iconFunction: 'back'
+      title: "Administration",
+      iconFunction: "back"
     }
   },
   {
-    path: 'requests/:requestId',
+    path: "requests/:requestId",
     component: RequestDetailsComponent,
     data: {
-      title: 'Administration',
-      iconFunction: 'back'
+      title: "Administration",
+      iconFunction: "back"
     }
   }
 ];

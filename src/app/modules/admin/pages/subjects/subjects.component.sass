@@ -10,7 +10,7 @@
     z-index: -1
     +mat-elevation(2)
 
-.users
+.subjects
     margin: 8px
     padding: 0
     height: auto
@@ -100,22 +100,20 @@
             align-items: center
             justify-content: center
 
-        table
-            width: 100%
+        .list
+            padding: 8px 0
 
-            tr.mat-row
-                transition: background 150ms $ease-in-out-curve-function
-                cursor: pointer
-
-                &:hover
-                    background-color: mat-color($background-light, hover)
-
-                td.mat-column-select
-                    width: 32px
+            .item
+                .view
+                    display: flex
+                    justify-content: space-between
+                    align-items: center
+                    padding: 4px 16px
+                    min-height: 56px
 
     
 @media not all and ($mat-xsmall)
-    .users
+    .subjects
         margin: 0 auto 24px auto
         width: 576px
 
@@ -123,8 +121,3 @@
             padding: 0 24px
             border-bottom: 1px solid mat-color($foreground-light, divider)
 
-        .body
-            table
-                tr.mat-row
-                    td.mat-column-select
-                        width: auto

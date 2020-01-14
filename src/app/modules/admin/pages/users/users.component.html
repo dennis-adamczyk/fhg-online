@@ -3,7 +3,19 @@
   <ng-container *ngIf="!sub">
     <ng-container *ngIf="!search && !selection.hasValue()">
       <header>
-        <h1>Benutzer</h1>
+        <mat-select
+          class="title"
+          value="users"
+          (selectionChange)="modeChange($event)"
+        >
+          <mat-option value="users">
+            Benutzer
+          </mat-option>
+          <mat-option value="teachers">
+            Lehrer
+          </mat-option>
+        </mat-select>
+
         <div class="actions">
           <button
             mat-icon-button
@@ -48,8 +60,8 @@
         <p>
           {{
             selection.selected.length > 1
-              ? selection.selected.length + ' Elemente'
-              : selection.selected.length + ' Element'
+              ? selection.selected.length + " Elemente"
+              : selection.selected.length + " Element"
           }}
           ausgewählt
         </p>

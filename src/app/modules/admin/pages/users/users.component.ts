@@ -5,25 +5,25 @@ import {
   Inject,
   PLATFORM_ID,
   ViewChild
-} from '@angular/core';
-import { isPlatformBrowser, Location } from '@angular/common';
+} from "@angular/core";
+import { isPlatformBrowser, Location } from "@angular/common";
 import {
   MatSort,
   MatTableDataSource,
   MatPaginator,
   MatDialog
-} from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
-import { AngularFireFunctions } from '@angular/fire/functions';
-import { AcceptCancelDialog } from 'src/app/core/dialogs/accept-cancel/accept-cancel.component';
-import { take, filter } from 'rxjs/operators';
-import { NavigationEnd, Router, ActivatedRoute } from '@angular/router';
-import { UserComponent } from './user/user.component';
-import { message } from 'src/configs/messages';
-import { userInfo } from 'os';
-import { registerUser } from 'functions/src';
-import { SeoService } from 'src/app/core/services/seo.service';
-import { HelperService } from 'src/app/core/services/helper.service';
+} from "@angular/material";
+import { SelectionModel } from "@angular/cdk/collections";
+import { AngularFireFunctions } from "@angular/fire/functions";
+import { AcceptCancelDialog } from "src/app/core/dialogs/accept-cancel/accept-cancel.component";
+import { take, filter } from "rxjs/operators";
+import { NavigationEnd, Router, ActivatedRoute } from "@angular/router";
+import { UserComponent } from "./user/user.component";
+import { message } from "src/configs/messages";
+import { userInfo } from "os";
+import { registerUser } from "functions/src";
+import { SeoService } from "src/app/core/services/seo.service";
+import { HelperService } from "src/app/core/services/helper.service";
 
 export interface UserElement {
   uid: string;
@@ -33,14 +33,14 @@ export interface UserElement {
 }
 
 @Component({
-  selector: 'app-users',
-  templateUrl: './users.component.html',
-  styleUrls: ['./users.component.sass']
+  selector: "app-users",
+  templateUrl: "./users.component.html",
+  styleUrls: ["./users.component.sass"]
 })
 export class UsersComponent implements OnInit {
   sub: boolean = !!this.route.children.length;
 
-  displayedColumns: string[] = ['select', 'name', 'role', 'last_login'];
+  displayedColumns: string[] = ["select", "name", "role", "last_login"];
   data = new MatTableDataSource<UserElement>([]);
   selection = new SelectionModel<UserElement>(true, []);
   @ViewChild(MatSort, { static: false }) sort!: MatSort;
@@ -52,7 +52,7 @@ export class UsersComponent implements OnInit {
 
   offline = false;
 
-  private storageKey = 'admin_users';
+  private storageKey = "admin_users";
 
   constructor(
     private helper: HelperService,
@@ -65,13 +65,13 @@ export class UsersComponent implements OnInit {
     private location: Location,
     @Inject(PLATFORM_ID) private platformId: string
   ) {
-    let title = this.route.snapshot.data['title'];
+    let title = this.route.snapshot.data["title"];
     this.seo.generateTags({
       title: title,
       description:
-        'Passe Benutzer an und sanktioniere sie, damit für niemand gegen die Nutzungsbedingungen verstößt.',
-      keywords: 'Administration, Benutzer, Schulplaner, FHG Online, FHG',
-      robots: 'noindex, nofollow'
+        "Passe Benutzer an und sanktioniere sie, damit für niemand gegen die Nutzungsbedingungen verstößt.",
+      keywords: "Administration, Benutzer, Schulplaner, FHG Online, FHG",
+      robots: "noindex, nofollow"
     });
   }
 
@@ -95,31 +95,31 @@ export class UsersComponent implements OnInit {
             this.data.sort = this.sort;
             this.data.paginator = this.paginator;
 
-            if (this.route.snapshot.queryParamMap.get('refresh')) {
+            if (this.route.snapshot.queryParamMap.get("refresh")) {
               this.refreshData(true);
-              this.location.replaceState('/admin/users');
+              this.location.replaceState("/admin/users");
             }
           }, 0);
         }
       });
     if (isPlatformBrowser(this.platformId)) {
-      this.toolbar = document.querySelector('.main-toolbar');
-      this.sidenavContent = document.querySelector('mat-sidenav-content');
-      this.toolbarExtention = document.querySelector('.toolbar-extention');
+      this.toolbar = document.querySelector(".main-toolbar");
+      this.sidenavContent = document.querySelector("mat-sidenav-content");
+      this.toolbarExtention = document.querySelector(".toolbar-extention");
       let scrollHandler = () => {
         if (
           this.sidenavContent.scrollTop >
           this.toolbarExtention.clientHeight - this.toolbar.clientHeight
         ) {
-          this.renderer.removeStyle(this.toolbar, 'box-shadow');
+          this.renderer.removeStyle(this.toolbar, "box-shadow");
         } else {
-          this.renderer.setStyle(this.toolbar, 'box-shadow', 'none');
+          this.renderer.setStyle(this.toolbar, "box-shadow", "none");
         }
       };
       scrollHandler();
       this.scrollListener = this.renderer.listen(
         this.sidenavContent,
-        'scroll',
+        "scroll",
         event => scrollHandler()
       );
     }
@@ -128,8 +128,15 @@ export class UsersComponent implements OnInit {
   ngOnDestroy() {
     if (isPlatformBrowser(this.platformId)) {
       if (this.scrollListener) this.scrollListener();
-      this.renderer.removeStyle(this.toolbar, 'box-shadow');
+      this.renderer.removeStyle(this.toolbar, "box-shadow");
     }
+  }
+
+  /* ##### TRIGGERS ##### */
+
+  modeChange(event) {
+    if (event.value != "teachers") return;
+    this.router.navigate(["/admin/users/teachers"]);
   }
 
   /* ##### LOAD DATA ##### */
@@ -141,7 +148,7 @@ export class UsersComponent implements OnInit {
   }
 
   prepareView() {
-    this.paginator._intl.itemsPerPageLabel = 'Pro Seite:';
+    this.paginator._intl.itemsPerPageLabel = "Pro Seite:";
     this.paginator._intl.getRangeLabel = (page, pageSize, length) => {
       if (length == 0 || pageSize == 0) {
         return `0 von ${length}`;
@@ -176,8 +183,8 @@ export class UsersComponent implements OnInit {
         this.data.paginator = this.paginator;
         this.data.sortingDataAccessor = (item, property) => {
           switch (property) {
-            case 'last_login':
-              let parts = item.last_login.split('.');
+            case "last_login":
+              let parts = item.last_login.split(".");
               return new Date(
                 parseInt(parts[2]),
                 parseInt(parts[1]) - 1,
@@ -206,14 +213,14 @@ export class UsersComponent implements OnInit {
   deleteUser() {
     if (this.selection.selected.length > 1) {
       const selected = this.selection.selected;
-      let names = selected.map(d => d.name).join('\n');
+      let names = selected.map(d => d.name).join("\n");
       let uids = selected.map(d => d.uid);
       this.dialog
         .open(AcceptCancelDialog, {
           data: {
-            title: 'Konto löschen?',
+            title: "Konto löschen?",
             content: `Die Konten werden unwiderruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.\n\nBetroffen sind folgende Konten:\n<b>${names}</b>`,
-            accept: 'Unwiederruflich löschen',
+            accept: "Unwiederruflich löschen",
             defaultCancel: true
           }
         })
@@ -223,7 +230,7 @@ export class UsersComponent implements OnInit {
           if (result) {
             this.isLoadingResults = true;
             let deleteUsers = this.afFunc.functions.httpsCallable(
-              'deleteUsers'
+              "deleteUsers"
             );
             deleteUsers({ uids: uids }).then(() => {
               let newData = this.data.data;
@@ -237,8 +244,8 @@ export class UsersComponent implements OnInit {
               this.data.paginator = this.paginator;
               this.data.sortingDataAccessor = (item, property) => {
                 switch (property) {
-                  case 'last_login':
-                    let parts = item.last_login.split('.');
+                  case "last_login":
+                    let parts = item.last_login.split(".");
                     return new Date(
                       parseInt(parts[2]),
                       parseInt(parts[1]) - 1,
@@ -258,9 +265,9 @@ export class UsersComponent implements OnInit {
       this.dialog
         .open(AcceptCancelDialog, {
           data: {
-            title: 'Konto löschen?',
+            title: "Konto löschen?",
             content: `Das Konto von <b>${selected.name}</b> wird unwiderruflich gelöscht, sodass die Daten nicht mehr wiederhergestellt werden können.`,
-            accept: 'Unwiederruflich löschen',
+            accept: "Unwiederruflich löschen",
             defaultCancel: true
           }
         })
@@ -269,7 +276,7 @@ export class UsersComponent implements OnInit {
         .subscribe(result => {
           if (result) {
             this.isLoadingResults = true;
-            let deleteUser = this.afFunc.functions.httpsCallable('deleteUser');
+            let deleteUser = this.afFunc.functions.httpsCallable("deleteUser");
             deleteUser({ uid: selected.uid }).then(() => {
               this.isLoadingResults = false;
               let newData = this.data.data;
@@ -280,8 +287,8 @@ export class UsersComponent implements OnInit {
               this.data.paginator = this.paginator;
               this.data.sortingDataAccessor = (item, property) => {
                 switch (property) {
-                  case 'last_login':
-                    let parts = item.last_login.split('.');
+                  case "last_login":
+                    let parts = item.last_login.split(".");
                     return new Date(
                       parseInt(parts[2]),
                       parseInt(parts[1]) - 1,
@@ -310,7 +317,7 @@ export class UsersComponent implements OnInit {
         }
       }
     }
-    let getUsers = this.afFunc.functions.httpsCallable('getUsers');
+    let getUsers = this.afFunc.functions.httpsCallable("getUsers");
     return getUsers({})
       .then(result => {
         if (!result && !this.helper.onLine) {

@@ -1,0 +1,146 @@
+<div class="toolbar-extention"></div>
+<div class="teachers">
+  <ng-container *ngIf="!search">
+    <header>
+      <mat-select
+        class="title"
+        value="teachers"
+        (selectionChange)="modeChange($event)"
+      >
+        <mat-option value="teachers">
+          Lehrer
+        </mat-option>
+        <mat-option value="users">
+          Benutzer
+        </mat-option>
+      </mat-select>
+
+      <div class="actions">
+        <button
+          mat-icon-button
+          (click)="downloadTeacherList()"
+          matTooltip="Lehrerliste abgleichen"
+        >
+          <mat-icon>sync</mat-icon>
+        </button>
+        <button mat-icon-button (click)="search = true" matTooltip="Suchen">
+          <mat-icon>search</mat-icon>
+        </button>
+        <a mat-icon-button matTooltip="Hinzufügen" routerLink="add">
+          <mat-icon>add</mat-icon>
+        </a>
+      </div>
+    </header>
+  </ng-container>
+  <ng-container *ngIf="search">
+    <header class="search">
+      <mat-icon class="prefix">search</mat-icon>
+      <input
+        matInput
+        type="text"
+        class="field"
+        (keyup)="applyFilter($event.target.value)"
+        (keydown.esc)="search = false; applyFilter('')"
+        autocomplete="off"
+        autofocus
+        placeholder="Lehrer suchen"
+      />
+      <button
+        mat-icon-button
+        class="close"
+        (click)="search = false; applyFilter('')"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+  </ng-container>
+  <ng-container *ngIf="false">
+    <header class="selected" [class.multiple]="selection.selected.length > 1">
+      <p>
+        {{
+          selection.selected.length > 1
+            ? selection.selected.length + " Elemente"
+            : selection.selected.length + " Element"
+        }}
+        ausgewählt
+      </p>
+      <div class="actions">
+        <button mat-icon-button (click)="deleteUser()">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </header>
+  </ng-container>
+
+  <div class="body">
+    <div class="loading" *ngIf="isLoading && !offline">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <app-offline *ngIf="offline"></app-offline>
+
+    <div class="list">
+      <div class="item" *ngFor="let teacher of teacherList">
+        <div class="header">
+          <button mat-icon-button class="drop-down">
+            <mat-icon>arrow_drop_down</mat-icon>
+          </button>
+          <div class="text">
+            <h3 class="name">
+              {{ teacher.name.title }} {{ teacher.name.last_name }}
+            </h3>
+            <p class="subjects">Deutsch, Pädagogik, Ev. Religion</p>
+          </div>
+          <mat-icon class="status">verified_user</mat-icon>
+        </div>
+        <div class="content">
+          <form
+            [formGroup]="getTeacherForm(teacher.uid)"
+            *ngIf="getTeacherForm(teacher.uid) as form"
+          >
+            <section formGroupName="name" class="name">
+              <mat-form-field>
+                <mat-label>Anrede</mat-label>
+                <mat-select formControlName="title">
+                  <mat-option *ngFor="let title of titles" [value]="title">{{
+                    title
+                  }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="form.get('name').get('title').invalid">{{
+                  getErrorMessage("title", form.get("name").get("title"))
+                }}</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Vorname</mat-label>
+                <input matInput formControlName="first_name" />
+                <mat-error *ngIf="form.get('name').get('first_name').invalid">{{
+                  getErrorMessage(
+                    "first_name",
+                    form.get("name").get("first_name")
+                  )
+                }}</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Nachname</mat-label>
+                <input matInput formControlName="last_name" />
+                <mat-error *ngIf="form.get('name').get('last_name').invalid">{{
+                  getErrorMessage(
+                    "last_name",
+                    form.get("name").get("last_name")
+                  )
+                }}</mat-error>
+              </mat-form-field>
+            </section>
+            <mat-form-field>
+              <mat-label>E-Mail</mat-label>
+              <input matInput formControlName="email" />
+              <p matSuffix>{{ constant.displayedEmailSuffix }}</p>
+              <mat-error *ngIf="form.get('email').invalid">{{
+                getErrorMessage("email", form.get("email"))
+              }}</mat-error>
+            </mat-form-field>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

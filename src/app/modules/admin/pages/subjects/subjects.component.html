@@ -1,0 +1,146 @@
+<div class="toolbar-extention"></div>
+<div class="subjects">
+  <ng-container *ngIf="!search">
+    <header>
+      <h1 class="title">Fächer</h1>
+      <div class="actions">
+        <button mat-icon-button (click)="search = true" matTooltip="Suchen">
+          <mat-icon>search</mat-icon>
+        </button>
+        <a mat-icon-button matTooltip="Hinzufügen" routerLink="add">
+          <mat-icon>add</mat-icon>
+        </a>
+      </div>
+    </header>
+  </ng-container>
+  <ng-container *ngIf="search">
+    <header class="search">
+      <mat-icon class="prefix">search</mat-icon>
+      <input
+        matInput
+        type="text"
+        class="field"
+        (keyup)="applyFilter($event.target.value)"
+        (keydown.esc)="search = false; applyFilter('')"
+        autocomplete="off"
+        autofocus
+        placeholder="Fach suchen"
+      />
+      <button
+        mat-icon-button
+        class="close"
+        (click)="search = false; applyFilter('')"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+  </ng-container>
+  <ng-container *ngIf="false">
+    <header class="selected" [class.multiple]="selection.selected.length > 1">
+      <p>
+        {{
+          selection.selected.length > 1
+            ? selection.selected.length + " Elemente"
+            : selection.selected.length + " Element"
+        }}
+        ausgewählt
+      </p>
+      <div class="actions">
+        <button mat-icon-button (click)="deleteElement()">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </header>
+  </ng-container>
+
+  <div class="body">
+    <div class="loading" *ngIf="isLoading && !offline">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+    <app-offline *ngIf="offline"></app-offline>
+
+    <div class="list">
+      <div class="item" *ngFor="let subject of subjects">
+        <div class="view" *ngIf="true">
+          <div
+            class="icon"
+            [style.background-color]="helper.getColor(subject.color)"
+          >
+            <p [style.color]="helper.getContrastColor(subject.color)">
+              {{ subject.name.short }}
+            </p>
+          </div>
+          <div class="text">
+            <h3 class="title">{{ subject.name.long }}</h3>
+            <p class="aliases">{{ subject.aliases }}</p>
+          </div>
+          <button mat-icon-button>
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <div class="edit" *ngIf="true">
+          <form
+            [formGroup]="getTeacherForm(teacher.uid)"
+            *ngIf="getTeacherForm(teacher.uid) as form"
+          >
+            <div
+              class="color"
+              [style.background-color]="helper.getColor(subject.color)"
+            >
+              <mat-icon [style.color]="helper.getContrastColor(subject.color)">
+                edit
+              </mat-icon>
+            </div>
+            <div class="text">
+              <section formGroupName="name" class="name">
+                <mat-form-field>
+                  <mat-label>Kurz</mat-label>
+                  <input matInput formControlName="short" />
+                  <mat-error *ngIf="form.get('name').get('short').invalid">{{
+                    getErrorMessage("short", form.get("name").get("short"))
+                  }}</mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Normal</mat-label>
+                  <input matInput formControlName="normal" />
+                  <mat-error *ngIf="form.get('name').get('normal').invalid">{{
+                    getErrorMessage("normal", form.get("name").get("normal"))
+                  }}</mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Lang</mat-label>
+                  <input matInput formControlName="long" />
+                  <mat-error *ngIf="form.get('name').get('long').invalid">{{
+                    getErrorMessage("long", form.get("name").get("long"))
+                  }}</mat-error>
+                </mat-form-field>
+              </section>
+              <mat-form-field class="aliases">
+                <mat-chip-list #chipList aria-label="Alternativnamen">
+                  <mat-chip
+                    *ngFor="let fruit of fruits"
+                    selectable="false"
+                    removable="true"
+                    (removed)="remove(fruit)"
+                  >
+                    {{ fruit.name }}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+                  <input
+                    placeholder="Alternativnamen"
+                    [matChipInputFor]="chipList"
+                    matChipInputAddOnBlur="true"
+                    (matChipInputTokenEnd)="add($event)"
+                  />
+                </mat-chip-list>
+              </mat-form-field>
+            </div>
+            <button mat-icon-button>
+              <mat-icon>save</mat-icon>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
