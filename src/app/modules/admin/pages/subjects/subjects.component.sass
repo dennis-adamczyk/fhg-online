@@ -1,5 +1,7 @@
 @import ../../../../../var
 
+$red: #F44336
+
 .toolbar-extention
     position: absolute
     left: 0
@@ -104,12 +106,142 @@
             padding: 8px 0
 
             .item
-                .view
+                border-bottom: 1px solid rgba(mat-color($foreground-light, divider), .08)
+
+                &:last-child
+                    border-bottom: none
+
+                .view, .edit
                     display: flex
                     justify-content: space-between
                     align-items: center
                     padding: 4px 16px
                     min-height: 56px
+
+                    .text
+                        flex-grow: 1
+                        display: flex
+                        flex-flow: column
+                        align-items: flex-start
+                        justify-content: center
+
+                        h3
+                            font-size: 16px
+                            font-weight: 500
+                            margin: 0
+
+                        p
+                            font-size: 14px
+                            font-weight: 400
+                            color: rgba(mat-color($foreground-light, text), .54)
+                            margin: 0
+
+                    .icon
+                        flex-shrink: 1
+                        display: flex
+                        justify-content: center
+                        align-items: center
+                        margin: 0 16px 0 0
+                        padding: 0
+                        width: 40px
+                        min-width: 40px
+                        height: 40px
+                        background-color: mat-color($primary-light)
+                        border-radius: 50%
+
+                        p
+                            margin: 0
+                            padding: 0
+                            font-size: 16px
+                            font-weight: 400
+                            text-align: center
+                            color: mat-color($foreground-dark, text)
+
+                    .action
+                        color: mat-color($foreground-light, icon)
+
+                .edit
+                    .color-container
+                        position: relative
+
+                        &.invalid
+                            &::before
+                                content: ''
+                                display: block
+                                position: absolute
+                                top: 0
+                                left: 0
+                                padding: 0
+                                width: 40px
+                                height: 40px
+                                background-color: $red
+                                border-radius: 50%
+                                z-index: 0
+                                animation: invalid 1.8s ease-out infinite
+
+                                @keyframes invalid
+                                    0%
+                                        opacity: 1
+                                        transform: scale(1)
+
+                                    60%
+                                        transform: scale(1.4)
+
+                                    100%
+                                        opacity: 0
+                                        transform: scale(1)
+
+                    .color
+                        position: relative
+                        flex-shrink: 1
+                        display: flex
+                        justify-content: center
+                        align-items: center
+                        margin: 0 16px 0 0
+                        padding: 0
+                        width: 40px
+                        min-width: 40px
+                        height: 40px
+                        background-color: mat-color($primary-light)
+                        border-radius: 50%
+                        cursor: pointer
+                        z-index: 1
+                        +mat-elevation(2)
+
+                        mat-icon
+                            font-size: 20px
+                            width: 20px
+                            height: 20px
+                            text-align: center
+                            color: mat-color($foreground-dark, text)
+
+                    .text
+                        max-width: calc(100% - 112px)
+
+                        h3
+                            margin: 8px 0 8px 0
+                            font-size: 14px
+                            font-weight: 500
+                            color: mat-color($foreground-light, text)
+
+                        section
+                            flex-grow: 1
+                            display: flex
+                            flex-flow: column
+                            align-items: stretch
+                            justify-content: center
+                            width: 100%
+
+                        mat-form-field
+                            width: 100%
+
+                    .actions
+                        display: flex
+                        flex-direction: column
+                        margin: 0 0 0 16px
+
+                        .action:first-child
+                            margin: 0 0 4px 0
 
     
 @media not all and ($mat-xsmall)
@@ -120,4 +252,25 @@
         header
             padding: 0 24px
             border-bottom: 1px solid mat-color($foreground-light, divider)
+
+        .body
+            .list
+                .item
+                    .edit
+                        .text
+                            section
+                                flex-flow: row
+                                justify-content: space-between
+                                align-items: center
+
+                                mat-form-field
+                                    width: calc((100% - 16px)*0.35)
+                                    margin: 0 8px 0 0
+
+                                    &:first-child
+                                        width: calc((100% - 16px)*0.2)
+
+                                    &:last-child
+                                        width: calc((100% - 16px)*0.45)
+                                        margin: 0
 

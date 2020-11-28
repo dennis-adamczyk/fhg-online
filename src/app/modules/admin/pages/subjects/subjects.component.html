@@ -7,7 +7,7 @@
         <button mat-icon-button (click)="search = true" matTooltip="Suchen">
           <mat-icon>search</mat-icon>
         </button>
-        <a mat-icon-button matTooltip="Hinzufügen" routerLink="add">
+        <a mat-icon-button matTooltip="Hinzufügen" (click)="addSubject()">
           <mat-icon>add</mat-icon>
         </a>
       </div>
@@ -40,8 +40,8 @@
       <p>
         {{
           selection.selected.length > 1
-            ? selection.selected.length + " Elemente"
-            : selection.selected.length + " Element"
+            ? selection.selected.length + ' Elemente'
+            : selection.selected.length + ' Element'
         }}
         ausgewählt
       </p>
@@ -61,85 +61,144 @@
 
     <div class="list">
       <div class="item" *ngFor="let subject of subjects">
-        <div class="view" *ngIf="true">
+        <div class="view" *ngIf="!subject.editing">
           <div
             class="icon"
-            [style.background-color]="helper.getColor(subject.color)"
+            [style.background-color]="helper.getColor(subject.data.color)"
           >
-            <p [style.color]="helper.getContrastColor(subject.color)">
-              {{ subject.name.short }}
+            <p [style.color]="helper.getContrastColor(subject.data.color)">
+              {{ subject.data.name.short }}
             </p>
           </div>
           <div class="text">
-            <h3 class="title">{{ subject.name.long }}</h3>
-            <p class="aliases">{{ subject.aliases }}</p>
+            <h3 class="title">{{ subject.data.name.long }}</h3>
+            <p class="aliases">
+              {{ helper.getStringOfArray(subject.data.aliases) }}
+            </p>
           </div>
-          <button mat-icon-button>
+          <button
+            mat-icon-button
+            class="action"
+            (click)="subject.editing = true"
+            matTooltip="Bearbeiten"
+          >
             <mat-icon>edit</mat-icon>
           </button>
         </div>
-        <div class="edit" *ngIf="true">
-          <form
-            [formGroup]="getTeacherForm(teacher.uid)"
-            *ngIf="getTeacherForm(teacher.uid) as form"
+        <form class="edit" [formGroup]="subject.form" *ngIf="subject.editing">
+          <div
+            class="color-container"
+            [class.invalid]="
+              subject.form.get('color').invalid &&
+              (subject.form.pending || subject.form.get('color').touched)
+            "
           >
             <div
               class="color"
-              [style.background-color]="helper.getColor(subject.color)"
+              [style.background-color]="
+                helper.getColor(subject.form.get('color').value)
+              "
+              (click)="changeColor(subject)"
             >
-              <mat-icon [style.color]="helper.getContrastColor(subject.color)">
+              <mat-icon
+                [style.color]="
+                  helper.getContrastColor(subject.form.get('color').value)
+                "
+              >
                 edit
               </mat-icon>
             </div>
-            <div class="text">
-              <section formGroupName="name" class="name">
-                <mat-form-field>
-                  <mat-label>Kurz</mat-label>
-                  <input matInput formControlName="short" />
-                  <mat-error *ngIf="form.get('name').get('short').invalid">{{
-                    getErrorMessage("short", form.get("name").get("short"))
-                  }}</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label>Normal</mat-label>
-                  <input matInput formControlName="normal" />
-                  <mat-error *ngIf="form.get('name').get('normal').invalid">{{
-                    getErrorMessage("normal", form.get("name").get("normal"))
-                  }}</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                  <mat-label>Lang</mat-label>
-                  <input matInput formControlName="long" />
-                  <mat-error *ngIf="form.get('name').get('long').invalid">{{
-                    getErrorMessage("long", form.get("name").get("long"))
-                  }}</mat-error>
-                </mat-form-field>
-              </section>
-              <mat-form-field class="aliases">
-                <mat-chip-list #chipList aria-label="Alternativnamen">
-                  <mat-chip
-                    *ngFor="let fruit of fruits"
-                    selectable="false"
-                    removable="true"
-                    (removed)="remove(fruit)"
-                  >
-                    {{ fruit.name }}
-                    <mat-icon matChipRemove>cancel</mat-icon>
-                  </mat-chip>
-                  <input
-                    placeholder="Alternativnamen"
-                    [matChipInputFor]="chipList"
-                    matChipInputAddOnBlur="true"
-                    (matChipInputTokenEnd)="add($event)"
-                  />
-                </mat-chip-list>
+          </div>
+          <div class="text">
+            <h3>Fachname</h3>
+            <section formGroupName="name" class="name">
+              <mat-form-field>
+                <mat-label>Kürzel</mat-label>
+                <input matInput formControlName="short" />
+                <mat-error
+                  *ngIf="subject.form.get('name').get('short').invalid"
+                  >{{
+                    getErrorMessage(
+                      'short',
+                      subject.form.get('name').get('short')
+                    )
+                  }}</mat-error
+                >
               </mat-form-field>
-            </div>
-            <button mat-icon-button>
+              <mat-form-field>
+                <mat-label>Normal</mat-label>
+                <input matInput formControlName="normal" />
+                <mat-error
+                  *ngIf="subject.form.get('name').get('normal').invalid"
+                  >{{
+                    getErrorMessage(
+                      'normal',
+                      subject.form.get('name').get('normal')
+                    )
+                  }}</mat-error
+                >
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Lang</mat-label>
+                <input matInput formControlName="long" />
+                <mat-error
+                  *ngIf="subject.form.get('name').get('long').invalid"
+                  >{{
+                    getErrorMessage(
+                      'long',
+                      subject.form.get('name').get('long')
+                    )
+                  }}</mat-error
+                >
+              </mat-form-field>
+            </section>
+            <mat-form-field class="aliases">
+              <mat-chip-list #chipList aria-label="Alternativnamen">
+                <mat-chip
+                  *ngFor="let alias of subject.form.get('aliases').value"
+                  removable="true"
+                  (removed)="removeAlias(alias, subject)"
+                >
+                  {{ alias }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+                <input
+                  matInput
+                  placeholder="Alternativnamen"
+                  [matChipInputFor]="chipList"
+                  matChipInputAddOnBlur="true"
+                  (matChipInputTokenEnd)="addAlias($event, subject)"
+                />
+              </mat-chip-list>
+            </mat-form-field>
+          </div>
+          <div class="actions">
+            <button
+              mat-icon-button
+              class="action"
+              (click)="onUndo(subject)"
+              matTooltip="Änderungen verwerfen"
+            >
+              <mat-icon>undo</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              class="action"
+              (click)="onDelete(subject)"
+              matTooltip="Löschen"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              class="action"
+              (click)="onSave(subject)"
+              matTooltip="Speichern"
+            >
               <mat-icon>save</mat-icon>
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>

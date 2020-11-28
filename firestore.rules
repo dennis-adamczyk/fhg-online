@@ -161,5 +161,10 @@ service cloud.firestore {
       allow read;
       allow write: if isGuard();
     }
+
+    match /config/{configName} {
+      allow read;
+      allow write: if isGuard();
+    }
   }
 } 

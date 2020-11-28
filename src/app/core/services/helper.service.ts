@@ -321,4 +321,15 @@ export class HelperService {
     data = JSON.stringify(data);
     return new Blob([data]).size;
   }
+
+  /**
+   * Returns the array as string sperated by a comma (or given seperator)
+   *
+   * @param array
+   */
+  getStringOfArray(array: string[], separator?: string) {
+    let output = '';
+    array.forEach(el => (output += el + (separator || ',') + ' '));
+    return output.substr(0, output.length - 2);
+  }
 }

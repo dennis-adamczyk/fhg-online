@@ -36,7 +36,9 @@ export class NavigationComponent {
       map(result => result.matches),
       startWith(
         isPlatformBrowser(this.platformId)
-          ? window.matchMedia('(max-width: 599px)').matches
+          ? window.matchMedia(
+              '(max-width: 599px) and (orientation: portrait), (max-width: 959px) and (orientation: landscape)'
+            ).matches
           : true
       )
     );
